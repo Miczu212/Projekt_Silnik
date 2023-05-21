@@ -5,9 +5,7 @@ class okno
 {
 public:
 	okno(int szerokosc, int wysokosc, const char* nazwa);
-	~okno();
-	static std::optional<int> ProcessMessages();
-	
+	~okno();	
 private:
 	static LRESULT CALLBACK HandleMsgThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept;
 	static LRESULT CALLBACK HandleMsgSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept;
