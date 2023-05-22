@@ -128,10 +128,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Error.cpp" />
     <ClCompile Include="okno.cpp" />
     <ClCompile Include="testdirectx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Error.h" />
     <ClInclude Include="okno.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
