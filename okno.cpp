@@ -1,10 +1,10 @@
 #include "okno.h"
 okno::okno(int szerokosc, int wysokosc, const char* nazwa) //definicja konstruktora
-	:
-	szerokosc(szerokosc),
-	wysokosc(wysokosc),
-	hInstance(GetModuleHandleA(nullptr))
 {
+	this->hInstance = GetModuleHandleA(nullptr);
+	this->szerokosc = szerokosc;
+	this->wysokosc = wysokosc;
+
 	WNDCLASS winclass = {}; //potrzebne by zarejestrowac okno
 		winclass.lpfnWndProc = WindowprocSetup; //wskazniki
 		winclass.hInstance = hInstance;//zrozumiale przez sie
