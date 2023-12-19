@@ -3,6 +3,8 @@
 #include<sstream>
 #include"Error.h"
 #include"Input.h"
+#include"Grafika.h"
+#include<memory>
 #define CHWND_EXCEPT(hr) Okno::oErrorexc(__LINE__,__FILE__,hr)	//Quality of life
 #define CHWND_LAST_EXCEPT() Okno::oErrorexc(__LINE__,__FILE__,GetLastError())	//Quality of life
 class Okno
@@ -17,12 +19,14 @@ public:
 		static std::string TranslateErrorCode(HRESULT hr);
 		HRESULT GetErrorCode();
 		std::string GetErrorDescript();
+		
 	private:
 		HRESULT hr;
 
 	};
 	Okno(int szerokosc, int wysokosc, const char* nazwa);
 	~Okno();	
+	Grafika& grafika();
 private:
 	static LRESULT CALLBACK WindowProcred(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept;
 	static LRESULT CALLBACK WindowprocSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept;
@@ -33,6 +37,7 @@ private:
 	HWND hwnd;
 	const char* wnazwa = "Okno1"; //to nie jest nazwa pokazywana na gorze tylko nazwa okna 
 	HINSTANCE hInstance; //handle do instancji okna 
+	std::unique_ptr<Grafika> pGrafika;
 public:
 	Myszka Mk;
 	Klawiatura Klt;

@@ -2,11 +2,16 @@
 
 // DZIALA 
 
+Mainapp::Mainapp()
+	: 
+	okno1(820, 640, "testing") // ustawianie parametrów okna
+{}
+
 int Mainapp::Go()
 {
 
-	Okno okno1(820, 640, "testing");
-	while ((result = GetMessageA(&msg, nullptr, 0, 0) > 0))
+	
+	while ((result = GetMessageA(&msg, nullptr, 0, 0) > 0)) //petla obslugujaca wiadomosci przychodzace
 	{
 		TranslateMessage(&msg);
 		DispatchMessageA(&msg);
@@ -28,12 +33,13 @@ int Mainapp::Go()
 		}
 
 
-
+		DoFrame();
 	}
 	return msg.wParam;
 }
 
 void Mainapp::DoFrame()
 {
-
+	okno1.grafika().ClearBuffer(255, 0, 0); // czerwono mi
+	okno1.grafika().EndFrame();
 }

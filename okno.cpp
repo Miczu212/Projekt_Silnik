@@ -32,6 +32,7 @@ Okno::Okno(int szerokosc, int wysokosc, const char* nazwa) //definicja konstrukt
 		throw CHWND_LAST_EXCEPT();
 	}
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
+	pGrafika = std::make_unique<Grafika>(hwnd);
 	UpdateWindow(hwnd);
 }
 
@@ -39,6 +40,10 @@ Okno::~Okno() //definicja destruktora
 {
 	UnregisterClass(wnazwa, hInstance);
 	DestroyWindow(hwnd);
+}
+Grafika& Okno::grafika()
+{
+	return *pGrafika;
 }
   LRESULT  Okno::WindowprocSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept	//jest tylko za pierwszym razym uruchomiane
 {
@@ -174,3 +179,4 @@ const char* Okno::oErrorexc::ErrorType()
  {
 	 return TranslateErrorCode(hr);
  }
+
