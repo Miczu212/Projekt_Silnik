@@ -1,11 +1,11 @@
-#include "okno.h"
-okno::okno(int szerokosc, int wysokosc, const char* nazwa) //definicja konstruktora
+#include "Okno.h"
+Okno::Okno(int szerokosc, int wysokosc, const char* nazwa) //definicja konstruktora
 {
 	this->hInstance = GetModuleHandleA(nullptr);
 	this->szerokosc = szerokosc;
 	this->wysokosc = wysokosc;
 
-	WNDCLASS winclass = {}; //potrzebne by zarejestrowac okno
+	WNDCLASS winclass = {}; //potrzebne by zarejestrowac Okno
 		winclass.lpfnWndProc = WindowprocSetup; //wskazniki
 		winclass.hInstance = hInstance;//zrozumiale przez sie
 		winclass.lpszClassName = wnazwa;//zrozumiale przez sie
@@ -18,8 +18,8 @@ okno::okno(int szerokosc, int wysokosc, const char* nazwa) //definicja konstrukt
 		winRect.top = 100;
 		winRect.bottom = wysokosc + winRect.top;
 		
-		if (FAILED(		//error handling
-			AdjustWindowRect(&winRect, WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU, FALSE))) //cos jak rejestracja winclass tylko dla recta
+		if (		//error handling
+			AdjustWindowRect(&winRect, WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU, FALSE)==0) //cos jak rejestracja winclass tylko dla recta
 		{
 			throw CHWND_LAST_EXCEPT();
 		}
@@ -35,60 +35,100 @@ okno::okno(int szerokosc, int wysokosc, const char* nazwa) //definicja konstrukt
 	UpdateWindow(hwnd);
 }
 
-okno::~okno() //definicja destruktora
+Okno::~Okno() //definicja destruktora
 {
 	UnregisterClass(wnazwa, hInstance);
 	DestroyWindow(hwnd);
 }
-  LRESULT  okno::WindowprocSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept	//jest tylko za pierwszym razym uruchomiane
+  LRESULT  Okno::WindowprocSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept	//jest tylko za pierwszym razym uruchomiane
 {
 	if (msg == WM_NCCREATE)	//wszystko to jest ustawiane tylko za pierwszym razem zeby zdobyc potrzebny pointer 
 	{
 		const CREATESTRUCTW* const pCreate = reinterpret_cast<CREATESTRUCTW*>(lparam);	//wyciagniecie pointera
-		okno* const pWnd = static_cast<okno*>(pCreate->lpCreateParams);		//przygotowanie do zalokowania pointera
+		Okno* const pWnd = static_cast<Okno*>(pCreate->lpCreateParams);		//przygotowanie do zalokowania pointera
 		SetWindowLongPtrA(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd)); //zalokowanie pointera do windows api
-		SetWindowLongPtrA(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&okno::WindowProcred));	//zmienienie funkcji handlujacej wiadomosci
+		SetWindowLongPtrA(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Okno::WindowProcred));	//zmienienie funkcji handlujacej wiadomosci
 		return pWnd->WindowProc(hwnd, msg, wParam, lparam);//zmienienie funkcji handlujacej wiadomosci
 	}
 	else
 			return DefWindowProcA(hwnd, msg, wParam, lparam);
 
 }
- LRESULT  okno::WindowProcred(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept {
-	okno* const pWnd = reinterpret_cast<okno*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA)); //odzyskanie pointera zestorowanego w windows api
+ LRESULT  Okno::WindowProcred(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept {
+	Okno* const pWnd = reinterpret_cast<Okno*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA)); //odzyskanie pointera zestorowanego w windows api
 		return pWnd->WindowProc(hwnd, msg, wParam, lparam); //przekazanie wiadomosci do aktualnej funkcji przetwarzania wiadomosci
 }
 
- LRESULT  okno::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept //Przetwarzanie Wiadomosci
+ LRESULT  Okno::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept //Przetwarzanie Wiadomosci
 {
 	switch (msg)
 	{
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
-	case WM_KEYDOWN:
-		if (wParam == 'Q') //wParam musi byc przypisane do Du¿ych liter ale dzia³a równie¿ na ma³e je¿eli chcia³bym rozró¿niæ du¿e i ma³e litery
-							//musialbym uzyc WM_CHAR
-		{
-			SetWindowTextA(hwnd, "testowa_zmiana_nazwy_okna");
-		}
-		break;
 	case WM_KEYUP:
-		if (wParam == 'Q') 
+		Klt.OnKeyPressed(static_cast<unsigned char>(wParam));
+		break;
+	case WM_KEYDOWN:
+		Klt.OnKeyReleased(static_cast<unsigned char>(wParam));
+		break;
+	case WM_CHAR:
+		Klt.OnChar(static_cast<unsigned char>(wParam));
+		break;
+	case WM_KILLFOCUS:
+		Klt.ClearState(); // po wyjsciu z okna usuwa klawisze z queue zeby nie naciskaly sie poza obecnosci¹ w oknie
+		break;
+	case WM_MOUSEMOVE:
+	{
+		POINTS points = MAKEPOINTS(lparam);
+		Mk.OnMyszkaMove(points.x, points.y);
+		break;
+	}
+	case WM_RBUTTONDOWN:
+	{
+		const POINTS points = MAKEPOINTS(lparam);
+		Mk.OnLeftPressed(points.x, points.y);
+		break;
+	}
+	case WM_RBUTTONUP:
+	{
+		const POINTS points = MAKEPOINTS(lparam);
+		Mk.OnRightReleased(points.x, points.y);
+		break;
+	}
+
+	case WM_LBUTTONUP:
+	{
+		const POINTS points = MAKEPOINTS(lparam);
+		Mk.OnLeftReleased(points.x, points.y);
+		break;
+	}
+	case WM_MOUSEWHEEL:
+	{
+		const POINTS points = MAKEPOINTS(lparam);
+		if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
 		{
-			SetWindowTextA(hwnd, "Zmiana_Wykonana_pomyslnie");
+			Mk.OnWheelUp(points.x, points.y);
+		}
+		else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
+		{
+			Mk.OnWheelDown(points.x, points.y);
 		}
 		break;
+	}
+	 //wParam musi byc przypisane do Du¿ych liter ale dzia³a równie¿ na ma³e je¿eli chcia³bym rozró¿niæ du¿e i ma³e litery
+						//musialbym uzyc WM_CHAR
+
 	case WM_LBUTTONDOWN:
 		const POINTS points = MAKEPOINTS(lparam);
-		std::ostringstream oss;
-		oss << points.x << "," << points.y;			// do stringstreama dodajemy wspó³rzêdne gdzie lpm zosta³ wciœniêty
+		Mk.OnLeftReleased(points.x, points.y);
+		break;
 	}
 	return DefWindowProcA(hwnd, msg, wParam, lparam);
 
 }
 
- okno::oErrorexc::oErrorexc(int line, const char* file, HRESULT hr) 
+ Okno::oErrorexc::oErrorexc(int line, const char* file, HRESULT hr) 
 	 :
 	 Errorexc(line, file) 
 		
@@ -98,7 +138,7 @@ okno::~okno() //definicja destruktora
 
 
 
- const char* okno::oErrorexc::Result()
+ const char* Okno::oErrorexc::Result()
  {
 	 std::ostringstream oss;
 	 oss << ErrorType() << std::endl << "[Kod B³êdu] " << GetErrorCode() << std::endl << "[Opis] " << GetErrorDescript() << std::endl << OGString();
@@ -106,12 +146,12 @@ okno::~okno() //definicja destruktora
 	 return bufor.c_str();
  }
 
-const char* okno::oErrorexc::ErrorType()
+const char* Okno::oErrorexc::ErrorType()
  {
 	 return "B³¹d Okna";
  }
 
- std::string okno::oErrorexc::TranslateErrorCode(HRESULT hr)
+ std::string Okno::oErrorexc::TranslateErrorCode(HRESULT hr)
  {
 	 char* msgbuff = nullptr;	//bufor na nasz¹ wiadomoœæ (wskaŸniki and stuff)
 	 DWORD msglen = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS	//przerabianie wiadomoœci na d³ugoœæ
@@ -125,12 +165,12 @@ const char* okno::oErrorexc::ErrorType()
 	 return errorstring;
  }
 
- HRESULT okno::oErrorexc::GetErrorCode()
+ HRESULT Okno::oErrorexc::GetErrorCode()
  {
 	 return hr;
  }
 
- std::string okno::oErrorexc::GetErrorDescript()
+ std::string Okno::oErrorexc::GetErrorDescript()
  {
 	 return TranslateErrorCode(hr);
  }

@@ -2,9 +2,10 @@
 #include<optional>
 #include<sstream>
 #include"Error.h"
-#define CHWND_EXCEPT(hr) okno::oErrorexc(__LINE__,__FILE__,hr)	//Quality of life
-#define CHWND_LAST_EXCEPT() okno::oErrorexc(__LINE__,__FILE__,GetLastError())	//Quality of life
-class okno
+#include"Input.h"
+#define CHWND_EXCEPT(hr) Okno::oErrorexc(__LINE__,__FILE__,hr)	//Quality of life
+#define CHWND_LAST_EXCEPT() Okno::oErrorexc(__LINE__,__FILE__,GetLastError())	//Quality of life
+class Okno
 {
 public:
 	class oErrorexc : public Errorexc
@@ -20,8 +21,8 @@ public:
 		HRESULT hr;
 
 	};
-	okno(int szerokosc, int wysokosc, const char* nazwa);
-	~okno();	
+	Okno(int szerokosc, int wysokosc, const char* nazwa);
+	~Okno();	
 private:
 	static LRESULT CALLBACK WindowProcred(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept;
 	static LRESULT CALLBACK WindowprocSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept;
@@ -30,7 +31,11 @@ private:
 	int szerokosc;
 	int	wysokosc;
 	HWND hwnd;
-	const char* wnazwa = "okno1"; //to nie jest nazwa pokazywana na gorze tylko nazwa okna 
+	const char* wnazwa = "Okno1"; //to nie jest nazwa pokazywana na gorze tylko nazwa okna 
 	HINSTANCE hInstance; //handle do instancji okna 
+public:
+	Myszka Mk;
+	Klawiatura Klt;
+	HWND *hwndcopy = &hwnd; //publiczny jest pointer do handla, zrobione w celu zabezpieczenia handla
 
 };

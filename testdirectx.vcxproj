@@ -70,6 +70,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <AllProjectBMIsArePublic>true</AllProjectBMIsArePublic>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -109,6 +112,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -129,11 +134,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Error.cpp" />
-    <ClCompile Include="okno.cpp" />
-    <ClCompile Include="testdirectx.cpp" />
+    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Input.h" />
+    <ClCompile Include="MAINWindow.cpp" />
+    <ClCompile Include="Okno.cpp" />
+    <ClCompile Include="Mainapp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Error.h" />
+    <ClInclude Include="Mainapp.h" />
     <ClInclude Include="okno.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
