@@ -39,8 +39,9 @@ private:
 	HINSTANCE hInstance; //handle do instancji okna 
 	std::unique_ptr<Grafika> pGrafika;
 public:
+	void Merge();
 	Myszka Mk;
 	Klawiatura Klt;
-	HWND *hwndcopy = &hwnd; //publiczny jest pointer do handla, zrobione w celu zabezpieczenia handla
+	HWND *pHwnd = &hwnd; //publiczny jest pointer do handla, zrobione w celu zabezpieczenia handla
 
 };

@@ -32,7 +32,9 @@ Okno::Okno(int szerokosc, int wysokosc, const char* nazwa) //definicja konstrukt
 		throw CHWND_LAST_EXCEPT();
 	}
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
-	pGrafika = std::make_unique<Grafika>(hwnd);
+	pGrafika = std::make_unique<Grafika>(hwnd, winRect);
+	pGrafika->ScreenHeight = wysokosc;
+	pGrafika->ScreenWidth = szerokosc;
 	UpdateWindow(hwnd);
 }
 
