@@ -26,9 +26,10 @@ void Mainapp::DoFrame() {
 	int randomNumber = dis(gen);
 	int randomNumber2 = dis(gen);
 	int randomNumber3 = dis(gen);
+	okno1.grafika().BeginFrame();
 	okno1.grafika().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
-	okno1.grafika().Draw();
-	okno1.grafika().EndFrame();
+	okno1.grafika().Draw1();
+	okno1.grafika().ENDFRAME();
 	//Sleep(300);
 }
 

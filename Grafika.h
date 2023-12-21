@@ -1,13 +1,11 @@
 #pragma once
-#include<d3d11.h>
-#include<d3dcompiler.h>
 #include<memory>
 #include <wrl.h>
 #include"Error.h"
 #include<vector>
+#include<d2d1.h>
 #include"DXErr.h"
-#pragma comment(lib,"d3d11.lib")
-#pragma comment(lib,"D3DCompiler.lib")
+#include<DirectXMath.h>
 class Grafika
 {
 public:
@@ -42,12 +40,19 @@ public:
 	void ClearBuffer(float r, float g, float b);
 	void Draw();
 	int ScreenWidth, ScreenHeight;
+	void BeginFrame();
+	void ENDFRAME();
+	void Draw1();
+	
 private:
+	//refaktor na 2d
+	Microsoft::WRL::ComPtr<ID2D1Factory> pFactory;
+	Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRTarget;
+	struct ConstantBuffer
+	{
+		DirectX::XMMATRIX transformmatrix;
+	};
 	RECT rect;
-	Microsoft::WRL::ComPtr<ID3D11Device> pDev;
-	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pDevContext;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
 	HRESULT result;
 	int AACountSetting = 1, AAQualitySetting = 0;
 	bool IsWindowed = true;	
