@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="Grafika.cpp" />
     <ClCompile Include="Input.cpp" />
@@ -143,6 +144,7 @@
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dxerr.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Grafika.h" />
     <ClInclude Include="Mainapp.h" />
@@ -158,6 +160,11 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="DXGetErrorDescription.txt" />
+    <Text Include="DXGetErrorString.txt" />
+    <Text Include="DXTrace.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

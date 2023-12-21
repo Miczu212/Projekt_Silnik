@@ -5,20 +5,20 @@
 #include"Input.h"
 #include"Grafika.h"
 #include<memory>
-#define CHWND_EXCEPT(hr) Okno::oErrorexc(__LINE__,__FILE__,hr)	//Quality of life
-#define CHWND_LAST_EXCEPT() Okno::oErrorexc(__LINE__,__FILE__,GetLastError())	//Quality of life
+#define CHWND_EXCEPT(hr) Okno::oErrorException(__LINE__,__FILE__,hr)	//Quality of life
+#define CHWND_LAST_EXCEPT() Okno::oErrorException(__LINE__,__FILE__,GetLastError())	//Quality of life
 class Okno
 {
 public:
-	class oErrorexc : public Errorexc
+	class oErrorException : public Errorexc
 	{
 	public:
-		oErrorexc(int line, const char* file, HRESULT hr);
+		oErrorException(int line, const char* file, HRESULT hr);
 		const char * Result();
 		virtual const char* ErrorType();
 		static std::string TranslateErrorCode(HRESULT hr);
 		HRESULT GetErrorCode();
-		std::string GetErrorDescript();
+		std::string GetErrorString();
 		
 	private:
 		HRESULT hr;

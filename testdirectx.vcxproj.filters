@@ -16,6 +16,9 @@
     <Filter Include="HLSL">
       <UniqueIdentifier>{eab55461-ce9b-49de-a486-fc3fce8c3db2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="INL">
+      <UniqueIdentifier>{f95cf8aa-7177-43e4-8817-78712349be0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Mainapp.cpp">
@@ -42,6 +45,9 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="dxerr.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="okno.h">
@@ -59,6 +65,9 @@
     <ClInclude Include="Timer.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
+    <ClInclude Include="dxerr.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaderkrawedzi.hlsl">
@@ -67,5 +76,16 @@
     <FxCompile Include="ShaderPixeli.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="DXGetErrorDescription.txt">
+      <Filter>INL</Filter>
+    </Text>
+    <Text Include="DXGetErrorString.txt">
+      <Filter>INL</Filter>
+    </Text>
+    <Text Include="DXTrace.txt">
+      <Filter>INL</Filter>
+    </Text>
   </ItemGroup>
 </Project>

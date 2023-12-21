@@ -10,11 +10,11 @@ public:
 	int GetLine();
 	std::string OGString();
 	std::string& GetFile();
-	const char* Result() ;	//musi byc wskaznikiem z powodu tego ze Messagebox przyjmuje LPCSTR
+	virtual const char* Result() ;	//musi byc wskaznikiem z powodu tego ze Messagebox przyjmuje LPCSTR
 private:
 	int line;
 	std::string file;
 protected:
-	mutable std::string bufor; // przetrzymuje strumien string z Result
+	 std::string bufor; // przetrzymuje strumien string z Result
 
 };

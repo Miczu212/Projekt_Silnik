@@ -23,8 +23,6 @@ Okno::Okno(int szerokosc, int wysokosc, const char* nazwa) //definicja konstrukt
 		{
 			throw CHWND_LAST_EXCEPT();
 		}
-	
-	//throw CHWND_EXCEPT(0x7);	//(TESTOWANIE ERRORHANDLINGU)
 	hwnd = CreateWindowA(wnazwa, nazwa, WS_CAPTION | WS_MINIMIZEBOX |WS_MAXIMIZEBOX  | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT,
 		 winRect.right - winRect.left,winRect.bottom - winRect.top, nullptr, nullptr, hInstance, this);// dokumentacja jest na stronie microsoftu 
 	if (hwnd == nullptr)
@@ -135,7 +133,7 @@ Grafika& Okno::grafika()
 
 }
 
- Okno::oErrorexc::oErrorexc(int line, const char* file, HRESULT hr) 
+ Okno::oErrorException::oErrorException(int line, const char* file, HRESULT hr) 
 	 :
 	 Errorexc(line, file) 
 		
@@ -145,20 +143,20 @@ Grafika& Okno::grafika()
 
 
 
- const char* Okno::oErrorexc::Result()
+ const char* Okno::oErrorException::Result()
  {
 	 std::ostringstream oss;
-	 oss << ErrorType() << std::endl << "[Kod B³êdu] " << GetErrorCode() << std::endl << "[Opis] " << GetErrorDescript() << std::endl << OGString();
+	 oss << ErrorType() << std::endl << "[Kod B³êdu] " << GetErrorCode() << std::endl << "[Opis] " << GetErrorString() << std::endl << OGString();
 	 bufor = oss.str();
 	 return bufor.c_str();
  }
 
-const char* Okno::oErrorexc::ErrorType()
+const char* Okno::oErrorException::ErrorType()
  {
 	 return "B³¹d Okna";
  }
 
- std::string Okno::oErrorexc::TranslateErrorCode(HRESULT hr)
+ std::string Okno::oErrorException::TranslateErrorCode(HRESULT hr)
  {
 	 char* msgbuff = nullptr;	//bufor na nasz¹ wiadomoœæ (wskaŸniki and stuff)
 	 DWORD msglen = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS	//przerabianie wiadomoœci na d³ugoœæ
@@ -172,13 +170,12 @@ const char* Okno::oErrorexc::ErrorType()
 	 return errorstring;
  }
 
- HRESULT Okno::oErrorexc::GetErrorCode()
+ HRESULT Okno::oErrorException::GetErrorCode()
  {
 	 return hr;
  }
 
- std::string Okno::oErrorexc::GetErrorDescript()
+ std::string Okno::oErrorException::GetErrorString()
  {
-	 return TranslateErrorCode(hr);
+	 return  TranslateErrorCode(hr);
  }
-

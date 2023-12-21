@@ -29,7 +29,7 @@ void Mainapp::DoFrame() {
 	okno1.grafika().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
 	okno1.grafika().Draw();
 	okno1.grafika().EndFrame();
-	Sleep(300);
+	//Sleep(300);
 }
 
 void Mainapp::ProcessMessages()
