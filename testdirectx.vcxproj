@@ -135,20 +135,20 @@
   <ItemGroup>
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="Error.cpp" />
-    <ClCompile Include="Grafika.cpp" />
+    <ClCompile Include="GFX.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Input.h" />
     <ClCompile Include="MAINWindow.cpp" />
-    <ClCompile Include="Okno.cpp" />
+    <ClCompile Include="WND.cpp" />
     <ClCompile Include="Mainapp.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="Error.h" />
-    <ClInclude Include="Grafika.h" />
+    <ClInclude Include="GFX.h" />
     <ClInclude Include="Mainapp.h" />
-    <ClInclude Include="okno.h" />
+    <ClInclude Include="WND.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -162,9 +162,15 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="DXGetErrorDescription.txt" />
-    <Text Include="DXGetErrorString.txt" />
-    <Text Include="DXTrace.txt" />
+    <None Include="DXGetErrorDescription.inl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="DXGetErrorString.inl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="DXTrace.inl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

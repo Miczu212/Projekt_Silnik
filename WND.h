@@ -3,18 +3,18 @@
 #include<sstream>
 #include"Error.h"
 #include"Input.h"
-#include"Grafika.h"
+#include"GFX.h"
 #include<memory>
-#define CHWND_EXCEPT(hr) Okno::oErrorException(__LINE__,__FILE__,hr)	//Quality of life
-#define CHWND_LAST_EXCEPT() Okno::oErrorException(__LINE__,__FILE__,GetLastError())	//Quality of life
-class Okno
+#define CHWND_EXCEPT(hr) WND::oErrorException(__LINE__,__FILE__,hr)	//Quality of life
+#define CHWND_LAST_EXCEPT() WND::oErrorException(__LINE__,__FILE__,GetLastError())	//Quality of life
+class WND
 {
 public:
 	class oErrorException : public Errorexc
 	{
 	public:
 		oErrorException(int line, const char* file, HRESULT hr);
-		const char * Result();
+		const char* Result();
 		virtual const char* ErrorType();
 		static std::string TranslateErrorCode(HRESULT hr);
 		HRESULT GetErrorCode();
@@ -24,20 +24,20 @@ public:
 		HRESULT hr;
 
 	};
-	Okno(int szerokosc, int wysokosc, const char* nazwa);
-	~Okno();	
-	Grafika& grafika();
+	WND(int Width, int Height, const char* nazwa);
+	~WND();	
+	GFX& ReturnGFX();
 private:
 	static LRESULT CALLBACK WindowProcred(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept;
 	static LRESULT CALLBACK WindowprocSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept;
 	LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept ;	//handle do okna, unsinged int, liczby,liczby //mesage handling
 private:
-	int szerokosc;
-	int	wysokosc;
+	int Width;
+	int	Height;
 	HWND hwnd;
-	const char* wnazwa = "Okno1"; //to nie jest nazwa pokazywana na gorze tylko nazwa okna 
+	const char* wName = "WND1"; //to nie jest nazwa pokazywana na gorze tylko nazwa okna 
 	HINSTANCE hInstance; //handle do instancji okna 
-	std::unique_ptr<Grafika> pGrafika;
+	std::unique_ptr<GFX> pGFX;
 public:
 	void Merge();
 	Myszka Mk;

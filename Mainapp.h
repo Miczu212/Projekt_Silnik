@@ -1,17 +1,14 @@
 #pragma once
-#include "okno.h"
+#include "WND.h"
 #include "Timer.h"
 class Mainapp
 {
-public:
-	const int* pScreenHeight = &ScreenHeight;
-	const int* pScreenWidth = &ScreenWidth;
 private:
-	const int ScreenWidth = 820;
-	const int ScreenHeight = 640;
+	const int ScreenWidth = 1024;
+	const int ScreenHeight = 820;
 	MSG msg;
 	BOOL result;
-	Okno okno1;
+	WND WND1;
 	Timer timer;
 public:
 	Mainapp();

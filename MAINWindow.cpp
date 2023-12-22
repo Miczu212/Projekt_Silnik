@@ -6,7 +6,7 @@ int __stdcall WinMain(HINSTANCE hinstance,HINSTANCE hPrevInstance,LPSTR comline,
 		Mainapp app;
 		app.Go();
 	}
-		catch (Errorexc& e)	// Pamiêtaj o kolejnosci o Okno::oErrorexc& e to wci¹¿ jest Errorexc& e
+		catch (Errorexc& e)	// Pamiêtaj o kolejnosci o WND::oErrorexc& e to wci¹¿ jest Errorexc& e
 		{
 			MessageBoxA(nullptr, e.Result(), e.ErrorType(), MB_OK | MB_ICONEXCLAMATION);
 		}

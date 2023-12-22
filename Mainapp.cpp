@@ -3,9 +3,10 @@
 #include<chrono>
 // DZIALA 
 
+
 Mainapp::Mainapp()
 	: 
-	okno1(*pScreenWidth, *pScreenHeight, "testing") // ustawianie parametrów okna
+	WND1(ScreenWidth, ScreenHeight, "testing") // ustawianie parametrów okna
 {}
 
 int Mainapp::Go()
@@ -26,11 +27,11 @@ void Mainapp::DoFrame() {
 	int randomNumber = dis(gen);
 	int randomNumber2 = dis(gen);
 	int randomNumber3 = dis(gen);
-	okno1.grafika().BeginFrame();
-	okno1.grafika().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
-	okno1.grafika().Draw1();
-	okno1.grafika().ENDFRAME();
-	//Sleep(300);
+	WND1.ReturnGFX().BeginFrame();
+	WND1.ReturnGFX().ClearBuffer(randomNumber, randomNumber2, randomNumber3); // by wylaczyc tencze wstaw tu sta³e
+	WND1.ReturnGFX().Draw();
+	WND1.ReturnGFX().EndFrame();
+
 }
 
 void Mainapp::ProcessMessages()
@@ -43,22 +44,22 @@ void Mainapp::ProcessMessages()
 		}
 		TranslateMessage(&msg);
 		DispatchMessageA(&msg);
-		//okno1.grafika().Draw();
-		while (!okno1.Mk.IsEmpty())
+		//WND1.grafika().Draw();
+		while (!WND1.Mk.IsEmpty())
 		{
-			const auto e = okno1.Mk.Read();
+			const auto e = WND1.Mk.Read();
 			if (e.GetType() == Myszka::Event::Type::Move)
 			{
 				std::ostringstream oss;
 				oss << e.GetPosX() << "," << e.GetPosY();			// do stringstreama dodajemy wspó³rzêdne gdzie lpm zosta³ wciœniêty
 
-				SetWindowTextA(*okno1.pHwnd, oss.str().c_str());
+				SetWindowTextA(*WND1.pHwnd, oss.str().c_str());
 			}
 		}
-		if (okno1.Klt.KeyIsPressed(0x51))
+		if (WND1.Klt.KeyIsPressed(0x51))
 		{
-			SetWindowTextA(*okno1.pHwnd, "jak naciskam Q to sie zmienia na ta");
-			okno1.Klt.ClearState(); // wymagane, inaczej przycisk jest uznawany za "Wiecznie wcisniety"
+			SetWindowTextA(*WND1.pHwnd, "jak naciskam Q to sie zmienia na ta");
+			WND1.Klt.ClearState(); // wymagane, inaczej przycisk jest uznawany za "Wiecznie wcisniety"
 		}
 
 	}

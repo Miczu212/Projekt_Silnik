@@ -24,7 +24,7 @@
     <ClCompile Include="Mainapp.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="Okno.cpp">
+    <ClCompile Include="WND.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="Error.cpp">
@@ -39,7 +39,7 @@
     <ClCompile Include="MAINWindow.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="Grafika.cpp">
+    <ClCompile Include="GFX.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
@@ -50,7 +50,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="okno.h">
+    <ClInclude Include="WND.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="Error.h">
@@ -59,7 +59,7 @@
     <ClInclude Include="Mainapp.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="Grafika.h">
+    <ClInclude Include="GFX.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
@@ -78,14 +78,14 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="DXGetErrorDescription.txt">
+    <None Include="DXGetErrorString.inl">
       <Filter>INL</Filter>
-    </Text>
-    <Text Include="DXGetErrorString.txt">
+    </None>
+    <None Include="DXGetErrorDescription.inl">
       <Filter>INL</Filter>
-    </Text>
-    <Text Include="DXTrace.txt">
+    </None>
+    <None Include="DXTrace.inl">
       <Filter>INL</Filter>
-    </Text>
+    </None>
   </ItemGroup>
 </Project>
