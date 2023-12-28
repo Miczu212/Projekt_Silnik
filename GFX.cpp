@@ -98,6 +98,13 @@ void GFX::Draw(D2D1_POINT_2F mousepoint1)
 	pRTarget->DrawLine(MousePoint, mousepoint1, pBrush.Get(), 3.0f);
 }
 
+Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> GFX::ReturnRenderTarget()
+{
+	return pRTarget;
+}
+
+
+
 const char* GFX::DeviceRemovedexc::ErrorType()
 {
 	return "B³¹d Urz¹dzenia";

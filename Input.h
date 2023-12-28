@@ -1,7 +1,7 @@
 #pragma once
 #include <queue>
 #include <bitset>
-
+#include"KeyNames.h"
 class Klawiatura
 {
 	friend class MainWindow;

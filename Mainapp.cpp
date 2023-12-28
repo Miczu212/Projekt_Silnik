@@ -22,6 +22,7 @@ int Mainapp::Go()
 }
 
 void Mainapp::DoFrame() {
+	std::filesystem::path CopiedPath;
 	std::random_device rd; //tecza ale boli w oczy
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> dis(0, 10);
@@ -29,16 +30,54 @@ void Mainapp::DoFrame() {
 	int randomNumber2 = dis(gen);
 	int randomNumber3 = dis(gen);
 	WND1.ReturnGFX().BeginFrame();
+
 	WND1.ReturnGFX().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
 	if (WND1.Mk.LeftIsPressed() == true)
 		WND1.ReturnGFX().Draw(MousePosition, MousePosition);
 	else
 		WND1.ReturnGFX().Draw(MousePosition);
-	
-	if (WND1.Klt.KeyIsPressed(0x46))
+
+
+	if (WND1.ReturnGFX().pBitmap.Get())
 	{
-		IFileDialog* pFileDialog = nullptr;
-		HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
+		//dostawanie wysokosci i szerokosci textury
+		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+		ULONG_PTR gdiplusToken;
+		Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+		Gdiplus::Bitmap* bitmap = Gdiplus::Bitmap::FromFile(TextureTab[TextureTabCounter].c_str());
+		if (bitmap) {
+
+			Twidth = bitmap->GetWidth();
+			Theight = bitmap->GetHeight();
+			delete bitmap;
+		}
+		else {
+		}
+
+		Gdiplus::GdiplusShutdown(gdiplusToken);
+		//
+		D2D1_RECT_F destinationRect = D2D1::RectF(0.0f, 0.0f, Twidth, Theight);
+		WND1.ReturnGFX().ReturnRenderTarget()->Clear();
+		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(WND1.ReturnGFX().pBitmap.Get(), destinationRect);
+	}
+	if (WND1.Klt.KeyIsPressed(KEY_R))
+	{
+		TextureTabCounter++;
+		Twidth = 0;
+		Theight = 0;
+		if (TextureTabCounter > TextureTab.size() - 1)
+		{
+			TextureTabCounter = 0;
+		}
+		WND1.ReturnGFX().pBitmap.Reset();  // Zwalnianie poprzedniego zasobu.
+		LoadBMPToTexture(TextureTab[TextureTabCounter], WND1.ReturnGFX().ReturnRenderTarget(), WND1.ReturnGFX().pBitmap.GetAddressOf());
+		WND1.Klt.ClearState();
+	}
+	if (WND1.Klt.KeyIsPressed(KEY_F))
+	{
+
+		Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
+		HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
 
 		if (SUCCEEDED(hr))
 		{
@@ -50,32 +89,44 @@ void Mainapp::DoFrame() {
 			if (SUCCEEDED(pFileDialog->Show(WND1.GetHandle())))
 			{
 				// Pobierz wybrany plik
-				IShellItem* pShellItem;
+				Microsoft::WRL::ComPtr<IShellItem> pShellItem;
 				if (SUCCEEDED(pFileDialog->GetResult(&pShellItem)))
 				{
 					PWSTR pszFilePath;
 					if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath)))
 					{
+
 						// Konwertuj na std::wstring lub std::string
 						std::wstring selectedFilePath = pszFilePath;
 						// Mo¿esz tak¿e skopiowaæ plik do folderu projektu itp.
-						CopyBitmapToProjectFolder(selectedFilePath);
+						LoadBMPToTexture(CopiedPath = CopyBitmapToProjectFolder(selectedFilePath), WND1.ReturnGFX().ReturnRenderTarget(), WND1.ReturnGFX().pBitmap.GetAddressOf());
+						TextureTab.push_back(CopiedPath);
+						Twidth = 0;
+						Theight = 0;
+						TextureTabCounter++;
 						// Zwolnij pamiêæ
 						CoTaskMemFree(pszFilePath);
 					}
 
-					pShellItem->Release();
+
 				}
 			}
 
-			pFileDialog->Release();
-		}
-	}
-	WND1.ReturnGFX().EndFrame();
 
+		}
+
+		WND1.Klt.ClearState();
+	}
+	if (WND1.Klt.KeyIsPressed(KEY_Q))
+	{
+		SetWindowTextA(WND1.GetHandle(), "jak naciskam Q to sie zmienia na ta");
+		WND1.Klt.ClearState(); // wymagane, inaczej przycisk jest uznawany za "Wiecznie wcisniety"
+	}
+		WND1.ReturnGFX().EndFrame();
+	
 }
 
-void Mainapp::CopyBitmapToProjectFolder(const std::wstring& SourceFilePath)
+std::filesystem::path Mainapp::CopyBitmapToProjectFolder(const std::wstring& SourceFilePath)
 {
 	try {
 		std::filesystem::path projectFolder = std::filesystem::current_path();
@@ -86,6 +137,7 @@ void Mainapp::CopyBitmapToProjectFolder(const std::wstring& SourceFilePath)
 		std::filesystem::copy_file(sourcePath, destinationPath, std::filesystem::copy_options::overwrite_existing);
 
 		MessageBoxA(WND1.GetHandle(), "Plik skopiowany pomyœlnie.", NULL, MB_OK);
+		return destinationPath;
 	}
 	catch(const std::exception& e)
 	{
@@ -117,11 +169,35 @@ void Mainapp::ProcessMessages()
 				SetWindowTextA(WND1.GetHandle(), oss.str().c_str());
 			}
 		}
-		if (WND1.Klt.KeyIsPressed(0x51))
-		{
-			SetWindowTextA(WND1.GetHandle(), "jak naciskam Q to sie zmienia na ta");
-			WND1.Klt.ClearState(); // wymagane, inaczej przycisk jest uznawany za "Wiecznie wcisniety"
-		}
 
+	}
+
+}
+void Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, ID2D1Bitmap** ppBitmap)
+{
+	Microsoft::WRL::ComPtr<IWICImagingFactory> pWICFactory;
+	Microsoft::WRL::ComPtr<IWICBitmapDecoder> pDecoder;
+	Microsoft::WRL::ComPtr<IWICBitmapFrameDecode> pFrame;
+	Microsoft::WRL::ComPtr<IWICFormatConverter> pConverter;
+	HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pWICFactory));
+	if (SUCCEEDED(hr))
+	{
+		hr = pWICFactory->CreateDecoderFromFilename(filePath.c_str(), nullptr, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder);
+		if (SUCCEEDED(hr))
+		{
+			hr = pDecoder->GetFrame(0, &pFrame);
+			if (SUCCEEDED(hr))
+			{
+				hr = pWICFactory->CreateFormatConverter(&pConverter);
+				if (SUCCEEDED(hr))
+				{
+					hr = pConverter->Initialize(pFrame.Get(), GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.0, WICBitmapPaletteTypeMedianCut);
+					if (SUCCEEDED(hr))
+					{
+						hr = pRenderTarget->CreateBitmapFromWicBitmap(pConverter.Get(), nullptr, ppBitmap);
+					}
+				}
+			}
+		}
 	}
 }

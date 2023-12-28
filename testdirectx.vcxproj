@@ -147,6 +147,7 @@
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="GFX.h" />
+    <ClInclude Include="KeyNames.h" />
     <ClInclude Include="Mainapp.h" />
     <ClInclude Include="WND.h" />
     <ClInclude Include="Timer.h" />
