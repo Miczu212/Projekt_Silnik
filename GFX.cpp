@@ -32,11 +32,70 @@ void GFX::BeginFrame()
 }
 
 
-void GFX::Draw()
+void GFX::Draw(D2D1_POINT_2F mousepoint1, D2D1_POINT_2F mousepoint2)
 {
+	this->MousePoint = mousepoint1;
+	switch (ColorofLine) {
+	case 0: {
+		GFX_THROW_FAILED(pRTarget->CreateSolidColorBrush(D2D1::ColorF(255, 0, 0), pBrush.GetAddressOf()));
+		ColorofLine++;
+		break;
+			}
+
+	case 1:
+		{
+		GFX_THROW_FAILED(pRTarget->CreateSolidColorBrush(D2D1::ColorF(0, 255, 0), pBrush.GetAddressOf()));
+		ColorofLine++;
+		break;
+		}
+	case 2:
+	{
+		GFX_THROW_FAILED(pRTarget->CreateSolidColorBrush(D2D1::ColorF(0, 0, 255), pBrush.GetAddressOf())); 
+		ColorofLine = 0;
+		break;
+	}
+	default: {
+		GFX_THROW_FAILED(pRTarget->CreateSolidColorBrush(D2D1::ColorF(255, 0, 0), pBrush.GetAddressOf()));
+		ColorofLine++;
+		break;
+
+	}
+
+	}
+	pRTarget->DrawLine(MousePoint,mousepoint2,pBrush.Get(),3.0f);
+}
+
+void GFX::Draw(D2D1_POINT_2F mousepoint1)
+{
+	switch (ColorofLine) {
+	case 0: {
+		GFX_THROW_FAILED(pRTarget->CreateSolidColorBrush(D2D1::ColorF(255, 0, 0), pBrush.GetAddressOf()));
+		
+		break;
+
+	}
+
+	case 1:
+	{
+		GFX_THROW_FAILED(pRTarget->CreateSolidColorBrush(D2D1::ColorF(0, 255, 0), pBrush.GetAddressOf()));
+		
+		break;
+	}
+	case 2:
+	{
+		GFX_THROW_FAILED(pRTarget->CreateSolidColorBrush(D2D1::ColorF(0, 0, 255), pBrush.GetAddressOf()));
+		
+		break;
+	}
+	default: {
+		GFX_THROW_FAILED(pRTarget->CreateSolidColorBrush(D2D1::ColorF(255, 0, 0), pBrush.GetAddressOf()));
+		
+		break;
+
+	}
+	}
 	
-	GFX_THROW_FAILED(pRTarget->CreateSolidColorBrush(D2D1::ColorF(255, 0, 0), pBrush.GetAddressOf()));
-	pRTarget->DrawLine(D2D1::Point2F(0, 0), D2D1::Point2F(100, 100),pBrush.Get(),3.0f);
+	pRTarget->DrawLine(MousePoint, mousepoint1, pBrush.Get(), 3.0f);
 }
 
 const char* GFX::DeviceRemovedexc::ErrorType()

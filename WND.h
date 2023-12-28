@@ -19,7 +19,6 @@ public:
 		static std::string TranslateErrorCode(HRESULT hr);
 		HRESULT GetErrorCode();
 		std::string GetErrorString();
-		
 	private:
 		HRESULT hr;
 
@@ -40,8 +39,8 @@ private:
 	std::unique_ptr<GFX> pGFX;
 public:
 	void Merge();
+	HWND GetHandle() const;
 	Myszka Mk;
 	Klawiatura Klt;
-	HWND *pHwnd = &hwnd; //publiczny jest pointer do handla, zrobione w celu zabezpieczenia handla
 
 };

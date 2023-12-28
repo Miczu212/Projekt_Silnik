@@ -38,15 +38,18 @@ public:
 	~GFX();//wprowadzone bo rule of 3/5
 	void EndFrame();
 	void ClearBuffer(float r, float g, float b);
-	void Draw();
 	int ScreenWidth, ScreenHeight;
 	void BeginFrame();
+	void Draw(D2D1_POINT_2F mousepoint1, D2D1_POINT_2F mousepoint2);
+	void Draw(D2D1_POINT_2F mousepoint1);
 	
 private:
 	//refaktor na 2d
+	int ColorofLine = 0;
 	Microsoft::WRL::ComPtr<ID2D1Factory> pFactory;
 	Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRTarget;
 	Microsoft::WRL::ComPtr<ID2D1SolidColorBrush> pBrush;
+	D2D1_POINT_2F MousePoint;
 	RECT rect;
 	HRESULT result;
 	int AACountSetting = 1, AAQualitySetting = 0;

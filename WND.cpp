@@ -41,10 +41,6 @@ WND::~WND() //definicja destruktora
 
 	UnregisterClass(wName, hInstance);
 	DestroyWindow(hwnd);
-	if (pHwnd != nullptr)
-	{
-		pHwnd = nullptr;
-	}
 	if (wName != nullptr)
 	{
 		wName = nullptr;
@@ -137,12 +133,17 @@ GFX& WND::ReturnGFX()
 
 	case WM_LBUTTONDOWN:
 		const POINTS points = MAKEPOINTS(lparam);
-		Mk.OnLeftReleased(points.x, points.y);
+		Mk.OnLeftPressed(points.x, points.y);
 		break;
 	}
 	return DefWindowProcA(hwnd, msg, wParam, lparam);
 
 }
+
+ HWND WND::GetHandle() const
+ {
+	 return hwnd;
+ }
 
  WND::oErrorException::oErrorException(int line, const char* file, HRESULT hr) 
 	 :
@@ -190,3 +191,5 @@ const char* WND::oErrorException::ErrorType()
  {
 	 return  TranslateErrorCode(hr);
  }
+
+
