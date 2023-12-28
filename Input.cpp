@@ -1,4 +1,4 @@
-#include "Input.h"
+#include "Input.h" 
 bool Klawiatura::KeyIsPressed(unsigned char keycode) const
 {
 	return keystates[keycode];

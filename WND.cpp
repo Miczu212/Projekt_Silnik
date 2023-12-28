@@ -79,10 +79,10 @@ GFX& WND::ReturnGFX()
 		PostQuitMessage(0);
 		return 0;
 	case WM_KEYUP:
-		Klt.OnKeyPressed(static_cast<unsigned char>(wParam));
+		Klt.OnKeyReleased(static_cast<unsigned char>(wParam));
 		break;
 	case WM_KEYDOWN:
-		Klt.OnKeyReleased(static_cast<unsigned char>(wParam));
+		Klt.OnKeyPressed(static_cast<unsigned char>(wParam));
 		break;
 	case WM_CHAR:
 		Klt.OnChar(static_cast<unsigned char>(wParam));

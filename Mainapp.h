@@ -21,6 +21,7 @@ private:
 	Timer timer;
 	D2D1_POINT_2F MousePosition;
 	UINT Twidth=0, Theight=0;
+	UINT ScaleTwidth = 0, ScaleTheight = 0;
 	
 	
 public:

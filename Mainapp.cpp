@@ -56,10 +56,11 @@ void Mainapp::DoFrame() {
 
 		Gdiplus::GdiplusShutdown(gdiplusToken);
 		//
-		D2D1_RECT_F destinationRect = D2D1::RectF(0.0f, 0.0f, Twidth, Theight);
+		D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), Twidth+ WND1.Mk.GetPosX()+ScaleTwidth, Theight+ WND1.Mk.GetPosY() + ScaleTheight);
 		WND1.ReturnGFX().ReturnRenderTarget()->Clear();
 		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(WND1.ReturnGFX().pBitmap.Get(), destinationRect);
 	}
+		//Zmiana miedzy texturami wyswietlanymi
 	if (WND1.Klt.KeyIsPressed(KEY_R))
 	{
 		TextureTabCounter++;
@@ -73,6 +74,7 @@ void Mainapp::DoFrame() {
 		LoadBMPToTexture(TextureTab[TextureTabCounter], WND1.ReturnGFX().ReturnRenderTarget(), WND1.ReturnGFX().pBitmap.GetAddressOf());
 		WND1.Klt.ClearState();
 	}
+		//Wczytanie Textury
 	if (WND1.Klt.KeyIsPressed(KEY_F))
 	{
 
@@ -117,10 +119,32 @@ void Mainapp::DoFrame() {
 
 		WND1.Klt.ClearState();
 	}
+		//zmiana tytulu okna
 	if (WND1.Klt.KeyIsPressed(KEY_Q))
 	{
 		SetWindowTextA(WND1.GetHandle(), "jak naciskam Q to sie zmienia na ta");
 		WND1.Klt.ClearState(); // wymagane, inaczej przycisk jest uznawany za "Wiecznie wcisniety"
+	}
+		//skalowanie textury zmniejszenie
+	if (WND1.Klt.KeyIsPressed(KEY_N)) 
+	{
+		ScaleTwidth-=10;
+		ScaleTheight-=10;
+		WND1.Klt.ClearState();
+	}
+		//skalowanie textury zwiekszenie
+	if (WND1.Klt.KeyIsPressed(KEY_M)) 
+	{
+		ScaleTwidth+=10;
+		ScaleTheight+=10;
+		WND1.Klt.ClearState();
+	}
+	// Reset do domyslnych width i height
+	if (WND1.Klt.KeyIsPressed(KEY_B))
+	{
+		ScaleTwidth = 0;
+		ScaleTheight = 0;
+		WND1.Klt.ClearState();
 	}
 		WND1.ReturnGFX().EndFrame();
 	
