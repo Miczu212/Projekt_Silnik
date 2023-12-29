@@ -7,12 +7,13 @@
 #include <ShObjIdl.h>
 #include <gdiplus.h>
 #include<vector>
+#include"TextureInstance.h"
 #pragma comment(lib, "gdiplus.lib")
 class Mainapp
 {
 private:
-	int TextureTabCounter = -1;
-	std::vector<std::filesystem::path> TextureTab;
+	int TextureInstanceTabCounter =-1;
+	std::vector<TextureInstance> TextureInstanceTab;
 	const int ScreenWidth = 1024;
 	const int ScreenHeight = 820;
 	MSG msg;
@@ -20,7 +21,6 @@ private:
 	WND WND1;
 	Timer timer;
 	D2D1_POINT_2F MousePosition;
-	UINT Twidth=0, Theight=0;
 	UINT ScaleTwidth = 0, ScaleTheight = 0;
 	
 	

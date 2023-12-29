@@ -36,42 +36,26 @@ void Mainapp::DoFrame() {
 		WND1.ReturnGFX().Draw(MousePosition, MousePosition);
 	else
 		WND1.ReturnGFX().Draw(MousePosition);
-
-
-	if (WND1.ReturnGFX().pBitmap.Get())
+	if (TextureInstanceTab.size() != 0)
 	{
-		//dostawanie wysokosci i szerokosci textury
-		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-		ULONG_PTR gdiplusToken;
-		Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-		Gdiplus::Bitmap* bitmap = Gdiplus::Bitmap::FromFile(TextureTab[TextureTabCounter].c_str());
-		if (bitmap) {
+		if (TextureInstanceTab[TextureInstanceTabCounter].pBitmap)
+		{
 
-			Twidth = bitmap->GetWidth();
-			Theight = bitmap->GetHeight();
-			delete bitmap;
+			//for(int i=0;i< TextureInstanceTab.size();i++){} //TODO 
+			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth, TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
+			WND1.ReturnGFX().ReturnRenderTarget()->Clear();
+			WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect);
 		}
-		else {
-		}
-
-		Gdiplus::GdiplusShutdown(gdiplusToken);
-		//
-		D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), Twidth+ WND1.Mk.GetPosX()+ScaleTwidth, Theight+ WND1.Mk.GetPosY() + ScaleTheight);
-		WND1.ReturnGFX().ReturnRenderTarget()->Clear();
-		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(WND1.ReturnGFX().pBitmap.Get(), destinationRect);
 	}
 		//Zmiana miedzy texturami wyswietlanymi
 	if (WND1.Klt.KeyIsPressed(KEY_R))
 	{
-		TextureTabCounter++;
-		Twidth = 0;
-		Theight = 0;
-		if (TextureTabCounter > TextureTab.size() - 1)
-		{
-			TextureTabCounter = 0;
-		}
-		WND1.ReturnGFX().pBitmap.Reset();  // Zwalnianie poprzedniego zasobu.
-		LoadBMPToTexture(TextureTab[TextureTabCounter], WND1.ReturnGFX().ReturnRenderTarget(), WND1.ReturnGFX().pBitmap.GetAddressOf());
+		TextureInstanceTabCounter++;
+		if (TextureInstanceTabCounter > TextureInstanceTab.size() - 1)
+			TextureInstanceTabCounter = 0;
+
+		TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Reset();  // Zwalnianie poprzedniego zasobu.
+		LoadBMPToTexture(TextureInstanceTab[TextureInstanceTabCounter].GetPath(), WND1.ReturnGFX().ReturnRenderTarget(), TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf());
 		WND1.Klt.ClearState();
 	}
 		//Wczytanie Textury
@@ -97,17 +81,40 @@ void Mainapp::DoFrame() {
 					PWSTR pszFilePath;
 					if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath)))
 					{
-
-						// Konwertuj na std::wstring lub std::string
+						TextureInstanceTabCounter++;
+							// Konwertuj na std::wstring lub std::string
 						std::wstring selectedFilePath = pszFilePath;
-						// Mo¿esz tak¿e skopiowaæ plik do folderu projektu itp.
-						LoadBMPToTexture(CopiedPath = CopyBitmapToProjectFolder(selectedFilePath), WND1.ReturnGFX().ReturnRenderTarget(), WND1.ReturnGFX().pBitmap.GetAddressOf());
-						TextureTab.push_back(CopiedPath);
-						Twidth = 0;
-						Theight = 0;
-						TextureTabCounter++;
-						// Zwolnij pamiêæ
+						TextureInstance NewTextureInstance;
+						TextureInstanceTab.push_back(NewTextureInstance);
+							// Mo¿esz tak¿e skopiowaæ plik do folderu projektu itp.
+
+						LoadBMPToTexture(
+							CopiedPath = CopyBitmapToProjectFolder(selectedFilePath),
+							WND1.ReturnGFX().ReturnRenderTarget(),
+							TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf()
+						);
+						TextureInstanceTab[TextureInstanceTabCounter].SetPath(CopiedPath);
+							// Zwolnij pamiêæ
 						CoTaskMemFree(pszFilePath);
+
+
+
+						//dostawanie wysokosci i szerokosci textury
+						Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+						ULONG_PTR gdiplusToken;
+						Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+						Gdiplus::Bitmap* bitmap = Gdiplus::Bitmap::FromFile(TextureInstanceTab[TextureInstanceTabCounter].GetPath().c_str());
+						if (bitmap) {
+
+							TextureInstanceTab[TextureInstanceTabCounter].Twidth = bitmap->GetWidth();
+							TextureInstanceTab[TextureInstanceTabCounter].Theight = bitmap->GetHeight();
+							delete bitmap;
+						}
+						else {
+						}
+
+						Gdiplus::GdiplusShutdown(gdiplusToken);
+						
 					}
 
 
@@ -146,7 +153,8 @@ void Mainapp::DoFrame() {
 		ScaleTheight = 0;
 		WND1.Klt.ClearState();
 	}
-		WND1.ReturnGFX().EndFrame();
+		
+	WND1.ReturnGFX().EndFrame();
 	
 }
 

@@ -139,6 +139,7 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Input.h" />
     <ClCompile Include="MAINWindow.cpp" />
+    <ClCompile Include="TextureInstance.cpp" />
     <ClCompile Include="WND.cpp" />
     <ClCompile Include="Mainapp.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="GFX.h" />
     <ClInclude Include="KeyNames.h" />
     <ClInclude Include="Mainapp.h" />
+    <ClInclude Include="TextureInstance.h" />
     <ClInclude Include="WND.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
