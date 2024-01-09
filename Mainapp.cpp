@@ -32,8 +32,19 @@ void Mainapp::DoFrame() {
 	WND1.ReturnGFX().BeginFrame();
 
 	WND1.ReturnGFX().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
-	if (WND1.Mk.LeftIsPressed() == true)
+	if (WND1.Mk.LeftIsPressed() == true) {
+	
 		WND1.ReturnGFX().Draw(MousePosition, MousePosition);
+		if (TextureInstanceTabCounter != -1) {
+			//TextureInstanceTab[TextureInstanceTabCounter].TexturePointTab.push_back(MousePosition);		
+			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
+				TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
+
+			TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab.push_back(destinationRect);
+		}
+		
+	}
+
 	else
 		WND1.ReturnGFX().Draw(MousePosition);
 	if (TextureInstanceTab.size() != 0)
@@ -42,9 +53,15 @@ void Mainapp::DoFrame() {
 		{
 
 			//for(int i=0;i< TextureInstanceTab.size();i++){} //TODO 
-			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth, TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
 			WND1.ReturnGFX().ReturnRenderTarget()->Clear();
-			WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect);
+			for (int i = 0; i < TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab.size(); i++)
+			{
+				WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab[i]); //rysowanie bitmap
+			
+			}
+			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
+				TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
+			WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect); //rysowanie bitmap
 		}
 	}
 		//Zmiana miedzy texturami wyswietlanymi
