@@ -19,11 +19,11 @@ WND::WND(int Width, int Height, const char* nazwa) //definicja konstruktora
 		winRect.bottom = Height + winRect.top;
 		
 		if (		//error handling
-			AdjustWindowRect(&winRect, WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU, FALSE)==0) //cos jak rejestracja winclass tylko dla recta
+			AdjustWindowRect(&winRect, WS_CAPTION |WS_MINIMIZEBOX |  WS_SYSMENU, FALSE)==0) //cos jak rejestracja winclass tylko dla recta
 		{
 			throw CHWND_LAST_EXCEPT();
 		}
-	hwnd = CreateWindowA(wName, nazwa, WS_CAPTION | WS_MINIMIZEBOX |WS_MAXIMIZEBOX  | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT,
+	hwnd = CreateWindowA(wName, nazwa, WS_CAPTION | WS_MINIMIZEBOX  | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT,
 		 winRect.right - winRect.left,winRect.bottom - winRect.top, nullptr, nullptr, hInstance, this);// dokumentacja jest na stronie microsoftu 
 	if (hwnd == nullptr)
 	{
