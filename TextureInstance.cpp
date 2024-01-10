@@ -1,6 +1,6 @@
 #include "TextureInstance.h"
 
-std::filesystem::path TextureInstance::GetPath()
+std::filesystem::path TextureInstance::GetPath() const
 {
 	return Path;
 }

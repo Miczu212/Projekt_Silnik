@@ -20,51 +20,9 @@ int Mainapp::Go()
 	}
 	return msg.wParam;
 }
-
-void Mainapp::DoFrame() {
-	std::filesystem::path CopiedPath;
-	std::random_device rd; //tecza ale boli w oczy
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> dis(0, 10);
-	int randomNumber = dis(gen);
-	int randomNumber2 = dis(gen);
-	int randomNumber3 = dis(gen);
-	WND1.ReturnGFX().BeginFrame();
-
-	WND1.ReturnGFX().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
-	if (WND1.Mk.LeftIsPressed() == true) {
-	
-		WND1.ReturnGFX().Draw(MousePosition, MousePosition);
-		if (TextureInstanceTabCounter != -1) {
-			//TextureInstanceTab[TextureInstanceTabCounter].TexturePointTab.push_back(MousePosition);		
-			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
-				TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
-
-			TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab.push_back(destinationRect);
-		}
-		
-	}
-
-	else
-		WND1.ReturnGFX().Draw(MousePosition);
-	if (TextureInstanceTab.size() != 0)
-	{
-		if (TextureInstanceTab[TextureInstanceTabCounter].pBitmap)
-		{
-
-			//for(int i=0;i< TextureInstanceTab.size();i++){} //TODO 
-			WND1.ReturnGFX().ReturnRenderTarget()->Clear();
-			for (int i = 0; i < TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab.size(); i++)
-			{
-				WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab[i]); //rysowanie bitmap
-			
-			}
-			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
-				TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
-			WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect); //rysowanie bitmap
-		}
-	}
-		//Zmiana miedzy texturami wyswietlanymi
+void Mainapp::HandleInput()
+{
+	//Zmiana miedzy texturami wyswietlanymi
 	if (WND1.Klt.KeyIsPressed(KEY_R))
 	{
 		TextureInstanceTabCounter++;
@@ -75,9 +33,10 @@ void Mainapp::DoFrame() {
 		LoadBMPToTexture(TextureInstanceTab[TextureInstanceTabCounter].GetPath(), WND1.ReturnGFX().ReturnRenderTarget(), TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf());
 		WND1.Klt.ClearState();
 	}
-		//Wczytanie Textury
+	//Wczytanie Textury
 	if (WND1.Klt.KeyIsPressed(KEY_F))
 	{
+		std::filesystem::path CopiedPath;
 
 		Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
 		HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
@@ -99,11 +58,11 @@ void Mainapp::DoFrame() {
 					if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath)))
 					{
 						TextureInstanceTabCounter++;
-							// Konwertuj na std::wstring lub std::string
+						// Konwertuj na std::wstring lub std::string
 						std::wstring selectedFilePath = pszFilePath;
 						TextureInstance NewTextureInstance;
 						TextureInstanceTab.push_back(NewTextureInstance);
-							// Mo¿esz tak¿e skopiowaæ plik do folderu projektu itp.
+						// Mo¿esz tak¿e skopiowaæ plik do folderu projektu itp.
 
 						LoadBMPToTexture(
 							CopiedPath = CopyBitmapToProjectFolder(selectedFilePath),
@@ -111,7 +70,7 @@ void Mainapp::DoFrame() {
 							TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf()
 						);
 						TextureInstanceTab[TextureInstanceTabCounter].SetPath(CopiedPath);
-							// Zwolnij pamiêæ
+						// Zwolnij pamiêæ
 						CoTaskMemFree(pszFilePath);
 
 
@@ -131,7 +90,7 @@ void Mainapp::DoFrame() {
 						}
 
 						Gdiplus::GdiplusShutdown(gdiplusToken);
-						
+
 					}
 
 
@@ -143,24 +102,24 @@ void Mainapp::DoFrame() {
 
 		WND1.Klt.ClearState();
 	}
-		//zmiana tytulu okna
+	//zmiana tytulu okna
 	if (WND1.Klt.KeyIsPressed(KEY_Q))
 	{
 		SetWindowTextA(WND1.GetHandle(), "jak naciskam Q to sie zmienia na ta");
 		WND1.Klt.ClearState(); // wymagane, inaczej przycisk jest uznawany za "Wiecznie wcisniety"
 	}
-		//skalowanie textury zmniejszenie
-	if (WND1.Klt.KeyIsPressed(KEY_N)) 
+	//skalowanie textury zmniejszenie
+	if (WND1.Klt.KeyIsPressed(KEY_N))
 	{
-		ScaleTwidth-=10;
-		ScaleTheight-=10;
+		ScaleTwidth -= 10;
+		ScaleTheight -= 10;
 		WND1.Klt.ClearState();
 	}
-		//skalowanie textury zwiekszenie
-	if (WND1.Klt.KeyIsPressed(KEY_M)) 
+	//skalowanie textury zwiekszenie
+	if (WND1.Klt.KeyIsPressed(KEY_M))
 	{
-		ScaleTwidth+=10;
-		ScaleTheight+=10;
+		ScaleTwidth += 10;
+		ScaleTheight += 10;
 		WND1.Klt.ClearState();
 	}
 	// Reset do domyslnych width i height
@@ -170,8 +129,54 @@ void Mainapp::DoFrame() {
 		ScaleTheight = 0;
 		WND1.Klt.ClearState();
 	}
-		
+}
+void Mainapp::DoLogic() 
+{
+	HandleInput();
+	
+}
+void Mainapp::DoDrawing()
+{
+	WND1.ReturnGFX().BeginFrame();
+	WND1.ReturnGFX().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
+	if (WND1.Mk.LeftIsPressed() == true) {
+
+		WND1.ReturnGFX().Draw(MousePosition, MousePosition);
+		if (TextureInstanceTabCounter != -1) {
+			//TextureInstanceTab[TextureInstanceTabCounter].TexturePointTab.push_back(MousePosition);		
+			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
+				TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
+
+			TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab.push_back(destinationRect);
+		}
+
+	}
+
+	else
+		WND1.ReturnGFX().Draw(MousePosition);
+	if (TextureInstanceTab.size() != 0)
+	{
+		if (TextureInstanceTab[TextureInstanceTabCounter].pBitmap)
+		{
+			WND1.ReturnGFX().ReturnRenderTarget()->Clear();
+			for (int i = 0; i < TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab.size(); i++)
+			{
+				WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab[i]); //rysowanie bitmap
+
+			}
+			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
+				TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
+			WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect); //rysowanie bitmap
+		}
+	}
+
+
 	WND1.ReturnGFX().EndFrame();
+}
+void Mainapp::DoFrame() {
+
+	DoLogic();
+	DoDrawing();
 	
 }
 

@@ -28,6 +28,9 @@ public:
 	Mainapp();
 	int Go();
 	void DoFrame();
+	void HandleInput();
+	void DoLogic();
+	void DoDrawing();
 	std::filesystem::path CopyBitmapToProjectFolder(const std::wstring& sourceFilePath);
 	void ProcessMessages();
 	void LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, ID2D1Bitmap** ppBitmap);

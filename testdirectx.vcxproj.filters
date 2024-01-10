@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="HLSL">
-      <UniqueIdentifier>{eab55461-ce9b-49de-a486-fc3fce8c3db2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="INL">
       <UniqueIdentifier>{f95cf8aa-7177-43e4-8817-78712349be0a}</UniqueIdentifier>
     </Filter>
@@ -77,14 +74,6 @@
     <ClInclude Include="TextureInstance.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shaderkrawedzi.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="ShaderPixeli.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="DXGetErrorString.inl">

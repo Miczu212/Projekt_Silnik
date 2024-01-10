@@ -9,7 +9,7 @@ public:
 	UINT Twidth=0, Theight=0;
 	//std::vector<D2D1_POINT_2F> TexturePointTab; //suprise tool that will help us later
 	std::vector<D2D1_RECT_F> destinationRectTab; //suprise tool that will help us later
-	std::filesystem::path GetPath();
+	std::filesystem::path GetPath() const;
 	void SetPath(std::filesystem::path path);
 private:
 std::filesystem::path Path;

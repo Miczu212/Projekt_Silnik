@@ -1,5 +1,5 @@
 #include "Mainapp.h"
-int __stdcall WinMain(HINSTANCE hinstance,HINSTANCE hPrevInstance,LPSTR comline,int consoleshow)
+int CALLBACK WinMain(HINSTANCE hinstance,HINSTANCE hPrevInstance,LPSTR comline,int consoleshow)
 {
 	
 	try {
