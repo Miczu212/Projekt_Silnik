@@ -138,6 +138,7 @@
     <ClCompile Include="GFX.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Input.h" />
+    <ClCompile Include="LevelInstance.cpp" />
     <ClCompile Include="MAINWindow.cpp" />
     <ClCompile Include="TextureInstance.cpp" />
     <ClCompile Include="WND.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="Error.h" />
     <ClInclude Include="GFX.h" />
     <ClInclude Include="KeyNames.h" />
+    <ClInclude Include="LevelInstance.h" />
     <ClInclude Include="Mainapp.h" />
     <ClInclude Include="TextureInstance.h" />
     <ClInclude Include="WND.h" />

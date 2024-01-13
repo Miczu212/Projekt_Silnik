@@ -70,6 +70,7 @@ void Mainapp::HandleInput()
 							TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf()
 						);
 						TextureInstanceTab[TextureInstanceTabCounter].SetPath(CopiedPath);
+						TextureInstanceTab[TextureInstanceTabCounter].PATHTest=CopiedPath;
 						// Zwolnij pamiêæ
 						CoTaskMemFree(pszFilePath);
 
@@ -129,6 +130,20 @@ void Mainapp::HandleInput()
 		ScaleTheight = 0;
 		WND1.Klt.ClearState();
 	}
+	if (WND1.Klt.KeyIsPressed(KEY_Z)) //TODO ZROBIC SYSTEM WCZYTYWANIA I ZAPISYWANIA LEVELI
+	{
+		Currentlevel.SaveLevel(TextureInstanceTab[TextureInstanceTabCounter],"Level");
+		WND1.Klt.ClearState();
+	}
+	if (WND1.Klt.KeyIsPressed(KEY_L))
+	{
+		Currentlevel.LoadLevel(TextureInstanceTab[TextureInstanceTabCounter], "Level");
+		TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Reset();
+		LoadBMPToTexture(TextureInstanceTab[TextureInstanceTabCounter].PATHTest,
+			WND1.ReturnGFX().ReturnRenderTarget(),
+			TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf());
+		WND1.Klt.ClearState();
+	}
 }
 void Mainapp::DoLogic() 
 {
@@ -149,7 +164,7 @@ void Mainapp::DoDrawing()
 
 			TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab.push_back(destinationRect);
 		}
-
+		Sleep(100);
 	}
 
 	else
@@ -168,6 +183,8 @@ void Mainapp::DoDrawing()
 				TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
 			WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect); //rysowanie bitmap
 		}
+
+
 	}
 
 

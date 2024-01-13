@@ -7,6 +7,7 @@
 #include <ShObjIdl.h>
 #include <gdiplus.h>
 #include<vector>
+#include"LevelInstance.h"
 #include"TextureInstance.h"
 #pragma comment(lib, "gdiplus.lib")
 class Mainapp
@@ -22,9 +23,10 @@ private:
 	Timer timer;
 	D2D1_POINT_2F MousePosition;
 	UINT ScaleTwidth = 0, ScaleTheight = 0;
-	
+    LevelInstance Currentlevel;
 	
 public:
+	std::vector<LevelInstance> LevelInstanceTab;
 	Mainapp();
 	int Go();
 	void DoFrame();

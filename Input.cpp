@@ -150,7 +150,6 @@ Myszka::Event Myszka::Read()
 		return Myszka::Event();
 	}
 }
-
 void Myszka::Flush()
 {
 	buffer = std::queue<Event>();
