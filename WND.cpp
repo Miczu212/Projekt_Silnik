@@ -106,6 +106,7 @@ GFX& WND::ReturnGFX()
 	{
 		const POINTS points = MAKEPOINTS(lparam);
 		Mk.OnRightReleased(points.x, points.y);
+		CurrentMouseState = false;
 		break;
 	}
 
@@ -113,6 +114,7 @@ GFX& WND::ReturnGFX()
 	{
 		const POINTS points = MAKEPOINTS(lparam);
 		Mk.OnLeftReleased(points.x, points.y);
+		CurrentMouseState = false;
 		break;
 	}
 	case WM_MOUSEWHEEL:

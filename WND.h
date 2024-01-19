@@ -42,5 +42,6 @@ public:
 	HWND GetHandle() const;
 	Myszka Mk;
 	Klawiatura Klt;
+	bool CurrentMouseState=false; // Dodane w celu wy³¹czenia autoklika w myszce
 
 };
