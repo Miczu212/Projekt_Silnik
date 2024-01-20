@@ -165,7 +165,6 @@ void Mainapp::DoDrawing()
 
 				TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab.push_back(destinationRect);
 			}
-			Sleep(100);
 		}
 
 		else
