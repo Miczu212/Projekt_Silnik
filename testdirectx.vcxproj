@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="Error.h" />
+    <ClInclude Include="FunctionDefines.h" />
     <ClInclude Include="GFX.h" />
     <ClInclude Include="KeyNames.h" />
     <ClInclude Include="LevelInstance.h" />

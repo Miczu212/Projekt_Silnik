@@ -1,9 +1,9 @@
 #include "LevelInstance.h"
 
-void LevelInstance::SaveLevel(TextureInstance ToSave,std::string Filename) //TODO NAPISAC OD NOWA
+void LevelInstance::SaveLevel(TextureInstance ToSave,std::wstring Filename) //TODO NAPISAC OD NOWA
 {
     std::ofstream file;
-    file.open(Filename + ".dat", std::ios::binary);
+    file.open(Filename + L".dat", std::ios::binary);
     if (file.is_open())
     {
         size_t destinationRectTabSize = ToSave.destinationRectTab.size();
@@ -19,10 +19,10 @@ void LevelInstance::SaveLevel(TextureInstance ToSave,std::string Filename) //TOD
     }
 }
 
-void LevelInstance::LoadLevel(TextureInstance& ToLoad, std::string Filename)  //TODO NAPISAC OD NOWA
+void LevelInstance::LoadLevel(TextureInstance& ToLoad, std::wstring Filename)  //TODO NAPISAC OD NOWA
 {
     std::ifstream file;
-    file.open(Filename + ".dat", std::ios::binary);
+    file.open(Filename, std::ios::binary);
     if (file.is_open())
     {
         size_t destinationRectTabSize;

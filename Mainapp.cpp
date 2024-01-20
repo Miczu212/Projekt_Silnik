@@ -1,6 +1,4 @@
 #include "Mainapp.h"
-#include<random>
-#include<chrono>
 
 // DZIALA 
 
@@ -132,18 +130,82 @@ void Mainapp::HandleInput()
 	}
 	if (WND1.Klt.KeyIsPressed(KEY_Z)) //TODO ZROBIC SYSTEM WCZYTYWANIA I ZAPISYWANIA LEVELI
 	{
-		Currentlevel.SaveLevel(TextureInstanceTab[TextureInstanceTabCounter],"Level");
+		std::wstring selectedFilePath;
+		Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
+		HRESULT hr = CoCreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
+
+		if (SUCCEEDED(hr))
+		{
+			// Ustaw opcje dialogu, np. filtry plików
+			COMDLG_FILTERSPEC fileTypes[] = { L"Binary Files", L"*.bin;*.dat" };
+			pFileDialog->SetFileTypes(_countof(fileTypes), fileTypes);
+
+			// Poka¿ okno dialogowe
+			if (SUCCEEDED(pFileDialog->Show(WND1.GetHandle())))
+			{
+				// Pobierz wybrany plik
+				Microsoft::WRL::ComPtr<IShellItem> pShellItem;
+				if (SUCCEEDED(pFileDialog->GetResult(&pShellItem)))
+				{
+					PWSTR pszFilePath;
+					if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath)))
+					{
+						// Konwertuj na std::wstring lub std::string
+						selectedFilePath = pszFilePath;
+						// Zwolnij pamiêæ
+						CoTaskMemFree(pszFilePath);
+					}
+				}
+			}
+		}
+
+		Currentlevel.SaveLevel(TextureInstanceTab[TextureInstanceTabCounter], selectedFilePath);
 		WND1.Klt.ClearState();
 	}
 	if (WND1.Klt.KeyIsPressed(KEY_L))
 	{
-		Currentlevel.LoadLevel(TextureInstanceTab[TextureInstanceTabCounter], "Level");
+		
+		std::wstring selectedFilePath;
+		Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
+		HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
+
+		if (SUCCEEDED(hr))
+		{
+			// Ustaw opcje dialogu, np. filtry plików
+			COMDLG_FILTERSPEC fileTypes[] = { L"Binary Files", L"*.bin;*.dat" };
+			pFileDialog->SetFileTypes(_countof(fileTypes), fileTypes);
+
+			// Poka¿ okno dialogowe
+			if (SUCCEEDED(pFileDialog->Show(WND1.GetHandle())))
+			{
+				// Pobierz wybrany plik
+				Microsoft::WRL::ComPtr<IShellItem> pShellItem;
+				if (SUCCEEDED(pFileDialog->GetResult(&pShellItem)))
+				{
+					PWSTR pszFilePath;
+					if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath)))
+					{
+						// Konwertuj na std::wstring lub std::string
+						selectedFilePath = pszFilePath;
+						// Zwolnij pamiêæ
+						CoTaskMemFree(pszFilePath);
+
+					}
+
+
+				}
+			}
+
+
+		}
+		Currentlevel.LoadLevel(TextureInstanceTab[TextureInstanceTabCounter], selectedFilePath);
 		TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Reset();
 		LoadBMPToTexture(TextureInstanceTab[TextureInstanceTabCounter].PATHTest,
 			WND1.ReturnGFX().ReturnRenderTarget(),
 			TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf());
 		WND1.Klt.ClearState();
 	}
+	
 }
 void Mainapp::DoLogic() 
 {
@@ -154,7 +216,7 @@ void Mainapp::DoDrawing()
 {
 	WND1.ReturnGFX().BeginFrame();
 	WND1.ReturnGFX().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
-	if (WND1.CurrentMouseState == false) {
+	NoAutoclick(
 		if (WND1.Mk.LeftIsPressed() == true) {
 			WND1.CurrentMouseState = true;
 			WND1.ReturnGFX().Draw(MousePosition, MousePosition);
@@ -169,7 +231,7 @@ void Mainapp::DoDrawing()
 
 		else
 			WND1.ReturnGFX().Draw(MousePosition);
-	}
+	)
 	if (TextureInstanceTab.size() != 0)
 	{
 		if (TextureInstanceTab[TextureInstanceTabCounter].pBitmap)

@@ -9,6 +9,7 @@
 #include<vector>
 #include"LevelInstance.h"
 #include"TextureInstance.h"
+#include"FunctionDefines.h"
 #pragma comment(lib, "gdiplus.lib")
 class Mainapp
 {

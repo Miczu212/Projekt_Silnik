@@ -5,7 +5,7 @@
 class LevelInstance
 {
 public:
-	void SaveLevel(TextureInstance ToSave, std::string Filename);
-	void LoadLevel(TextureInstance& ToLoad, std::string Filename);
+	void SaveLevel(TextureInstance ToSave, std::wstring Filename);
+	void LoadLevel(TextureInstance& ToLoad, std::wstring Filename);
 
 };
