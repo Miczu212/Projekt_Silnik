@@ -27,13 +27,14 @@ void Mainapp::HandleInput()
 		if (TextureInstanceTabCounter > TextureInstanceTab.size() - 1)
 			TextureInstanceTabCounter = 0;
 
-		TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Reset();  // Zwalnianie poprzedniego zasobu.
-		LoadBMPToTexture(TextureInstanceTab[TextureInstanceTabCounter].GetPath(), WND1.ReturnGFX().ReturnRenderTarget(), TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf());
+	//	TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Reset();  // Zwalnianie poprzedniego zasobu. 
+	//	LoadBMPToTexture(TextureInstanceTab[TextureInstanceTabCounter].GetPath(), WND1.ReturnGFX().ReturnRenderTarget(), TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf());
 		WND1.Klt.ClearState();
 	}
 	//Wczytanie Textury
 	if (WND1.Klt.KeyIsPressed(KEY_F))
 	{
+		czyrysowaclinie = false;
 		std::filesystem::path CopiedPath;
 
 		Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
@@ -219,36 +220,36 @@ void Mainapp::DoDrawing()
 	NoAutoclick(
 		if (WND1.Mk.LeftIsPressed() == true) {
 			WND1.CurrentMouseState = true;
+			if(czyrysowaclinie==true)
 			WND1.ReturnGFX().Draw(MousePosition, MousePosition);
 			if (TextureInstanceTabCounter != -1) {
 				//TextureInstanceTab[TextureInstanceTabCounter].TexturePointTab.push_back(MousePosition);		
 				D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
 					TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
-
 				TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab.push_back(destinationRect);
 			}
 		}
-
-		else
+		else if (czyrysowaclinie == true)
 			WND1.ReturnGFX().Draw(MousePosition);
 	)
-	if (TextureInstanceTab.size() != 0)
-	{
-		if (TextureInstanceTab[TextureInstanceTabCounter].pBitmap)
+		if (TextureInstanceTab.size()!= 0)
 		{
-			WND1.ReturnGFX().ReturnRenderTarget()->Clear();
-			for (int i = 0; i < TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab.size(); i++)
+			for (const auto& texture : TextureInstanceTab)
 			{
-				WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab[i]); //rysowanie bitmap
-
+				if (texture.pBitmap)
+				{
+					// Rysuj wszystkie instancje tekstur na ekranie
+					for (const auto& destinationRect : texture.destinationRectTab)
+					{
+						WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(texture.pBitmap.Get(), destinationRect);
+					}
+				}
 			}
+
 			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
 				TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
 			WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect); //rysowanie bitmap
 		}
-
-
-	}
 
 
 	WND1.ReturnGFX().EndFrame();

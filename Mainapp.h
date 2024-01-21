@@ -18,6 +18,7 @@ private:
 	std::vector<TextureInstance> TextureInstanceTab;
 	const int ScreenWidth = 1024;
 	const int ScreenHeight = 820;
+	bool czyrysowaclinie = true;
 	MSG msg;
 	BOOL result;
 	WND WND1;
