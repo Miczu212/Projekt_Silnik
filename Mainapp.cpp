@@ -159,8 +159,9 @@ void Mainapp::HandleInput()
 				}
 			}
 		}
-
-		Currentlevel.SaveLevel(TextureInstanceTab[TextureInstanceTabCounter], selectedFilePath);
+			Currentlevel.SaveLevel(TextureInstanceTab, selectedFilePath);
+		
+	
 		WND1.Klt.ClearState();
 	}
 	if (WND1.Klt.KeyIsPressed(KEY_L))
@@ -199,11 +200,14 @@ void Mainapp::HandleInput()
 
 
 		}
-		Currentlevel.LoadLevel(TextureInstanceTab[TextureInstanceTabCounter], selectedFilePath);
-		TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Reset();
-		LoadBMPToTexture(TextureInstanceTab[TextureInstanceTabCounter].PATHTest,
-			WND1.ReturnGFX().ReturnRenderTarget(),
-			TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf());
+		Currentlevel.LoadLevel(TextureInstanceTab, selectedFilePath);
+		for (int i = 0; i < TextureInstanceTab.size(); i++)
+		{
+			LoadBMPToTexture(TextureInstanceTab[i].PATHTest,
+				WND1.ReturnGFX().ReturnRenderTarget(),
+				TextureInstanceTab[i].pBitmap.GetAddressOf());
+		}
+		
 		WND1.Klt.ClearState();
 	}
 	

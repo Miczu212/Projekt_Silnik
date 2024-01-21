@@ -1,44 +1,62 @@
 #include "LevelInstance.h"
-
-void LevelInstance::SaveLevel(TextureInstance ToSave,std::wstring Filename) //TODO NAPISAC OD NOWA
+void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSave, const std::wstring& Filename)
 {
     std::ofstream file;
     file.open(Filename + L".dat", std::ios::binary);
     if (file.is_open())
     {
-        size_t destinationRectTabSize = ToSave.destinationRectTab.size();
-        file.write(reinterpret_cast<char*>(&destinationRectTabSize), sizeof(destinationRectTabSize));
-        for (int i = 0; i < ToSave.destinationRectTab.size(); i++)
+        size_t TextureCount = ToSave.size();
+        file.write(reinterpret_cast<char*>(&TextureCount), sizeof(TextureCount));
+
+        for (const auto& texture : ToSave)
         {
-            file.write(reinterpret_cast<char*>(&ToSave.destinationRectTab[i]), sizeof(ToSave.destinationRectTab[i]));
+            size_t destinationRectTabSize = texture.destinationRectTab.size();
+            file.write(reinterpret_cast<char*>(&destinationRectTabSize), sizeof(destinationRectTabSize));
+
+            // Zapisz ca³¹ tablicê destinationRectTab jako jeden blok danych
+            file.write(reinterpret_cast<const char*>(texture.destinationRectTab.data()),
+                destinationRectTabSize * sizeof(D2D1_RECT_F));
+
+            std::wstring::size_type sizepath = texture.PATHTest.size();
+            file.write(reinterpret_cast<char*>(&sizepath), sizeof(sizepath));
+            file.write(reinterpret_cast<const char*>(texture.PATHTest.c_str()), sizepath * sizeof(wchar_t));
         }
-        std::wstring::size_type sizepath = ToSave.PATHTest.size();
-        file.write(reinterpret_cast<char*>(&sizepath), sizeof(sizepath));
-        file.write(reinterpret_cast<const char*>(ToSave.PATHTest.c_str()), sizepath * sizeof(wchar_t));
+
         file.close();
     }
 }
 
-void LevelInstance::LoadLevel(TextureInstance& ToLoad, std::wstring Filename)  //TODO NAPISAC OD NOWA
+void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoad, const std::wstring& Filename)
 {
     std::ifstream file;
     file.open(Filename, std::ios::binary);
     if (file.is_open())
     {
-        size_t destinationRectTabSize;
-        ToLoad.destinationRectTab.clear();
-        file.read(reinterpret_cast<char*>(&destinationRectTabSize), sizeof(destinationRectTabSize));
-        for (int i = 0; i < destinationRectTabSize; i++)
+        size_t TextureCount;
+        file.read(reinterpret_cast<char*>(&TextureCount), sizeof(TextureCount));
+
+        ToLoad.resize(TextureCount);
+
+        for (size_t i = 0; i < TextureCount; ++i)
         {
-            D2D1_RECT_F TempRect;
-            file.read(reinterpret_cast<char*>(&TempRect), sizeof(TempRect));
-            ToLoad.destinationRectTab.push_back(TempRect);
+            TextureInstance& TempTexture = ToLoad[i];
+
+            size_t destinationRectTabSize;
+            file.read(reinterpret_cast<char*>(&destinationRectTabSize), sizeof(destinationRectTabSize));
+            TempTexture.destinationRectTab.resize(destinationRectTabSize);
+
+            // Odczytaj ca³¹ tablicê destinationRectTab jako jeden blok danych
+            file.read(reinterpret_cast<char*>(TempTexture.destinationRectTab.data()),
+                destinationRectTabSize * sizeof(D2D1_RECT_F));
+
+            std::wstring::size_type sizepath;
+            file.read(reinterpret_cast<char*>(&sizepath), sizeof(sizepath));
+            TempTexture.PATHTest.resize(sizepath);
+            file.read(reinterpret_cast<char*>(&TempTexture.PATHTest[0]), sizepath * sizeof(wchar_t));
         }
-        std::wstring::size_type sizepath;
-        file.read(reinterpret_cast<char*>(&sizepath), sizeof(sizepath));
-        ToLoad.PATHTest.resize(sizepath);
-        file.read(reinterpret_cast<char*>(&ToLoad.PATHTest[0]), sizepath * sizeof(wchar_t));
 
         file.close();
     }
 }
+
+
