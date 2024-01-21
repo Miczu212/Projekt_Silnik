@@ -210,7 +210,30 @@ void Mainapp::HandleInput()
 		
 		WND1.Klt.ClearState();
 	}
-	
+	if (WND1.Klt.KeyIsPressed(KEY_RIGHT))
+	{
+		CameraXPosition=10;
+		CameraXState = true;
+		WND1.Klt.ClearState();
+	}
+	if (WND1.Klt.KeyIsPressed(KEY_LEFT))
+	{
+		CameraXPosition = -10;
+		CameraXState = true;
+		WND1.Klt.ClearState();
+	}
+	if (WND1.Klt.KeyIsPressed(KEY_UP))
+	{
+		CameraYPosition = -10;
+		CameraYState = true;
+		WND1.Klt.ClearState();
+	}
+	if (WND1.Klt.KeyIsPressed(KEY_DOWN))
+	{
+		CameraYPosition = 10;
+		CameraYState = true;
+		WND1.Klt.ClearState();
+	}
 }
 void Mainapp::DoLogic() 
 {
@@ -238,12 +261,13 @@ void Mainapp::DoDrawing()
 	)
 		if (TextureInstanceTab.size()!= 0)
 		{
-			for (const auto& texture : TextureInstanceTab)
+			UpdateCameraPosition();
+			for (auto& texture : TextureInstanceTab)
 			{
 				if (texture.pBitmap)
 				{
 					// Rysuj wszystkie instancje tekstur na ekranie
-					for (const auto& destinationRect : texture.destinationRectTab)
+					for (auto& destinationRect : texture.destinationRectTab)
 					{
 						WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(texture.pBitmap.Get(), destinationRect);
 					}
@@ -264,6 +288,31 @@ void Mainapp::DoFrame() {
 	DoDrawing();
 	
 }
+void Mainapp::UpdateCameraPosition()
+{
+	if (CameraXState || CameraYState)
+	{
+		for (auto& texture : TextureInstanceTab)
+		{
+			for (int i = 0; i < texture.destinationRectTab.size(); i++)
+			{
+				if (CameraXState) {
+					texture.destinationRectTab[i].left += CameraXPosition;
+					texture.destinationRectTab[i].right += CameraXPosition;
+				}
+				if (CameraYState) {
+					texture.destinationRectTab[i].top += CameraYPosition;
+					texture.destinationRectTab[i].bottom += CameraYPosition;
+				}
+			}
+		}
+		CameraXPosition = 0;
+		CameraYPosition = 0;
+		CameraXState = false;
+		CameraYState = false;
+	}
+}
+
 
 std::filesystem::path Mainapp::CopyBitmapToProjectFolder(const std::wstring& SourceFilePath)
 {

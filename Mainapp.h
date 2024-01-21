@@ -19,6 +19,10 @@ private:
 	const int ScreenWidth = 1024;
 	const int ScreenHeight = 820;
 	bool czyrysowaclinie = true;
+	int CameraXPosition = 0;
+	int CameraYPosition = 0;
+	bool CameraXState = false;
+	bool CameraYState = false;
 	MSG msg;
 	BOOL result;
 	WND WND1;
@@ -32,6 +36,7 @@ public:
 	Mainapp();
 	int Go();
 	void DoFrame();
+	void UpdateCameraPosition();
 	void HandleInput();
 	void DoLogic();
 	void DoDrawing();
