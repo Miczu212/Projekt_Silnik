@@ -23,6 +23,7 @@ private:
 	int CameraYPosition = 0;
 	bool CameraXState = false;
 	bool CameraYState = false;
+	D2D1_RECT_F PlayerRect;
 	MSG msg;
 	BOOL result;
 	WND WND1;
@@ -30,6 +31,7 @@ private:
 	D2D1_POINT_2F MousePosition;
 	UINT ScaleTwidth = 0, ScaleTheight = 0;
     LevelInstance Currentlevel;
+	TextureInstance PlayerTexture;
 	
 public:
 	std::vector<LevelInstance> LevelInstanceTab;

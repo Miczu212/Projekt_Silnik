@@ -21,7 +21,7 @@ int Mainapp::Go()
 void Mainapp::HandleInput()
 {
 	//Zmiana miedzy texturami wyswietlanymi
-	if (WND1.Klt.KeyIsPressed(KEY_R))
+	if (ISPressed(KEY_R))
 	{
 		TextureInstanceTabCounter++;
 		if (TextureInstanceTabCounter > TextureInstanceTab.size() - 1)
@@ -32,7 +32,7 @@ void Mainapp::HandleInput()
 		WND1.Klt.ClearState();
 	}
 	//Wczytanie Textury
-	if (WND1.Klt.KeyIsPressed(KEY_F))
+	if (ISPressed(KEY_F))
 	{
 		czyrysowaclinie = false;
 		std::filesystem::path CopiedPath;
@@ -103,33 +103,33 @@ void Mainapp::HandleInput()
 		WND1.Klt.ClearState();
 	}
 	//zmiana tytulu okna
-	if (WND1.Klt.KeyIsPressed(KEY_Q))
+	if (ISPressed(KEY_Q))
 	{
 		SetWindowTextA(WND1.GetHandle(), "jak naciskam Q to sie zmienia na ta");
 		WND1.Klt.ClearState(); // wymagane, inaczej przycisk jest uznawany za "Wiecznie wcisniety"
 	}
 	//skalowanie textury zmniejszenie
-	if (WND1.Klt.KeyIsPressed(KEY_N))
+	if (ISPressed(KEY_N))
 	{
 		ScaleTwidth -= 10;
 		ScaleTheight -= 10;
 		WND1.Klt.ClearState();
 	}
 	//skalowanie textury zwiekszenie
-	if (WND1.Klt.KeyIsPressed(KEY_M))
+	if (ISPressed(KEY_M))
 	{
 		ScaleTwidth += 10;
 		ScaleTheight += 10;
 		WND1.Klt.ClearState();
 	}
 	// Reset do domyslnych width i height
-	if (WND1.Klt.KeyIsPressed(KEY_B))
+	if (ISPressed(KEY_B))
 	{
 		ScaleTwidth = 0;
 		ScaleTheight = 0;
 		WND1.Klt.ClearState();
 	}
-	if (WND1.Klt.KeyIsPressed(KEY_Z)) //TODO ZROBIC SYSTEM WCZYTYWANIA I ZAPISYWANIA LEVELI
+	if (ISPressed(KEY_Z)) //TODO ZROBIC SYSTEM WCZYTYWANIA I ZAPISYWANIA LEVELI
 	{
 		std::wstring selectedFilePath;
 		Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
@@ -164,7 +164,7 @@ void Mainapp::HandleInput()
 	
 		WND1.Klt.ClearState();
 	}
-	if (WND1.Klt.KeyIsPressed(KEY_L))
+	if (ISPressed(KEY_L))
 	{
 		
 		std::wstring selectedFilePath;
@@ -210,30 +210,43 @@ void Mainapp::HandleInput()
 		
 		WND1.Klt.ClearState();
 	}
-	if (WND1.Klt.KeyIsPressed(KEY_RIGHT))
+	if (ISPressed(KEY_LEFT))
 	{
 		CameraXPosition=10;
 		CameraXState = true;
 		WND1.Klt.ClearState();
 	}
-	if (WND1.Klt.KeyIsPressed(KEY_LEFT))
+	if (ISPressed(KEY_RIGHT))
 	{
 		CameraXPosition = -10;
 		CameraXState = true;
 		WND1.Klt.ClearState();
 	}
-	if (WND1.Klt.KeyIsPressed(KEY_UP))
+	if (ISPressed(KEY_UP))
 	{
 		CameraYPosition = -10;
 		CameraYState = true;
 		WND1.Klt.ClearState();
 	}
-	if (WND1.Klt.KeyIsPressed(KEY_DOWN))
+	if (ISPressed(KEY_DOWN))
 	{
 		CameraYPosition = 10;
 		CameraYState = true;
 		WND1.Klt.ClearState();
 	}
+	if (ISPressed(KEY_P))
+	{
+		PlayerTexture = TextureInstanceTab[TextureInstanceTabCounter];
+
+		PlayerRect = D2D1::RectF(
+			ScreenWidth / 2 - (PlayerTexture.Twidth + ScaleTwidth) / 2,
+			ScreenHeight / 2 - (PlayerTexture.Theight + ScaleTheight) / 2,
+			ScreenWidth / 2 + (PlayerTexture.Twidth + ScaleTwidth) / 2,
+			ScreenHeight / 2 + (PlayerTexture.Theight + ScaleTheight) / 2
+		); //zrobione tak by postac byla zawsze na srodku ekranu
+
+	}
+	
 }
 void Mainapp::DoLogic() 
 {
@@ -244,7 +257,7 @@ void Mainapp::DoDrawing()
 {
 	WND1.ReturnGFX().BeginFrame();
 	WND1.ReturnGFX().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
-	NoAutoclick(
+	NoAutoclick(			//Ta funkcja jest tutaj nie w handle input dlatego ¿e jest bezpoœrednio zwi¹zana z rysowaniem 
 		if (WND1.Mk.LeftIsPressed() == true) {
 			WND1.CurrentMouseState = true;
 			if(czyrysowaclinie==true)
@@ -278,7 +291,8 @@ void Mainapp::DoDrawing()
 				TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
 			WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect); //rysowanie bitmap
 		}
-
+	if(PlayerTexture.pBitmap) //jak textura gracza jest to rysuj
+		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(PlayerTexture.pBitmap.Get(), PlayerRect);
 
 	WND1.ReturnGFX().EndFrame();
 }
