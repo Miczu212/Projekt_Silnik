@@ -23,6 +23,7 @@ private:
 	int CameraYPosition = 0;
 	bool CameraXState = false;
 	bool CameraYState = false;
+	UINT32 KeyColour = 0xFFFF00FF;
 	D2D1_RECT_F PlayerRect;
 	MSG msg;
 	BOOL result;

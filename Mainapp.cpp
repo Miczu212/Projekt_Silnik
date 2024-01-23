@@ -222,13 +222,13 @@ void Mainapp::HandleInput()
 		CameraXState = true;
 		WND1.Klt.ClearState();
 	}
-	if (ISPressed(KEY_UP))
+	if (ISPressed(KEY_DOWN))
 	{
 		CameraYPosition = -10;
 		CameraYState = true;
 		WND1.Klt.ClearState();
 	}
-	if (ISPressed(KEY_DOWN))
+	if (ISPressed(KEY_UP))
 	{
 		CameraYPosition = 10;
 		CameraYState = true;
@@ -289,7 +289,7 @@ void Mainapp::DoDrawing()
 
 			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
 				TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
-			WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect); //rysowanie bitmap
+			WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect);
 		}
 	if(PlayerTexture.pBitmap) //jak textura gracza jest to rysuj
 		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(PlayerTexture.pBitmap.Get(), PlayerRect);
@@ -396,10 +396,48 @@ void Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::Com
 					hr = pConverter->Initialize(pFrame.Get(), GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.0, WICBitmapPaletteTypeMedianCut);
 					if (SUCCEEDED(hr))
 					{
-						hr = pRenderTarget->CreateBitmapFromWicBitmap(pConverter.Get(), nullptr, ppBitmap);
+						
+						UINT width, height;
+						hr = pConverter->GetSize(&width, &height);
+						if (SUCCEEDED(hr))
+						{
+							
+							std::vector<BYTE> pixelData(width * height * 4);
+
+							
+							WICRect rect = { 0, 0, static_cast<INT>(width), static_cast<INT>(height) };
+							hr = pConverter->CopyPixels(&rect, width * 4, width * height * 4, pixelData.data());
+							if (SUCCEEDED(hr))
+							{
+								// zamieniamy kluczowy kolor na przeüroczysty
+								for (UINT i = 0; i < width * height; ++i)
+								{
+									if (*reinterpret_cast<UINT32*>(&pixelData[i * 4]) == KeyColour)
+									{
+										*reinterpret_cast<UINT32*>(&pixelData[i * 4]) = 0; //alpha to 0
+									}
+								}
+
+								D2D1_BITMAP_PROPERTIES bitmapProperties;
+								bitmapProperties.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
+								bitmapProperties.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
+								bitmapProperties.dpiX = 96.0f;
+								bitmapProperties.dpiY = 96.0f;
+
+								//faktyczne tworzenie bitmapy
+								hr = pRenderTarget->CreateBitmap(
+									D2D1::SizeU(width, height),
+									pixelData.data(),
+									width * 4,
+									&bitmapProperties,
+									ppBitmap
+								);
+							}
+						}
 					}
 				}
 			}
 		}
 	}
 }
+
