@@ -159,7 +159,7 @@ void Mainapp::HandleInput()
 				}
 			}
 		}
-			Currentlevel.SaveLevel(TextureInstanceTab, selectedFilePath);
+			Currentlevel.SaveLevel(TextureInstanceTab, selectedFilePath, PlayerTexture);
 		
 	
 		WND1.Klt.ClearState();
@@ -200,7 +200,7 @@ void Mainapp::HandleInput()
 
 
 		}
-		Currentlevel.LoadLevel(TextureInstanceTab, selectedFilePath);
+		Currentlevel.LoadLevel(TextureInstanceTab, selectedFilePath,PlayerTexture);
 		for (int i = 0; i < TextureInstanceTab.size(); i++)
 		{
 			LoadBMPToTexture(TextureInstanceTab[i].PATHTest,
@@ -212,25 +212,25 @@ void Mainapp::HandleInput()
 	}
 	if (ISPressed(KEY_LEFT))
 	{
-		CameraXPosition=10;
+		CameraXPosition=CameraSpeed;
 		CameraXState = true;
 		WND1.Klt.ClearState();
 	}
 	if (ISPressed(KEY_RIGHT))
 	{
-		CameraXPosition = -10;
+		CameraXPosition = -CameraSpeed;
 		CameraXState = true;
 		WND1.Klt.ClearState();
 	}
 	if (ISPressed(KEY_DOWN))
 	{
-		CameraYPosition = -10;
+		CameraYPosition = -CameraSpeed;
 		CameraYState = true;
 		WND1.Klt.ClearState();
 	}
 	if (ISPressed(KEY_UP))
 	{
-		CameraYPosition = 10;
+		CameraYPosition = CameraSpeed;
 		CameraYState = true;
 		WND1.Klt.ClearState();
 	}
@@ -302,28 +302,84 @@ void Mainapp::DoFrame() {
 	DoDrawing();
 	
 }
+
+bool Mainapp::IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) //jezeli prostok¹ty siê pokryj¹ zwracana jest odpowiednia wartosc
+{
+	// Sprawdzamy warunki brzegowe, czyli czy jeden prostok¹t jest po lewej, po prawej, nad lub pod drugim prostok¹tem.
+	if (rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom < rect2.top || rect1.top > rect2.bottom)
+		return false;
+	return true;
+}
 void Mainapp::UpdateCameraPosition()
 {
+	std::vector<TextureInstance> Rollback = TextureInstanceTab;
 	if (CameraXState || CameraYState)
 	{
 		for (auto& texture : TextureInstanceTab)
 		{
+				for (int i = 0; i < texture.destinationRectTab.size(); i++)
+				{
+					if (CameraXState) {
+
+						texture.destinationRectTab[i].left += CameraXPosition;
+						texture.destinationRectTab[i].right += CameraXPosition;
+						if (IFColision(PlayerRect, texture.destinationRectTab[i]))
+						{
+							Collision = true;
+							break;
+						}
+
+					}
+					if (CameraYState) {
+						texture.destinationRectTab[i].top += CameraYPosition;
+						texture.destinationRectTab[i].bottom += CameraYPosition;
+						if (IFColision(PlayerRect, texture.destinationRectTab[i]))
+						{
+							Collision = true;
+							break;
+						}
+					}
+				}
+			}
+		
+	if(Collision) //jezeli doszlo do kolizji, zawroc wszelkie zmiany do kamery
+		TextureInstanceTab = Rollback;
+	//jezeli bede chcial by cos nie mialo kolizji bede musial dodac drug¹ pêtlê która bêdzie sczytywaæ na nowo i sprawdzac parametr czy ma miec kolizje i jak ma miec to skipuje 
+	for (auto& texture : TextureInstanceTab)
+	{
+		if (!texture.IsCollisionOn) { //czy textura ma kolizje jest przypisane do jakby obrazka nie do pojedynczego recta, dlatego jak chcemy mieæ 2 ró¿ne textury z kolizj¹ i bez to po prostu
+									 //bêdzie trzeba wczytaæ 2 textury i ustawiæ im 2 ró¿ne parametry
 			for (int i = 0; i < texture.destinationRectTab.size(); i++)
 			{
 				if (CameraXState) {
+
 					texture.destinationRectTab[i].left += CameraXPosition;
 					texture.destinationRectTab[i].right += CameraXPosition;
+					if (IFColision(PlayerRect, texture.destinationRectTab[i]))
+					{
+						Collision = true;
+						break;
+					}
+
 				}
 				if (CameraYState) {
 					texture.destinationRectTab[i].top += CameraYPosition;
 					texture.destinationRectTab[i].bottom += CameraYPosition;
+					if (IFColision(PlayerRect, texture.destinationRectTab[i]))
+					{
+						Collision = true;
+						break;
+					}
 				}
 			}
 		}
+	}
+
 		CameraXPosition = 0;
 		CameraYPosition = 0;
 		CameraXState = false;
 		CameraYState = false;
+		Collision = false;
 	}
 }
 

@@ -11,6 +11,7 @@ public:
 	std::filesystem::path GetPath() const;
 	void SetPath(std::filesystem::path path);
 	std::wstring PATHTest;
+	bool IsCollisionOn = true;
 private:
 std::filesystem::path Path;
 

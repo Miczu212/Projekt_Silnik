@@ -21,8 +21,10 @@ private:
 	bool czyrysowaclinie = true;
 	int CameraXPosition = 0;
 	int CameraYPosition = 0;
+	int CameraSpeed = 10;
 	bool CameraXState = false;
 	bool CameraYState = false;
+	bool Collision = false;
 	UINT32 KeyColour = 0xFFFF00FF;
 	D2D1_RECT_F PlayerRect;
 	MSG msg;
@@ -39,6 +41,7 @@ public:
 	Mainapp();
 	int Go();
 	void DoFrame();
+	bool IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2);
 	void UpdateCameraPosition();
 	void HandleInput();
 	void DoLogic();
