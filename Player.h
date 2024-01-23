@@ -17,8 +17,7 @@ public:
 	public:
 		PlayerTexture operator=(TextureInstance& Texture)
 		{
-			this->SetPath(Texture.GetPath());
-			this->PATHTest = Texture.PATHTest;
+			this->Path = Texture.Path;
 			this->Theight = Texture.Theight;
 			this->Twidth = Texture.Twidth;
 			return *this;
@@ -26,11 +25,7 @@ public:
 
 		Microsoft::WRL::ComPtr<ID2D1Bitmap> pBitmap;
 		UINT Twidth = 0, Theight = 0;
-		std::filesystem::path GetPath() const;
-		void SetPath(std::filesystem::path path);
-		std::wstring PATHTest;
-	private:
-		std::filesystem::path Path;
+		std::wstring Path;
 	};
 
 	PlayerTexture CurrentPlayerTexture;

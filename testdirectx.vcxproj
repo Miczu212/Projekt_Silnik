@@ -140,9 +140,7 @@
     <ClCompile Include="Input.h" />
     <ClCompile Include="LevelInstance.cpp" />
     <ClCompile Include="MAINWindow.cpp" />
-    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player.h" />
-    <ClCompile Include="TextureInstance.cpp" />
     <ClCompile Include="WND.cpp" />
     <ClCompile Include="Mainapp.cpp" />
     <ClCompile Include="Timer.cpp" />

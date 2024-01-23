@@ -68,8 +68,7 @@ void Mainapp::HandleInput()
 							WND1.ReturnGFX().ReturnRenderTarget(),
 							TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf()
 						);
-						TextureInstanceTab[TextureInstanceTabCounter].SetPath(CopiedPath);
-						TextureInstanceTab[TextureInstanceTabCounter].PATHTest=CopiedPath;
+						TextureInstanceTab[TextureInstanceTabCounter].Path=CopiedPath;
 						// Zwolnij pamiêæ
 						CoTaskMemFree(pszFilePath);
 
@@ -79,7 +78,7 @@ void Mainapp::HandleInput()
 						Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 						ULONG_PTR gdiplusToken;
 						Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-						Gdiplus::Bitmap* bitmap = Gdiplus::Bitmap::FromFile(TextureInstanceTab[TextureInstanceTabCounter].GetPath().c_str());
+						Gdiplus::Bitmap* bitmap = Gdiplus::Bitmap::FromFile(TextureInstanceTab[TextureInstanceTabCounter].Path.c_str());
 						if (bitmap) {
 
 							TextureInstanceTab[TextureInstanceTabCounter].Twidth = bitmap->GetWidth();
@@ -166,7 +165,7 @@ void Mainapp::HandleInput()
 	}
 	if (ISPressed(KEY_L))
 	{
-		
+		czyrysowaclinie = false;
 		std::wstring selectedFilePath;
 		Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
 		HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
@@ -200,17 +199,17 @@ void Mainapp::HandleInput()
 		}
 		Currentlevel.LoadLevel(TextureInstanceTab, selectedFilePath, CurrentPlayer);
 		LoadBMPToTexture(
-			CurrentPlayer.CurrentPlayerTexture.PATHTest,
+			CurrentPlayer.CurrentPlayerTexture.Path,
 			WND1.ReturnGFX().ReturnRenderTarget(),
 			CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf()
 		);
-		for (int i = 0; i < TextureInstanceTab.size(); i++)
+		for (TextureInstanceTabCounter=0; TextureInstanceTabCounter < TextureInstanceTab.size(); TextureInstanceTabCounter++)
 		{
-			LoadBMPToTexture(TextureInstanceTab[i].PATHTest,
+			LoadBMPToTexture(TextureInstanceTab[TextureInstanceTabCounter].Path,
 				WND1.ReturnGFX().ReturnRenderTarget(),
-				TextureInstanceTab[i].pBitmap.GetAddressOf());
+				TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf());
 		}
-		
+		TextureInstanceTabCounter = 0;
 		WND1.Klt.ClearState();
 	}
 	if (ISPressed(KEY_LEFT))
@@ -242,7 +241,7 @@ void Mainapp::HandleInput()
 		CurrentPlayer.CurrentPlayerTexture = TextureInstanceTab[TextureInstanceTabCounter];
 		
 		LoadBMPToTexture(
-			CurrentPlayer.CurrentPlayerTexture.GetPath(),
+			CurrentPlayer.CurrentPlayerTexture.Path,
 			WND1.ReturnGFX().ReturnRenderTarget(),
 			CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf()
 		);
@@ -253,9 +252,9 @@ void Mainapp::HandleInput()
 			ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2
 		);
 		 //zrobione tak by postac byla zawsze na srodku ekranu
-
+		WND1.Klt.ClearState();
 	}
-	
+
 }
 void Mainapp::DoLogic() 
 {
@@ -296,9 +295,13 @@ void Mainapp::DoDrawing()
 				}
 			}
 
-			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
-				TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
-			WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect);
+			if (TextureInstanceTab[TextureInstanceTabCounter].pBitmap)
+			{
+				D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
+					TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
+				WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect);
+			}
+			
 		}
 	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
 	{
