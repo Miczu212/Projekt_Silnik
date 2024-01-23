@@ -1,5 +1,6 @@
 #pragma once
 #include "WND.h"
+#include "Player.h"
 #include "Timer.h"
 #include <filesystem>
 #include <iostream>
@@ -26,7 +27,6 @@ private:
 	bool CameraYState = false;
 	bool Collision = false;
 	UINT32 KeyColour = 0xFFFF00FF;
-	D2D1_RECT_F PlayerRect;
 	MSG msg;
 	BOOL result;
 	WND WND1;
@@ -34,8 +34,7 @@ private:
 	D2D1_POINT_2F MousePosition;
 	UINT ScaleTwidth = 0, ScaleTheight = 0;
     LevelInstance Currentlevel;
-	TextureInstance PlayerTexture;
-	
+	Player CurrentPlayer;
 public:
 	std::vector<LevelInstance> LevelInstanceTab;
 	Mainapp();

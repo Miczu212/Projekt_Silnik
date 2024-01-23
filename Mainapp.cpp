@@ -159,7 +159,7 @@ void Mainapp::HandleInput()
 				}
 			}
 		}
-			Currentlevel.SaveLevel(TextureInstanceTab, selectedFilePath, PlayerTexture);
+			Currentlevel.SaveLevel(TextureInstanceTab, selectedFilePath,CurrentPlayer);
 		
 	
 		WND1.Klt.ClearState();
@@ -197,10 +197,13 @@ void Mainapp::HandleInput()
 
 				}
 			}
-
-
 		}
-		Currentlevel.LoadLevel(TextureInstanceTab, selectedFilePath,PlayerTexture);
+		Currentlevel.LoadLevel(TextureInstanceTab, selectedFilePath, CurrentPlayer);
+		LoadBMPToTexture(
+			CurrentPlayer.CurrentPlayerTexture.PATHTest,
+			WND1.ReturnGFX().ReturnRenderTarget(),
+			CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf()
+		);
 		for (int i = 0; i < TextureInstanceTab.size(); i++)
 		{
 			LoadBMPToTexture(TextureInstanceTab[i].PATHTest,
@@ -236,14 +239,20 @@ void Mainapp::HandleInput()
 	}
 	if (ISPressed(KEY_P))
 	{
-		PlayerTexture = TextureInstanceTab[TextureInstanceTabCounter];
-
-		PlayerRect = D2D1::RectF(
-			ScreenWidth / 2 - (PlayerTexture.Twidth + ScaleTwidth) / 2,
-			ScreenHeight / 2 - (PlayerTexture.Theight + ScaleTheight) / 2,
-			ScreenWidth / 2 + (PlayerTexture.Twidth + ScaleTwidth) / 2,
-			ScreenHeight / 2 + (PlayerTexture.Theight + ScaleTheight) / 2
-		); //zrobione tak by postac byla zawsze na srodku ekranu
+		CurrentPlayer.CurrentPlayerTexture = TextureInstanceTab[TextureInstanceTabCounter];
+		
+		LoadBMPToTexture(
+			CurrentPlayer.CurrentPlayerTexture.GetPath(),
+			WND1.ReturnGFX().ReturnRenderTarget(),
+			CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf()
+		);
+		CurrentPlayer.PlayerRect = D2D1::RectF(
+			ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
+			ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2,
+			ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
+			ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2
+		);
+		 //zrobione tak by postac byla zawsze na srodku ekranu
 
 	}
 	
@@ -291,8 +300,11 @@ void Mainapp::DoDrawing()
 				TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
 			WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect);
 		}
-	if(PlayerTexture.pBitmap) //jak textura gracza jest to rysuj
-		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(PlayerTexture.pBitmap.Get(), PlayerRect);
+	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
+	{
+		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(CurrentPlayer.CurrentPlayerTexture.pBitmap.Get(), CurrentPlayer.PlayerRect);
+	}
+		
 
 	WND1.ReturnGFX().EndFrame();
 }
@@ -323,7 +335,7 @@ void Mainapp::UpdateCameraPosition()
 
 						texture.destinationRectTab[i].left += CameraXPosition;
 						texture.destinationRectTab[i].right += CameraXPosition;
-						if (IFColision(PlayerRect, texture.destinationRectTab[i]))
+						if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
 						{
 							Collision = true;
 							break;
@@ -333,7 +345,7 @@ void Mainapp::UpdateCameraPosition()
 					if (CameraYState) {
 						texture.destinationRectTab[i].top += CameraYPosition;
 						texture.destinationRectTab[i].bottom += CameraYPosition;
-						if (IFColision(PlayerRect, texture.destinationRectTab[i]))
+						if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
 						{
 							Collision = true;
 							break;
@@ -355,7 +367,7 @@ void Mainapp::UpdateCameraPosition()
 
 					texture.destinationRectTab[i].left += CameraXPosition;
 					texture.destinationRectTab[i].right += CameraXPosition;
-					if (IFColision(PlayerRect, texture.destinationRectTab[i]))
+					if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
 					{
 						Collision = true;
 						break;
@@ -365,7 +377,7 @@ void Mainapp::UpdateCameraPosition()
 				if (CameraYState) {
 					texture.destinationRectTab[i].top += CameraYPosition;
 					texture.destinationRectTab[i].bottom += CameraYPosition;
-					if (IFColision(PlayerRect, texture.destinationRectTab[i]))
+					if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
 					{
 						Collision = true;
 						break;
