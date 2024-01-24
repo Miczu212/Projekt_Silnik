@@ -11,12 +11,18 @@
 #include"LevelInstance.h"
 #include"TextureInstance.h"
 #include"FunctionDefines.h"
+#include <codecvt>
+//dzwiekowe
+#include "Sound.h"
+//dzwiekowe
 #pragma comment(lib, "gdiplus.lib")
 class Mainapp
 {
 private:
 	int TextureInstanceTabCounter =-1;
 	std::vector<TextureInstance> TextureInstanceTab;
+	std::vector<HWAVEOUT> AudioHolder;
+	int AudioCounter = -1;
 	const int ScreenWidth = 1024;
 	const int ScreenHeight = 820;
 	bool czyrysowaclinie = true;
@@ -35,6 +41,7 @@ private:
 	UINT ScaleTwidth = 0, ScaleTheight = 0;
     LevelInstance Currentlevel;
 	Player CurrentPlayer;
+	Sound SoundHandler;
 public:
 	std::vector<LevelInstance> LevelInstanceTab;
 	Mainapp();
@@ -47,6 +54,9 @@ public:
 	void DoDrawing();
 	std::filesystem::path CopyBitmapToProjectFolder(const std::wstring& sourceFilePath);
 	void ProcessMessages();
+	void LoadAudio();
+	void GetWaveFormat(const std::wstring& filePath, WAVEFORMATEX& waveFormat);
+	void LoadAudioData(const std::wstring& filePath);
 	void LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, ID2D1Bitmap** ppBitmap);
 	
 

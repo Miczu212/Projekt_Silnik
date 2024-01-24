@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #define KEY_CANCEL 0x03
 #define KEY_MBUTTON 0x04
 #define KEY_XBUTTON1 0x05

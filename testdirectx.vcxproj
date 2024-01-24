@@ -113,7 +113,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d2d1.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d2d1.lib;DirectXTK.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -153,6 +153,7 @@
     <ClInclude Include="KeyNames.h" />
     <ClInclude Include="LevelInstance.h" />
     <ClInclude Include="Mainapp.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="TextureInstance.h" />
     <ClInclude Include="WND.h" />
     <ClInclude Include="Timer.h" />
