@@ -1,4 +1,5 @@
 #pragma once
+#include"ComManager.h"
 #include "WND.h"
 #include "Player.h"
 #include "Timer.h"
@@ -12,16 +13,14 @@
 #include"TextureInstance.h"
 #include"FunctionDefines.h"
 #include <codecvt>
-//dzwiekowe
-#include "Sound.h"
-//dzwiekowe
+#include "SoundHandler.h"
 #pragma comment(lib, "gdiplus.lib")
 class Mainapp
 {
 private:
 	int TextureInstanceTabCounter =-1;
 	std::vector<TextureInstance> TextureInstanceTab;
-	std::vector<HWAVEOUT> AudioHolder;
+	std::vector<Sound> AudioHolder;
 	int AudioCounter = -1;
 	const int ScreenWidth = 1024;
 	const int ScreenHeight = 820;
@@ -41,7 +40,8 @@ private:
 	UINT ScaleTwidth = 0, ScaleTheight = 0;
     LevelInstance Currentlevel;
 	Player CurrentPlayer;
-	Sound SoundHandler;
+	SoundHandler& Soundhandler = SoundHandler::Get();
+	ComManager commanager;
 public:
 	std::vector<LevelInstance> LevelInstanceTab;
 	Mainapp();
@@ -55,8 +55,6 @@ public:
 	std::filesystem::path CopyBitmapToProjectFolder(const std::wstring& sourceFilePath);
 	void ProcessMessages();
 	void LoadAudio();
-	void GetWaveFormat(const std::wstring& filePath, WAVEFORMATEX& waveFormat);
-	void LoadAudioData(const std::wstring& filePath);
 	void LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, ID2D1Bitmap** ppBitmap);
 	
 

@@ -29,7 +29,7 @@ void Mainapp::HandleInput()
 
 		//	TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Reset();  // Zwalnianie poprzedniego zasobu. 
 		//	LoadBMPToTexture(TextureInstanceTab[TextureInstanceTabCounter].GetPath(), WND1.ReturnGFX().ReturnRenderTarget(), TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf());
-		WND1.Klt.ClearState();
+		
 	}
 	//Wczytanie Textury
 	if (ISPressed(KEY_F))
@@ -99,34 +99,34 @@ void Mainapp::HandleInput()
 
 		}
 
-		WND1.Klt.ClearState();
+		
 	}
 	//zmiana tytulu okna
 	if (ISPressed(KEY_Q))
 	{
 		SetWindowTextA(WND1.GetHandle(), "jak naciskam Q to sie zmienia na ta");
-		WND1.Klt.ClearState(); // wymagane, inaczej przycisk jest uznawany za "Wiecznie wcisniety"
+		 // wymagane, inaczej przycisk jest uznawany za "Wiecznie wcisniety"
 	}
 	//skalowanie textury zmniejszenie
 	if (ISPressed(KEY_N))
 	{
 		ScaleTwidth -= 10;
 		ScaleTheight -= 10;
-		WND1.Klt.ClearState();
+		
 	}
 	//skalowanie textury zwiekszenie
 	if (ISPressed(KEY_M))
 	{
 		ScaleTwidth += 10;
 		ScaleTheight += 10;
-		WND1.Klt.ClearState();
+		
 	}
 	// Reset do domyslnych width i height
 	if (ISPressed(KEY_B))
 	{
 		ScaleTwidth = 0;
 		ScaleTheight = 0;
-		WND1.Klt.ClearState();
+		
 	}
 	if (ISPressed(KEY_Z)) //TODO ZROBIC SYSTEM WCZYTYWANIA I ZAPISYWANIA LEVELI
 	{
@@ -161,7 +161,7 @@ void Mainapp::HandleInput()
 		Currentlevel.SaveLevel(TextureInstanceTab, selectedFilePath, CurrentPlayer);
 
 
-		WND1.Klt.ClearState();
+		
 	}
 	if (ISPressed(KEY_L))
 	{
@@ -169,34 +169,41 @@ void Mainapp::HandleInput()
 		std::wstring selectedFilePath;
 		Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
 		HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
-
-		if (SUCCEEDED(hr))
-		{
-			// Ustaw opcje dialogu, np. filtry plików
+		if (SUCCEEDED(hr)) {
+			// Ustawianie opcji dialogu, np. filtry plików audio
 			COMDLG_FILTERSPEC fileTypes[] = { L"Binary Files", L"*.bin;*.dat" };
 			pFileDialog->SetFileTypes(_countof(fileTypes), fileTypes);
 
-			// Poka¿ okno dialogowe
-			if (SUCCEEDED(pFileDialog->Show(WND1.GetHandle())))
-			{
-				// Pobierz wybrany plik
+			// Pokazywanie okna dialogowego
+			if (SUCCEEDED(pFileDialog->Show(nullptr))) {
+				// Pobieranie wybranego pliku
 				Microsoft::WRL::ComPtr<IShellItem> pShellItem;
-				if (SUCCEEDED(pFileDialog->GetResult(&pShellItem)))
-				{
+				if (SUCCEEDED(pFileDialog->GetResult(&pShellItem))) {
 					PWSTR pszFilePath;
-					if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath)))
-					{
-						// Konwertuj na std::wstring lub std::string
+					if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath))) {
 						selectedFilePath = pszFilePath;
-						// Zwolnij pamiêæ
 						CoTaskMemFree(pszFilePath);
 
+						try {
+							AudioCounter++;
+							std::filesystem::path projectFolder = std::filesystem::current_path();
+							std::filesystem::path sourcePath(selectedFilePath);
+							// Uzyskiwanie pe³nej œcie¿ki do pliku docelowego w folderze projektowym
+							std::filesystem::path destinationPath = projectFolder / sourcePath.filename();
+							// Kopiowanie pliku
+							std::filesystem::copy_file(sourcePath, destinationPath, std::filesystem::copy_options::overwrite_existing);
+
+							MessageBoxW(nullptr, L"Plik skopiowany pomyœlnie.", nullptr, MB_OK);
+						}
+						catch (const std::exception& e) {
+							MessageBoxA(nullptr, "B³¹d podczas kopiowania pliku.", nullptr, MB_OK);
+						}
 					}
-
-
 				}
 			}
 		}
+		
+		
 		Currentlevel.LoadLevel(TextureInstanceTab, selectedFilePath, CurrentPlayer);
 		LoadBMPToTexture(
 			CurrentPlayer.CurrentPlayerTexture.Path,
@@ -210,31 +217,31 @@ void Mainapp::HandleInput()
 				TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf());
 		}
 		TextureInstanceTabCounter = 0;
-		WND1.Klt.ClearState();
+		
 	}
 	if (ISPressed(KEY_LEFT))
 	{
 		CameraXPosition = CameraSpeed;
 		CameraXState = true;
-		WND1.Klt.ClearState();
+		
 	}
 	if (ISPressed(KEY_RIGHT))
 	{
 		CameraXPosition = -CameraSpeed;
 		CameraXState = true;
-		WND1.Klt.ClearState();
+		
 	}
 	if (ISPressed(KEY_DOWN))
 	{
 		CameraYPosition = -CameraSpeed;
 		CameraYState = true;
-		WND1.Klt.ClearState();
+		
 	}
 	if (ISPressed(KEY_UP))
 	{
 		CameraYPosition = CameraSpeed;
 		CameraYState = true;
-		WND1.Klt.ClearState();
+		
 	}
 	if (ISPressed(KEY_P))
 	{
@@ -252,19 +259,26 @@ void Mainapp::HandleInput()
 			ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2
 		);
 		//zrobione tak by postac byla zawsze na srodku ekranu
-		WND1.Klt.ClearState();
+		
 	}
 	if (ISPressed(KEY_O))
 	{
 		LoadAudio();
+		
 	}
 	if (ISPressed(KEY_0))
 	{
 		AudioCounter++;
+
 		if (AudioCounter >= AudioHolder.size())
 			AudioCounter = 0;
+		
 	}
-
+	if (ISPressed(KEY_9))
+	{
+		AudioHolder[AudioCounter].Play(1.0f,1.0f);
+	}
+	WND1.Klt.ClearState();
 }
 	
 
@@ -463,149 +477,42 @@ void Mainapp::LoadAudio()
 	std::wstring selectedFilePath;
 	Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
 	HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
-
-	if (SUCCEEDED(hr))
-	{
-		// Ustaw opcje dialogu, np. filtry plików audio
+	if (SUCCEEDED(hr)) {
+		// Ustawianie opcji dialogu, np. filtry plików audio
 		COMDLG_FILTERSPEC fileTypes[] = { L"Audio Files", L"*.wav;*.mp3;*.ogg" };
 		pFileDialog->SetFileTypes(_countof(fileTypes), fileTypes);
 
-		// Poka¿ okno dialogowe
-		if (SUCCEEDED(pFileDialog->Show(WND1.GetHandle())))
-		{
-			// Pobierz wybrany plik
+		// Pokazywanie okna dialogowego
+		if (SUCCEEDED(pFileDialog->Show(nullptr))) {
+			// Pobieranie wybranego pliku
 			Microsoft::WRL::ComPtr<IShellItem> pShellItem;
-			if (SUCCEEDED(pFileDialog->GetResult(&pShellItem)))
-			{
+			if (SUCCEEDED(pFileDialog->GetResult(&pShellItem))) {
 				PWSTR pszFilePath;
-				if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath)))
-				{
-					AudioCounter++;
-
-					// Konwertuj na std::wstring lub std::string
+				if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath))) {
 					selectedFilePath = pszFilePath;
+					CoTaskMemFree(pszFilePath);
 
-				}
-				try {
-					std::filesystem::path projectFolder = std::filesystem::current_path();
-					std::filesystem::path sourcePath(pszFilePath);
-					// Uzyskaj pe³n¹ œcie¿kê do pliku docelowego w folderze projektowym
-					std::filesystem::path destinationPath = projectFolder / sourcePath.filename();
-					// Skopiuj plik
-					std::filesystem::copy_file(sourcePath, destinationPath, std::filesystem::copy_options::overwrite_existing);
+					try {
+						AudioCounter++;
+						std::filesystem::path projectFolder = std::filesystem::current_path();
+						std::filesystem::path sourcePath(selectedFilePath);
+						// Uzyskiwanie pe³nej œcie¿ki do pliku docelowego w folderze projektowym
+						std::filesystem::path destinationPath = projectFolder / sourcePath.filename();
+						// Kopiowanie pliku
+						std::filesystem::copy_file(sourcePath, destinationPath, std::filesystem::copy_options::overwrite_existing);
 
-					MessageBoxA(WND1.GetHandle(), "Plik skopiowany pomyœlnie.", NULL, MB_OK);
+						MessageBoxW(nullptr, L"Plik skopiowany pomyœlnie.", nullptr, MB_OK);
+					}
+					catch (const std::exception& e) {
+						MessageBoxA(nullptr, "B³¹d podczas kopiowania pliku.", nullptr, MB_OK);
+					}
 				}
-				catch (const std::exception& e)
-				{
-					MessageBoxA(WND1.GetHandle(), "B³¹d podczas kopiowania pliku: ", NULL, MB_OK);
-				}
-				CoTaskMemFree(pszFilePath);
 			}
 		}
 	}
 	// Po uzyskaniu œcie¿ki pliku
-	IXAudio2MasteringVoice* pMasteringVoice = nullptr;
-	if (SUCCEEDED(XAudio2Create(SoundHandler.pXAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR)))
-	{
-		if (SUCCEEDED(SoundHandler.pXAudio2->CreateMasteringVoice(&pMasteringVoice)))
-		{
-			// Ustaw format dŸwiêku
-			SoundHandler.waveFormat.wFormatTag = WAVE_FORMAT_PCM;
-			SoundHandler.waveFormat.nChannels = 2; // Stereo
-			SoundHandler.waveFormat.nSamplesPerSec = 44100; // Przyk³adowa czêstotliwoœæ próbkowania
-			SoundHandler.waveFormat.nAvgBytesPerSec = 44100 * 2 * 2; // Przyk³adowa liczba bajtów na sekundê
-			SoundHandler.waveFormat.nBlockAlign = 4;
-			SoundHandler.waveFormat.wBitsPerSample = 16;
-			SoundHandler.waveFormat.cbSize = 0;
-			GetWaveFormat(selectedFilePath, SoundHandler.waveFormat);
-			// Wczytaj plik audio
-			LoadAudioData(selectedFilePath);
-			// Utwórz Ÿród³owy g³os XAudio2
-			if (SUCCEEDED(SoundHandler.pXAudio2->CreateSourceVoice(&SoundHandler.pSourceVoice, &SoundHandler.waveFormat)))
-			{
-				// Przeka¿ dane dŸwiêku do Ÿród³owego g³osu
-
-				SoundHandler.buffer.AudioBytes = static_cast<UINT32>(SoundHandler.audioData.size());
-				SoundHandler.buffer.pAudioData = SoundHandler.audioData.data();
-				SoundHandler.buffer.Flags = XAUDIO2_END_OF_STREAM;
-
-				hr = SoundHandler.pSourceVoice->SubmitSourceBuffer(&SoundHandler.buffer); // mam dobr¹ i z³¹ wiadomoœæ, zaimplementowalem obsluge dzwiêku, zla to taka ze nie dziala
-				if (hr == S_OK) {
-					// Rozpocznij odtwarzanie
-					SoundHandler.pSourceVoice->Start();
-				}
-
-			}
-		}
-	}
-}
-void Mainapp::GetWaveFormat(const std::wstring& filePath, WAVEFORMATEX& waveFormat)
-{
-    MMCKINFO ckRIFF = { 0 };
-    MMCKINFO ckFmt = { 0 };
-
-    // Otwórz plik .wav
-    HMMIO hFile = mmioOpenW(const_cast<LPWSTR>(filePath.c_str()), nullptr, MMIO_READ);
-    if (hFile == nullptr)
-    {
-        // Obs³uga b³êdów otwierania pliku .wav
-        return;
-    }
-
-    // SprawdŸ, czy to jest plik .wav
-    if (mmioDescend(hFile, &ckRIFF, nullptr, 0) != MMSYSERR_NOERROR)
-    {
-        // Obs³uga b³êdów opisu pliku .wav
-        mmioClose(hFile, 0);
-        return;
-    }
-
-    if (ckRIFF.ckid != FOURCC_RIFF || ckRIFF.fccType != mmioFOURCC('W', 'A', 'V', 'E'))
-    {
-        // Obs³uga b³êdów - to nie jest plik .wav
-        mmioClose(hFile, 0);
-        return;
-    }
-
-    // ZnajdŸ fmt chunk
-    ckFmt.ckid = mmioFOURCC('f', 'm', 't', ' ');
-    if (mmioDescend(hFile, &ckFmt, &ckRIFF, MMIO_FINDCHUNK) != MMSYSERR_NOERROR)
-    {
-        // Obs³uga b³êdów opisu fmt chunk
-        mmioClose(hFile, 0);
-        return;
-    }
-
-    // Odczytaj dane fmt chunk
-    if (mmioRead(hFile, reinterpret_cast<HPSTR>(&waveFormat), sizeof(WAVEFORMATEX)) != sizeof(WAVEFORMATEX))
-    {
-        // Obs³uga b³êdów odczytu danych fmt chunk
-        mmioClose(hFile, 0);
-        return;
-    }
-
-    // Zamknij plik .wav
-    mmioClose(hFile, 0);
-}
-void Mainapp::LoadAudioData(const std::wstring& filePath)
-{
-	std::ifstream file(filePath, std::ios::binary);
-	if (file.is_open())
-	{
-		// Pobierz rozmiar pliku
-		file.seekg(0, std::ios::end);
-		size_t fileSize = file.tellg();
-		file.seekg(0, std::ios::beg);
-
-		// Zarezerwuj pamiêæ dla danych audio
-		SoundHandler.audioData.resize(fileSize);
-
-		// Wczytaj dane audio
-		file.read(reinterpret_cast<char*>(SoundHandler.audioData.data()), fileSize);
-
-		file.close();
-	}
+	Sound s(selectedFilePath);
+	AudioHolder.push_back(s);
 }
 void Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, ID2D1Bitmap** ppBitmap)
 {

@@ -141,11 +141,13 @@
     <ClCompile Include="LevelInstance.cpp" />
     <ClCompile Include="MAINWindow.cpp" />
     <ClCompile Include="Player.h" />
+    <ClCompile Include="SoundHandler.cpp" />
     <ClCompile Include="WND.cpp" />
     <ClCompile Include="Mainapp.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ComManager.h" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="FunctionDefines.h" />
@@ -153,7 +155,7 @@
     <ClInclude Include="KeyNames.h" />
     <ClInclude Include="LevelInstance.h" />
     <ClInclude Include="Mainapp.h" />
-    <ClInclude Include="Sound.h" />
+    <ClInclude Include="SoundHandler.h" />
     <ClInclude Include="TextureInstance.h" />
     <ClInclude Include="WND.h" />
     <ClInclude Include="Timer.h" />
