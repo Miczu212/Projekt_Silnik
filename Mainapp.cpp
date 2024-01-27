@@ -20,101 +20,30 @@ int Mainapp::Go()
 }
 void Mainapp::HandleInput()
 {
-	//Zmiana miedzy texturami wyswietlanymi
+	//Poruszanie sie po tablicy textur
 	if (ISPressed(KEY_R))
 	{
-		TextureInstanceTabCounter++;
-		if (TextureInstanceTabCounter > TextureInstanceTab.size() - 1)
-			TextureInstanceTabCounter = 0;
+		TextureCounter++;
+		if (TextureCounter > TextureHolder.size() - 1)
+			TextureCounter = 0;
 
-		//	TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Reset();  // Zwalnianie poprzedniego zasobu. 
-		//	LoadBMPToTexture(TextureInstanceTab[TextureInstanceTabCounter].GetPath(), WND1.ReturnGFX().ReturnRenderTarget(), TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf());
+		//	TextureHolder[TextureCounter].pBitmap.Reset();  // Zwalnianie poprzedniego zasobu. 
+		//	LoadBMPToTexture(TextureHolder[TextureCounter].GetPath(), WND1.ReturnGFX().ReturnRenderTarget(), TextureHolder[TextureCounter].pBitmap.GetAddressOf());
 		
 	}
 	//Wczytanie Textury
 	if (ISPressed(KEY_F))
-	{
-		czyrysowaclinie = false;
-		std::filesystem::path CopiedPath;
-
-		Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
-		HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
-
-		if (SUCCEEDED(hr))
-		{
-			// Ustaw opcje dialogu, np. filtry plików
-			COMDLG_FILTERSPEC fileTypes[] = { L"Bitmap Files", L"*.bmp;*.png;*.jpg" };
-			pFileDialog->SetFileTypes(_countof(fileTypes), fileTypes);
-
-			// Poka¿ okno dialogowe
-			if (SUCCEEDED(pFileDialog->Show(WND1.GetHandle())))
-			{
-				// Pobierz wybrany plik
-				Microsoft::WRL::ComPtr<IShellItem> pShellItem;
-				if (SUCCEEDED(pFileDialog->GetResult(&pShellItem)))
-				{
-					PWSTR pszFilePath;
-					if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath)))
-					{
-						TextureInstanceTabCounter++;
-						// Konwertuj na std::wstring lub std::string
-						std::wstring selectedFilePath = pszFilePath;
-						TextureInstance NewTextureInstance;
-						TextureInstanceTab.push_back(NewTextureInstance);
-						// Mo¿esz tak¿e skopiowaæ plik do folderu projektu itp.
-
-						LoadBMPToTexture(
-							CopiedPath = CopyBitmapToProjectFolder(selectedFilePath),
-							WND1.ReturnGFX().ReturnRenderTarget(),
-							TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf()
-						);
-						TextureInstanceTab[TextureInstanceTabCounter].Path = CopiedPath;
-						// Zwolnij pamiêæ
-						CoTaskMemFree(pszFilePath);
-
-
-
-						//dostawanie wysokosci i szerokosci textury
-						Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-						ULONG_PTR gdiplusToken;
-						Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-						Gdiplus::Bitmap* bitmap = Gdiplus::Bitmap::FromFile(TextureInstanceTab[TextureInstanceTabCounter].Path.c_str());
-						if (bitmap) {
-
-							TextureInstanceTab[TextureInstanceTabCounter].Twidth = bitmap->GetWidth();
-							TextureInstanceTab[TextureInstanceTabCounter].Theight = bitmap->GetHeight();
-							delete bitmap;
-						}
-						else {
-						}
-
-						Gdiplus::GdiplusShutdown(gdiplusToken);
-
-					}
-
-
-				}
-			}
-
-
-		}
-
-		
+	{	
+		LoadFileTypeTexture();
 	}
-	//zmiana tytulu okna
-	if (ISPressed(KEY_Q))
-	{
-		SetWindowTextA(WND1.GetHandle(), "jak naciskam Q to sie zmienia na ta");
-		 // wymagane, inaczej przycisk jest uznawany za "Wiecznie wcisniety"
-	}
-	//skalowanie textury zmniejszenie
+	//Skalowanie textury zmniejszenie
 	if (ISPressed(KEY_N))
 	{
 		ScaleTwidth -= 10;
 		ScaleTheight -= 10;
 		
 	}
-	//skalowanie textury zwiekszenie
+	//Skalowanie textury zwiekszenie
 	if (ISPressed(KEY_M))
 	{
 		ScaleTwidth += 10;
@@ -128,97 +57,17 @@ void Mainapp::HandleInput()
 		ScaleTheight = 0;
 		
 	}
-	if (ISPressed(KEY_Z)) //TODO ZROBIC SYSTEM WCZYTYWANIA I ZAPISYWANIA LEVELI
-	{
-		std::wstring selectedFilePath;
-		Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
-		HRESULT hr = CoCreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
-
-		if (SUCCEEDED(hr))
-		{
-			// Ustaw opcje dialogu, np. filtry plików
-			COMDLG_FILTERSPEC fileTypes[] = { L"Binary Files", L"*.bin;*.dat" };
-			pFileDialog->SetFileTypes(_countof(fileTypes), fileTypes);
-
-			// Poka¿ okno dialogowe
-			if (SUCCEEDED(pFileDialog->Show(WND1.GetHandle())))
-			{
-				// Pobierz wybrany plik
-				Microsoft::WRL::ComPtr<IShellItem> pShellItem;
-				if (SUCCEEDED(pFileDialog->GetResult(&pShellItem)))
-				{
-					PWSTR pszFilePath;
-					if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath)))
-					{
-						// Konwertuj na std::wstring lub std::string
-						selectedFilePath = pszFilePath;
-						// Zwolnij pamiêæ
-						CoTaskMemFree(pszFilePath);
-					}
-				}
-			}
-		}
-		Currentlevel.SaveLevel(TextureInstanceTab, selectedFilePath, CurrentPlayer);
-
-
-		
+	//Zapisanie Poziomu
+	if (ISPressed(KEY_Z)) 
+	{ 
+		SaveFileTypeLevel();
 	}
+	//Wczytanie Poziomu
 	if (ISPressed(KEY_L))
 	{
-		czyrysowaclinie = false;
-		std::wstring selectedFilePath;
-		Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
-		HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
-		if (SUCCEEDED(hr)) {
-			// Ustawianie opcji dialogu, np. filtry plików audio
-			COMDLG_FILTERSPEC fileTypes[] = { L"Binary Files", L"*.bin;*.dat" };
-			pFileDialog->SetFileTypes(_countof(fileTypes), fileTypes);
-
-			// Pokazywanie okna dialogowego
-			if (SUCCEEDED(pFileDialog->Show(nullptr))) {
-				// Pobieranie wybranego pliku
-				Microsoft::WRL::ComPtr<IShellItem> pShellItem;
-				if (SUCCEEDED(pFileDialog->GetResult(&pShellItem))) {
-					PWSTR pszFilePath;
-					if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath))) {
-						selectedFilePath = pszFilePath;
-						CoTaskMemFree(pszFilePath);
-
-						try {
-							AudioCounter++;
-							std::filesystem::path projectFolder = std::filesystem::current_path();
-							std::filesystem::path sourcePath(selectedFilePath);
-							// Uzyskiwanie pe³nej œcie¿ki do pliku docelowego w folderze projektowym
-							std::filesystem::path destinationPath = projectFolder / sourcePath.filename();
-							// Kopiowanie pliku
-							std::filesystem::copy_file(sourcePath, destinationPath, std::filesystem::copy_options::overwrite_existing);
-
-							MessageBoxW(nullptr, L"Plik skopiowany pomyœlnie.", nullptr, MB_OK);
-						}
-						catch (const std::exception& e) {
-							MessageBoxA(nullptr, "B³¹d podczas kopiowania pliku.", nullptr, MB_OK);
-						}
-					}
-				}
-			}
-		}
-		
-		
-		Currentlevel.LoadLevel(TextureInstanceTab, selectedFilePath, CurrentPlayer);
-		LoadBMPToTexture(
-			CurrentPlayer.CurrentPlayerTexture.Path,
-			WND1.ReturnGFX().ReturnRenderTarget(),
-			CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf()
-		);
-		for (TextureInstanceTabCounter = 0; TextureInstanceTabCounter < TextureInstanceTab.size(); TextureInstanceTabCounter++)
-		{
-			LoadBMPToTexture(TextureInstanceTab[TextureInstanceTabCounter].Path,
-				WND1.ReturnGFX().ReturnRenderTarget(),
-				TextureInstanceTab[TextureInstanceTabCounter].pBitmap.GetAddressOf());
-		}
-		TextureInstanceTabCounter = 0;
-		
+		LoadFileTypeLevel();
 	}
+	//Sterowanie
 	if (ISPressed(KEY_LEFT))
 	{
 		CameraXPosition = CameraSpeed;
@@ -243,9 +92,11 @@ void Mainapp::HandleInput()
 		CameraYState = true;
 		
 	}
+	//Sterowanie
+	//Ustawienie Gracza na obecnie Wybran¹ texture
 	if (ISPressed(KEY_P))
 	{
-		CurrentPlayer.CurrentPlayerTexture = TextureInstanceTab[TextureInstanceTabCounter];
+		CurrentPlayer.CurrentPlayerTexture = TextureHolder[TextureCounter];
 
 		LoadBMPToTexture(
 			CurrentPlayer.CurrentPlayerTexture.Path,
@@ -261,11 +112,13 @@ void Mainapp::HandleInput()
 		//zrobione tak by postac byla zawsze na srodku ekranu
 		
 	}
+	//Wczytanie dzwiekow
 	if (ISPressed(KEY_O))
 	{
-		LoadAudio();
+		LoadFileTypeAudio();
 		
 	}
+	//Poruszanie sie po tablicy dzwiekow
 	if (ISPressed(KEY_0))
 	{
 		AudioCounter++;
@@ -274,14 +127,118 @@ void Mainapp::HandleInput()
 			AudioCounter = 0;
 		
 	}
+	//Odtworzenie dzwieku
 	if (ISPressed(KEY_9))
 	{
 		AudioHolder[AudioCounter].Play(1.0f,1.0f);
 	}
+	//Prze³¹czenie Kolizji Dla Wybranej Textury
+	if (ISPressed(KEY_Q))
+	{
+		TextureHolder[TextureCounter].IsCollisionOn = !TextureHolder[TextureCounter].IsCollisionOn;
+	}
 	WND1.Klt.ClearState();
 }
-	
+//Funkcje Wczytuj¹ce/Zapisuj¹ce
+void Mainapp::LoadFileTypeAudio()
+{
+	std::wstring selectedFilePath = OpenFileDialog(L"Audio Files", L"*.wav;*.mp3;*.ogg");
+	if (!selectedFilePath.empty()) {
+		CopyFileToProjectFolder(selectedFilePath);
+		AudioCounter++;
+		Sound s(selectedFilePath);
+		AudioHolder.push_back(s);
+	}
+}
+void Mainapp::LoadFileTypeLevel()
+{
 
+	std::wstring selectedFilePath = OpenFileDialog(L"Binary Files", L"*.bin;*.dat");
+	if (!selectedFilePath.empty())
+	{
+		AudioCounter++;
+		czyrysowaclinie = false;
+		CopyFileToProjectFolder(selectedFilePath);
+		Currentlevel.LoadLevel(TextureHolder, selectedFilePath, CurrentPlayer);
+		LoadBMPToTexture(
+			CurrentPlayer.CurrentPlayerTexture.Path,
+			WND1.ReturnGFX().ReturnRenderTarget(),
+			CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf()
+		);
+		for (TextureCounter = 0; TextureCounter < TextureHolder.size(); TextureCounter++)
+		{
+			LoadBMPToTexture(TextureHolder[TextureCounter].Path,
+				WND1.ReturnGFX().ReturnRenderTarget(),
+				TextureHolder[TextureCounter].pBitmap.GetAddressOf());
+		}
+		TextureCounter = 0;
+
+	}
+}
+void Mainapp::SaveFileTypeLevel()
+{
+	std::wstring selectedFilePath;
+	Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
+	HRESULT hr = CoCreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
+	if (SUCCEEDED(hr))
+	{
+		COMDLG_FILTERSPEC fileTypes[] = { L"Binary Files", L"*.bin;*.dat" };
+		pFileDialog->SetFileTypes(_countof(fileTypes), fileTypes);
+		// Poka¿ okno dialogowe
+		if (SUCCEEDED(pFileDialog->Show(WND1.GetHandle())))
+		{
+			// Pobierz wybrany plik
+			Microsoft::WRL::ComPtr<IShellItem> pShellItem;
+			if (SUCCEEDED(pFileDialog->GetResult(&pShellItem)))
+			{
+				PWSTR pszFilePath;
+				if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath)))
+				{
+					selectedFilePath = pszFilePath;
+					CoTaskMemFree(pszFilePath);
+				}
+			}
+		}
+	}
+	Currentlevel.SaveLevel(TextureHolder, selectedFilePath, CurrentPlayer);
+
+
+
+}
+void Mainapp::LoadFileTypeTexture()
+{
+	std::wstring CopiedPath = OpenFileDialog(L"Bitmap Files", L"*.bmp;*.png;*.jpg");
+	if (!CopiedPath.empty()) {
+		czyrysowaclinie = false;
+		TextureCounter++;
+		TextureInstance NewTextureInstance;
+		TextureHolder.push_back(NewTextureInstance);
+		LoadBMPToTexture(
+			CopyFileToProjectFolder(CopiedPath),
+			WND1.ReturnGFX().ReturnRenderTarget(),
+			TextureHolder[TextureCounter].pBitmap.GetAddressOf()
+		);
+		TextureHolder[TextureCounter].Path = CopiedPath;
+
+		//dostawanie wysokosci i szerokosci textury
+		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+		ULONG_PTR gdiplusToken;
+		Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+		Gdiplus::Bitmap* bitmap = Gdiplus::Bitmap::FromFile(TextureHolder[TextureCounter].Path.c_str());
+		if (bitmap) {
+
+			TextureHolder[TextureCounter].Twidth = bitmap->GetWidth();
+			TextureHolder[TextureCounter].Theight = bitmap->GetHeight();
+			delete bitmap;
+		}
+		else {
+		}
+
+		Gdiplus::GdiplusShutdown(gdiplusToken);
+
+	}
+}
+//Funkcje Wczytuj¹ce/Zapisuj¹ce
 void Mainapp::DoLogic() 
 {
 	HandleInput();
@@ -296,20 +253,20 @@ void Mainapp::DoDrawing()
 			WND1.CurrentMouseState = true;
 			if(czyrysowaclinie==true)
 			WND1.ReturnGFX().Draw(MousePosition, MousePosition);
-			if (TextureInstanceTabCounter != -1) {
-				//TextureInstanceTab[TextureInstanceTabCounter].TexturePointTab.push_back(MousePosition);		
-				D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
-					TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
-				TextureInstanceTab[TextureInstanceTabCounter].destinationRectTab.push_back(destinationRect);
+			if (TextureCounter != -1) {
+				//TextureHolder[TextureCounter].TexturePointTab.push_back(MousePosition);		
+				D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureHolder[TextureCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
+					TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
+				TextureHolder[TextureCounter].destinationRectTab.push_back(destinationRect);
 			}
 		}
 		else if (czyrysowaclinie == true)
 			WND1.ReturnGFX().Draw(MousePosition);
 	)
-		if (TextureInstanceTab.size()!= 0)
+		if (TextureHolder.size()!= 0)
 		{
 			UpdateCameraPosition();
-			for (auto& texture : TextureInstanceTab)
+			for (auto& texture : TextureHolder)
 			{
 				if (texture.pBitmap)
 				{
@@ -321,11 +278,11 @@ void Mainapp::DoDrawing()
 				}
 			}
 
-			if (TextureInstanceTab[TextureInstanceTabCounter].pBitmap)
+			if (TextureHolder[TextureCounter].pBitmap)
 			{
-				D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureInstanceTab[TextureInstanceTabCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
-					TextureInstanceTab[TextureInstanceTabCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
-				WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureInstanceTab[TextureInstanceTabCounter].pBitmap.Get(), destinationRect);
+				D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureHolder[TextureCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
+					TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
+				WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureHolder[TextureCounter].pBitmap.Get(), destinationRect);
 			}
 			
 		}
@@ -353,10 +310,10 @@ bool Mainapp::IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) //j
 }
 void Mainapp::UpdateCameraPosition()
 {
-	std::vector<TextureInstance> Rollback = TextureInstanceTab;
+	std::vector<TextureInstance> Rollback = TextureHolder;
 	if (CameraXState || CameraYState)
 	{
-		for (auto& texture : TextureInstanceTab)
+		for (auto& texture : TextureHolder)
 		{
 				for (int i = 0; i < texture.destinationRectTab.size(); i++)
 				{
@@ -384,9 +341,9 @@ void Mainapp::UpdateCameraPosition()
 			}
 		
 	if(Collision) //jezeli doszlo do kolizji, zawroc wszelkie zmiany do kamery
-		TextureInstanceTab = Rollback;
-	//jezeli bede chcial by cos nie mialo kolizji bede musial dodac drug¹ pêtlê która bêdzie sczytywaæ na nowo i sprawdzac parametr czy ma miec kolizje i jak ma miec to skipuje 
-	for (auto& texture : TextureInstanceTab)
+		TextureHolder = Rollback;
+
+	for (auto& texture : TextureHolder) //Petla co sprawdza textury co maj¹ nie mieæ kolizji
 	{
 		if (!texture.IsCollisionOn) { //czy textura ma kolizje jest przypisane do jakby obrazka nie do pojedynczego recta, dlatego jak chcemy mieæ 2 ró¿ne textury z kolizj¹ i bez to po prostu
 									 //bêdzie trzeba wczytaæ 2 textury i ustawiæ im 2 ró¿ne parametry
@@ -396,21 +353,13 @@ void Mainapp::UpdateCameraPosition()
 
 					texture.destinationRectTab[i].left += CameraXPosition;
 					texture.destinationRectTab[i].right += CameraXPosition;
-					if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
-					{
-						Collision = true;
-						break;
-					}
+				
 
 				}
 				if (CameraYState) {
 					texture.destinationRectTab[i].top += CameraYPosition;
 					texture.destinationRectTab[i].bottom += CameraYPosition;
-					if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
-					{
-						Collision = true;
-						break;
-					}
+					
 				}
 			}
 		}
@@ -425,7 +374,7 @@ void Mainapp::UpdateCameraPosition()
 }
 
 
-std::filesystem::path Mainapp::CopyBitmapToProjectFolder(const std::wstring& SourceFilePath)
+std::filesystem::path Mainapp::CopyFileToProjectFolder(const std::wstring& SourceFilePath)
 {
 	try {
 		std::filesystem::path projectFolder = std::filesystem::current_path();
@@ -472,14 +421,15 @@ void Mainapp::ProcessMessages()
 	}
 
 }
-void Mainapp::LoadAudio()
+
+std::wstring Mainapp::OpenFileDialog(LPCWSTR Filetype, LPCWSTR FileExtension)
 {
 	std::wstring selectedFilePath;
 	Microsoft::WRL::ComPtr<IFileDialog> pFileDialog;
 	HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
 	if (SUCCEEDED(hr)) {
-		// Ustawianie opcji dialogu, np. filtry plików audio
-		COMDLG_FILTERSPEC fileTypes[] = { L"Audio Files", L"*.wav;*.mp3;*.ogg" };
+		// Ustawianie opcji dialogu, np. filtry plików audio,pliki binarne itp.
+		COMDLG_FILTERSPEC fileTypes[] = { Filetype, FileExtension };
 		pFileDialog->SetFileTypes(_countof(fileTypes), fileTypes);
 
 		// Pokazywanie okna dialogowego
@@ -491,29 +441,13 @@ void Mainapp::LoadAudio()
 				if (SUCCEEDED(pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath))) {
 					selectedFilePath = pszFilePath;
 					CoTaskMemFree(pszFilePath);
-
-					try {
-						AudioCounter++;
-						std::filesystem::path projectFolder = std::filesystem::current_path();
-						std::filesystem::path sourcePath(selectedFilePath);
-						// Uzyskiwanie pe³nej œcie¿ki do pliku docelowego w folderze projektowym
-						std::filesystem::path destinationPath = projectFolder / sourcePath.filename();
-						// Kopiowanie pliku
-						std::filesystem::copy_file(sourcePath, destinationPath, std::filesystem::copy_options::overwrite_existing);
-
-						MessageBoxW(nullptr, L"Plik skopiowany pomyœlnie.", nullptr, MB_OK);
-					}
-					catch (const std::exception& e) {
-						MessageBoxA(nullptr, "B³¹d podczas kopiowania pliku.", nullptr, MB_OK);
-					}
 				}
 			}
 		}
 	}
-	// Po uzyskaniu œcie¿ki pliku
-	Sound s(selectedFilePath);
-	AudioHolder.push_back(s);
+	return selectedFilePath;
 }
+
 void Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, ID2D1Bitmap** ppBitmap)
 {
 	Microsoft::WRL::ComPtr<IWICImagingFactory> pWICFactory;

@@ -18,19 +18,23 @@
 class Mainapp
 {
 private:
-	int TextureInstanceTabCounter =-1;
-	std::vector<TextureInstance> TextureInstanceTab;
+	std::vector<LevelInstance> LevelHolder;
+	std::vector<TextureInstance> TextureHolder;
 	std::vector<Sound> AudioHolder;
-	int AudioCounter = -1;
-	const int ScreenWidth = 1024;
-	const int ScreenHeight = 820;
-	bool czyrysowaclinie = true;
-	int CameraXPosition = 0;
-	int CameraYPosition = 0;
-	int CameraSpeed = 10;
+private:
 	bool CameraXState = false;
 	bool CameraYState = false;
 	bool Collision = false;
+	bool czyrysowaclinie = true;
+private:
+	const int ScreenWidth = 1024;
+	const int ScreenHeight = 820;
+	int CameraXPosition = 0;
+	int CameraYPosition = 0;
+	int CameraSpeed = 10;
+	int TextureCounter = -1;
+	int AudioCounter = -1;
+private:
 	UINT32 KeyColour = 0xFFFF00FF;
 	MSG msg;
 	BOOL result;
@@ -43,19 +47,28 @@ private:
 	SoundHandler& Soundhandler = SoundHandler::Get();
 	ComManager commanager;
 public:
-	std::vector<LevelInstance> LevelInstanceTab;
 	Mainapp();
 	int Go();
 	void DoFrame();
-	bool IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2);
-	void UpdateCameraPosition();
-	void HandleInput();
 	void DoLogic();
 	void DoDrawing();
-	std::filesystem::path CopyBitmapToProjectFolder(const std::wstring& sourceFilePath);
+public:
+
+public:
+	void LoadFileTypeAudio();
+	void LoadFileTypeLevel();
+	void SaveFileTypeLevel();
+	void LoadFileTypeTexture();
+public:	
+	void UpdateCameraPosition();
+	void HandleInput();
 	void ProcessMessages();
-	void LoadAudio();
 	void LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, ID2D1Bitmap** ppBitmap);
+	bool IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2);
+public:
+	std::filesystem::path CopyFileToProjectFolder(const std::wstring& SourceFilePath);
+	std::wstring OpenFileDialog(LPCWSTR Filetype, LPCWSTR FileExtension);
+
 	
 
 

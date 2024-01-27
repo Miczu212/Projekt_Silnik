@@ -63,12 +63,12 @@ public:
 		Channel(const Channel&) = delete;
 		~Channel()
 		{
-			assert(!pSound);
-			if (pSource)
-			{
+			if (!pSound)
+				pSound = nullptr;
+
 				pSource->DestroyVoice();
 				pSource = nullptr;
-			}
+			
 		}
 		void PlaySoundBuffer(class Sound& s, float freqMod, float vol);
 		void Stop()
@@ -83,7 +83,7 @@ public:
 		class Sound* pSound = nullptr;
 	};
 public:
-	SoundHandler(const SoundHandler&) = delete;
+	SoundHandler(const SoundHandler&) = delete; //Usuwamy Copy Konstruktor dla SoundHandlera
 	static SoundHandler& Get(); //funkcja która upewnia nas ze system zostanie zainicjalizowany tylko raz
 	static WAVEFORMATEX& GetFormat()
 	{
@@ -101,13 +101,13 @@ public:
 	}
 private:
 	SoundHandler();
-	void DeactivateChannel(Channel& channel)
+	void DeactivateChannel(Channel& Chan)
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		auto i = std::find_if(activeChannelPtrs.begin(), activeChannelPtrs.end(),
-			[&channel](const std::unique_ptr<Channel>& pChan) -> bool
+			[&Chan](const std::unique_ptr<Channel>& pChan) -> bool
 			{
-				return &channel == pChan.get();
+				return &Chan == pChan.get();
 			});
 		idleChannelPtrs.push_back(std::move(*i));
 		activeChannelPtrs.erase(i);
@@ -126,9 +126,9 @@ class Sound
 {
 	friend SoundHandler::Channel;
 public:
-	Sound(const Sound& other)
+	Sound(const Sound& other) //Copy Konstruktor Dla Klasy DŸwiêku
 		: nBytes(other.nBytes), pData(new BYTE[other.nBytes]), activeChannelPtrs(other.activeChannelPtrs) {
-		// Kopiowanie danych z innego obiektu
+		// Kopiowanie danych z innego obiektu do obecnego obiektu
 		std::copy(other.pData.get(), other.pData.get() + other.nBytes, pData.get());
 	}
 	Sound(const std::wstring& fileName)
@@ -160,10 +160,10 @@ public:
 				}
 
 				file.read(reinterpret_cast<char*>(&fileSize), 4);
-				fileSize += 8; // entry doesn't include the fourcc or itself
+				fileSize += 8; 
 				if (fileSize <= 44)
 				{
-					throw SoundHandler::FileError("Plik jest za ma³y");
+					throw SoundHandler::FileError("Plik jest za ma³y"); // nie ma fourcc albo plik pusty
 				}
 
 				file.seekg(0, std::ios::beg);
@@ -176,7 +176,7 @@ public:
 				throw SoundHandler::FileError("Format to nie WAVE");
 			}
 
-			//look for 'fmt ' chunk id
+			//Szukamy 'fmt ' chunk id
 			WAVEFORMATEX format;
 			bool bFilledFormat = false;
 			for (unsigned int i = 12; i < fileSize; )
@@ -195,7 +195,7 @@ public:
 				throw SoundHandler::FileError("fmt chunk nie znaleziony");
 			}
 
-			// compare format with sound system format
+			//Porównanie formatu pliku z formatem przyjmowanym przez soundhandler
 			{
 				const WAVEFORMATEX sysFormat = SoundHandler::GetFormat();
 
@@ -254,7 +254,7 @@ public:
 			throw SoundHandler::FileError(e.what());
 		}
 	}
-	Sound(Sound&& donor)
+	Sound(Sound&& donor) noexcept
 		:
 		nBytes(donor.nBytes),
 		pData(std::move(donor.pData)),
