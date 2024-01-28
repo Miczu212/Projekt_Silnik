@@ -137,6 +137,11 @@ void Mainapp::HandleInput()
 	{
 		TextureHolder[TextureCounter].IsCollisionOn = !TextureHolder[TextureCounter].IsCollisionOn;
 	}
+	if (ISPressed(KEY_W))
+	{
+		std::wstring selectedFilePath = OpenFileDialog(L"Binary Files", L"*.bin;*.dat");
+		Currentlevel.ReTargetLevel(selectedFilePath);
+	}
 	WND1.Klt.ClearState();
 }
 //Funkcje Wczytuj¹ce/Zapisuj¹ce
