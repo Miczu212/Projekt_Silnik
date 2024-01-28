@@ -1,5 +1,5 @@
 #include "LevelInstance.h"
-void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSave, const std::wstring& Filename,const Player PlayerInstance) //pamietaj by jak cokolwiek dodasz co wymaga zapisania to to tutaj zapisac
+void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT,std::vector<std::wstring>& ToSaveA, const std::wstring& Filename,const Player PlayerInstance) //pamietaj by jak cokolwiek dodasz co wymaga zapisania to to tutaj zapisac
 {
     std::ofstream file;
     file.open(Filename + L".dat", std::ios::binary);
@@ -10,10 +10,10 @@ void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSave, const 
         file.write(reinterpret_cast<char*>(&sizepath), sizeof(sizepath));
         file.write(reinterpret_cast<const char*>(PlayerInstance.CurrentPlayerTexture.Path.c_str()), sizepath * sizeof(wchar_t)); //path to texture instance
 
-        size_t TextureCount = ToSave.size();
+        size_t TextureCount = ToSaveT.size();
         file.write(reinterpret_cast<char*>(&TextureCount), sizeof(TextureCount)); //ilosc textur
 
-        for (const auto& texture : ToSave)
+        for (const auto& texture : ToSaveT)
         {   
             size_t destinationRectTabSize = texture.destinationRectTab.size();
             file.write(reinterpret_cast<char*>(&destinationRectTabSize), sizeof(destinationRectTabSize)); 
@@ -30,11 +30,20 @@ void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSave, const 
             file.write(reinterpret_cast<const char*>(&texture.Twidth), sizeof(texture.Twidth)); //Twidth
         }
 
+        std::wstring::size_type sizepathA;
+        size_t Tabsize = ToSaveA.size();
+        file.write(reinterpret_cast<char*>(&Tabsize), sizeof(Tabsize));
+        for (const auto& Path : ToSaveA)
+        {
+            sizepathA = Path.size();
+            file.write(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
+            file.write(reinterpret_cast<const char*>(Path.c_str()), sizepathA * sizeof(wchar_t)); //path to Audio instance
+        }
         file.close();
     }
 }
 
-void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoad, const std::wstring& Filename, Player& PlayerInstance) //pamiêtaj ¿e jak chcesz cokolwiek wczytac to musisz parametr przekazac by reference &
+void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, std::vector<std::wstring>& ToLoadA, const std::wstring& Filename, Player& PlayerInstance) //pamiêtaj ¿e jak chcesz cokolwiek wczytac to musisz parametr przekazac by reference &
 {
     std::ifstream file;
     file.open(Filename, std::ios::binary);
@@ -49,11 +58,11 @@ void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoad, const std::w
         size_t TextureCount;
         file.read(reinterpret_cast<char*>(&TextureCount), sizeof(TextureCount));
 
-        ToLoad.resize(TextureCount);
+        ToLoadT.resize(TextureCount);
 
         for (size_t i = 0; i < TextureCount; ++i)
         {
-            TextureInstance& TempTexture = ToLoad[i];
+            TextureInstance& TempTexture = ToLoadT[i];
 
             size_t destinationRectTabSize;
             file.read(reinterpret_cast<char*>(&destinationRectTabSize), sizeof(destinationRectTabSize));
@@ -69,6 +78,18 @@ void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoad, const std::w
             file.read(reinterpret_cast<char*>(&TempTexture.IsCollisionOn), sizeof(TempTexture.IsCollisionOn));
             file.read(reinterpret_cast<char*>(&TempTexture.Theight), sizeof(TempTexture.Theight));
             file.read(reinterpret_cast<char*>(&TempTexture.Twidth), sizeof(TempTexture.Twidth));
+        }
+
+        std::wstring::size_type sizepathA;
+        size_t Tabsize;
+        file.read(reinterpret_cast<char*>(&Tabsize), sizeof(Tabsize));
+        ToLoadA.resize(Tabsize);
+        for (size_t i = 0; i < Tabsize; ++i)
+        {
+            
+            file.read(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
+            ToLoadA[i].resize(sizepathA);
+            file.read(reinterpret_cast<char*>(&ToLoadA[i][0]), sizepathA * sizeof(wchar_t));//path to Audio instance
         }
 
 

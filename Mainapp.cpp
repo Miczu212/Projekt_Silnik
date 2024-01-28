@@ -148,6 +148,7 @@ void Mainapp::LoadFileTypeAudio()
 		AudioCounter++;
 		Sound s(selectedFilePath);
 		AudioHolder.push_back(s);
+		AudioPathHolder.push_back(selectedFilePath);
 	}
 }
 void Mainapp::LoadFileTypeLevel()
@@ -156,10 +157,12 @@ void Mainapp::LoadFileTypeLevel()
 	std::wstring selectedFilePath = OpenFileDialog(L"Binary Files", L"*.bin;*.dat");
 	if (!selectedFilePath.empty())
 	{
-		AudioCounter++;
 		czyrysowaclinie = false;
-		CopyFileToProjectFolder(selectedFilePath);
-		Currentlevel.LoadLevel(TextureHolder, selectedFilePath, CurrentPlayer);
+		AudioHolder.clear();
+		TextureHolder.clear();
+		AudioPathHolder.clear();
+		Currentlevel.LoadLevel(TextureHolder,AudioPathHolder, selectedFilePath, CurrentPlayer);
+		//textury
 		LoadBMPToTexture(
 			CurrentPlayer.CurrentPlayerTexture.Path,
 			WND1.ReturnGFX().ReturnRenderTarget(),
@@ -170,9 +173,27 @@ void Mainapp::LoadFileTypeLevel()
 			LoadBMPToTexture(TextureHolder[TextureCounter].Path,
 				WND1.ReturnGFX().ReturnRenderTarget(),
 				TextureHolder[TextureCounter].pBitmap.GetAddressOf());
+			
 		}
-		TextureCounter = 0;
+		TextureCounter = TextureHolder.size() - 1;
+		//textury
 
+		//audio
+		AudioHolder.clear();
+		
+		
+		for (auto& Path : AudioPathHolder)
+		{
+			if (!Path.empty())
+			{
+				Sound s(Path);
+				AudioHolder.push_back(s);
+
+			}
+			
+		}
+		AudioCounter = AudioHolder.size() - 1;
+		//audio
 	}
 }
 void Mainapp::SaveFileTypeLevel()
@@ -200,7 +221,7 @@ void Mainapp::SaveFileTypeLevel()
 			}
 		}
 	}
-	Currentlevel.SaveLevel(TextureHolder, selectedFilePath, CurrentPlayer);
+	Currentlevel.SaveLevel(TextureHolder,AudioPathHolder, selectedFilePath, CurrentPlayer);
 
 
 

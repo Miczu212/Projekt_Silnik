@@ -6,8 +6,8 @@
 class LevelInstance
 {
 public:
-	void SaveLevel(const std::vector<TextureInstance>& ToSave, const std::wstring& Filename, const Player PlayerInstance);
-	void LoadLevel(std::vector<TextureInstance>& ToLoad, const std::wstring& Filename, Player& PlayerInstance);
+	void SaveLevel(const std::vector<TextureInstance>& ToSave, std::vector<std::wstring>& ToSaveA, const std::wstring& Filename, const Player PlayerInstance);
+	void LoadLevel(std::vector<TextureInstance>& ToLoadT, std::vector<std::wstring>& ToLoadA, const std::wstring& Filename, Player& PlayerInstance);
 
 
 };

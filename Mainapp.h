@@ -21,6 +21,7 @@ private:
 	std::vector<LevelInstance> LevelHolder;
 	std::vector<TextureInstance> TextureHolder;
 	std::vector<Sound> AudioHolder;
+	std::vector<std::wstring> AudioPathHolder;
 private:
 	bool CameraXState = false;
 	bool CameraYState = false;
