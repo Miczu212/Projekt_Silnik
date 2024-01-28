@@ -131,6 +131,16 @@ public:
 		// Kopiowanie danych z innego obiektu do obecnego obiektu
 		std::copy(other.pData.get(), other.pData.get() + other.nBytes, pData.get());
 	}
+
+	void Stop()
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		for (auto pChannel : activeChannelPtrs)
+		{
+			pChannel->Stop();
+		}
+	}
+
 	Sound(const std::wstring& fileName)
 	{
 		unsigned int fileSize = 0;

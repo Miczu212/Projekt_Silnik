@@ -132,6 +132,11 @@ void Mainapp::HandleInput()
 	{
 		AudioHolder[AudioCounter].Play(1.0f,1.0f);
 	}
+	//Zatrzymanie odtworzenia dzwieku
+	if (ISPressed(KEY_8))
+	{
+		AudioHolder[AudioCounter].Stop();
+	}
 	//Prze³¹czenie Kolizji Dla Wybranej Textury
 	if (ISPressed(KEY_Q))
 	{
