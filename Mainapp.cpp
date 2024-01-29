@@ -416,10 +416,18 @@ std::filesystem::path Mainapp::CopyFileToProjectFolder(const std::wstring& Sourc
 			// Uzyskaj pe³n¹ œcie¿kê do pliku docelowego w folderze projektowym
 		std::filesystem::path destinationPath = projectFolder / sourcePath.filename();
 			// Skopiuj plik
-		std::filesystem::copy_file(sourcePath, destinationPath, std::filesystem::copy_options::overwrite_existing);
 
-		MessageBoxA(WND1.GetHandle(), "Plik skopiowany pomyœlnie.", NULL, MB_OK);
-		return destinationPath;
+		if (std::filesystem::exists(destinationPath)) {
+			MessageBoxA(WND1.GetHandle(), "Plik o takiej samej nazwie, ju¿ istnieje w folderze projektowym.", NULL, MB_OK);
+			return destinationPath; 
+		}
+
+		else {
+			std::filesystem::copy_file(sourcePath, destinationPath, std::filesystem::copy_options::overwrite_existing);
+
+			MessageBoxA(WND1.GetHandle(), "Plik skopiowany pomyœlnie.", NULL, MB_OK);
+			return destinationPath;
+		}
 	}
 	catch(const std::exception& e)
 	{
