@@ -176,6 +176,9 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
     }
 void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, std::vector<std::wstring>& ToLoadA, const std::wstring& Filename, Player& PlayerInstance) //pamiêtaj ¿e jak chcesz cokolwiek wczytac to musisz parametr przekazac by reference &
 {
+    PlayerInstance.CurrentPlayerTexture.Path.clear();
+    ToLoadT.clear();
+    ToLoadA.clear();
     std::ifstream file;
     file.open(Filename, std::ios::binary);
     if (file.is_open())

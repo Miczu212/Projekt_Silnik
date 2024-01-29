@@ -21,72 +21,69 @@ int Mainapp::Go()
 void Mainapp::HandleInput()
 {
 	//Poruszanie sie po tablicy textur
-	if (ISPressed(KEY_R))
+	ISPressed(KEY_R)
 	{
 		TextureCounter++;
 		if (TextureCounter > TextureHolder.size() - 1)
 			TextureCounter = 0;
-
-		//	TextureHolder[TextureCounter].pBitmap.Reset();  // Zwalnianie poprzedniego zasobu. 
-		//	LoadBMPToTexture(TextureHolder[TextureCounter].GetPath(), WND1.ReturnGFX().ReturnRenderTarget(), TextureHolder[TextureCounter].pBitmap.GetAddressOf());
 		
 	}
 	//Wczytanie Textury
-	if (ISPressed(KEY_F))
+	ISPressed(KEY_F)
 	{	
 		LoadFileTypeTexture();
 	}
 	//Skalowanie textury zmniejszenie
-	if (ISPressed(KEY_N))
+	ISPressed(KEY_N)
 	{
 		ScaleTwidth -= 10;
 		ScaleTheight -= 10;
 		
 	}
 	//Skalowanie textury zwiekszenie
-	if (ISPressed(KEY_M))
+	ISPressed(KEY_M)
 	{
 		ScaleTwidth += 10;
 		ScaleTheight += 10;
 		
 	}
 	// Reset do domyslnych width i height
-	if (ISPressed(KEY_B))
+	ISPressed(KEY_B)
 	{
 		ScaleTwidth = 0;
 		ScaleTheight = 0;
 		
 	}
 	//Zapisanie Poziomu
-	if (ISPressed(KEY_Z)) 
+	ISPressed(KEY_Z)
 	{ 
 		SaveFileTypeLevel();
 	}
 	//Wczytanie Poziomu
-	if (ISPressed(KEY_L))
+	ISPressed(KEY_L)
 	{
 		LoadFileTypeLevel();
 	}
 	//Sterowanie
-	if (ISPressed(KEY_LEFT))
+	ISPressed(KEY_LEFT)
 	{
 		CameraXPosition = CameraSpeed;
 		CameraXState = true;
 		
 	}
-	if (ISPressed(KEY_RIGHT))
+	ISPressed(KEY_RIGHT)
 	{
 		CameraXPosition = -CameraSpeed;
 		CameraXState = true;
 		
 	}
-	if (ISPressed(KEY_DOWN))
+	ISPressed(KEY_DOWN)
 	{
 		CameraYPosition = -CameraSpeed;
 		CameraYState = true;
 		
 	}
-	if (ISPressed(KEY_UP))
+	ISPressed(KEY_UP)
 	{
 		CameraYPosition = CameraSpeed;
 		CameraYState = true;
@@ -94,7 +91,7 @@ void Mainapp::HandleInput()
 	}
 	//Sterowanie
 	//Ustawienie Gracza na obecnie Wybran¹ texture
-	if (ISPressed(KEY_P))
+	ISPressed(KEY_P)
 	{
 		CurrentPlayer.CurrentPlayerTexture = TextureHolder[TextureCounter];
 
@@ -113,13 +110,13 @@ void Mainapp::HandleInput()
 		
 	}
 	//Wczytanie dzwiekow
-	if (ISPressed(KEY_O))
+	ISPressed(KEY_O)
 	{
 		LoadFileTypeAudio();
 		
 	}
 	//Poruszanie sie po tablicy dzwiekow
-	if (ISPressed(KEY_0))
+	ISPressed(KEY_0)
 	{
 		AudioCounter++;
 
@@ -128,21 +125,21 @@ void Mainapp::HandleInput()
 		
 	}
 	//Odtworzenie dzwieku
-	if (ISPressed(KEY_9))
+	ISPressed(KEY_9)
 	{
 		AudioHolder[AudioCounter].Play(1.0f,1.0f);
 	}
 	//Zatrzymanie odtworzenia dzwieku
-	if (ISPressed(KEY_8))
+	ISPressed(KEY_8)
 	{
 		AudioHolder[AudioCounter].Stop();
 	}
 	//Prze³¹czenie Kolizji Dla Wybranej Textury
-	if (ISPressed(KEY_Q))
+	ISPressed(KEY_Q)
 	{
 		TextureHolder[TextureCounter].IsCollisionOn = !TextureHolder[TextureCounter].IsCollisionOn;
 	}
-	if (ISPressed(KEY_W))
+	ISPressed(KEY_W)
 	{
 		std::wstring selectedFilePath = OpenFileDialog(L"Binary Files", L"*.bin;*.dat");
 		Currentlevel.ReTargetLevel(selectedFilePath);
@@ -198,6 +195,7 @@ void Mainapp::LoadFileTypeLevel()
 			{
 				Sound s(Path);
 				AudioHolder.push_back(s);
+				//po tym jak wyjdziemy ze scopa to destruktor dla s automatycznie siê uruchamia, a audioholder przechowuje kopie
 
 			}
 			
@@ -272,16 +270,17 @@ void Mainapp::LoadFileTypeTexture()
 //Funkcje Wczytuj¹ce/Zapisuj¹ce
 void Mainapp::DoLogic() 
 {
-	HandleInput();
-	
+	if (timer.Peek() >= 1.0f / 30.0f) //logika bêdzie sprawdzana co 1.0f/30.0f sekundy a nie co klatke, przez co dla wszystkich frameratów gra bedzie podobnie p³ynna
+	{
+		timer.Mark();
+		HandleInput();
+	}
 }
 void Mainapp::DoDrawing()
 {
 	WND1.ReturnGFX().BeginFrame();
 	WND1.ReturnGFX().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
-	NoAutoclick(			//Ta funkcja jest tutaj nie w handle input dlatego ¿e jest bezpoœrednio zwi¹zana z rysowaniem 
-		if (WND1.Mk.LeftIsPressed() == true) {
-			WND1.CurrentMouseState = true;
+	NoAutoclickE(			//Ta funkcja jest tutaj nie w handle input dlatego ¿e jest bezpoœrednio zwi¹zana z rysowaniem 
 			if(czyrysowaclinie==true)
 			WND1.ReturnGFX().Draw(MousePosition, MousePosition);
 			if (TextureCounter != -1) {
@@ -289,11 +288,12 @@ void Mainapp::DoDrawing()
 				D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureHolder[TextureCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
 					TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
 				TextureHolder[TextureCounter].destinationRectTab.push_back(destinationRect);
-			}
-		}
-		else if (czyrysowaclinie == true)
+			}	
+		, else if (czyrysowaclinie == true) //else if jest po przecinku z powodu struktury makra
 			WND1.ReturnGFX().Draw(MousePosition);
 	)
+			
+
 		if (TextureHolder.size()!= 0)
 		{
 			UpdateCameraPosition();
@@ -326,9 +326,12 @@ void Mainapp::DoDrawing()
 	WND1.ReturnGFX().EndFrame();
 }
 void Mainapp::DoFrame() {
-
+	/*std::ostringstream oss;
+	oss << timer.Peek();
+	SetWindowTextA(WND1.GetHandle(), oss.str().c_str());*/ //potrzebne do debugowania problemów z timerem
 	DoLogic();
 	DoDrawing();
+	
 	
 }
 

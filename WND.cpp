@@ -99,7 +99,7 @@ GFX& WND::ReturnGFX()
 	case WM_RBUTTONDOWN:
 	{
 		const POINTS points = MAKEPOINTS(lparam);
-		Mk.OnLeftPressed(points.x, points.y);
+		Mk.OnRightPressed(points.x, points.y);
 		break;
 	}
 	case WM_RBUTTONUP:
