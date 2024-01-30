@@ -1,5 +1,5 @@
 #include "LevelInstance.h"
-void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT,std::vector<std::wstring>& ToSaveA, const std::wstring& Filename,const Player PlayerInstance) //pamietaj by jak cokolwiek dodasz co wymaga zapisania to to tutaj zapisac
+void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT,std::vector<std::wstring>& ToSaveA, const std::wstring& Filename,const Player PlayerInstance) const //pamietaj by jak cokolwiek dodasz co wymaga zapisania to to tutaj zapisac
 {
     std::ofstream file;
     file.open(Filename + L".dat", std::ios::binary);
@@ -42,7 +42,7 @@ void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT,std::v
         file.close();
     }
 }
-std::wstring LevelInstance::GetNameOfFile(const std::wstring& path)
+std::wstring LevelInstance::GetNameOfFile(const std::wstring& path) const
 {
     int counter=0;
     for (int i = path.size() - 1; i > 0; i--)

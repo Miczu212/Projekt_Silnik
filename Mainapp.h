@@ -71,12 +71,12 @@ public:
 	void LoadFileTypeTexture();
 public:
 	void UpdateCameraPosition();
-	void HandleInput();
-	void ProcessMessages();
+	void HandleInput() noexcept;
+	void ProcessMessages() noexcept;
 	void LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, ID2D1Bitmap** ppBitmap);
-	bool IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2);
+	bool IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) const noexcept;
 public:
-	std::filesystem::path CopyFileToProjectFolder(const std::wstring& SourceFilePath);
+	std::filesystem::path CopyFileToProjectFolder(const std::wstring& SourceFilePath) const;
 	std::wstring OpenFileDialog(LPCWSTR Filetype, LPCWSTR FileExtension);
 
 

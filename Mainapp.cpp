@@ -18,7 +18,7 @@ int Mainapp::Go()
 	}
 	return msg.wParam;
 }
-void Mainapp::HandleInput()
+void Mainapp::HandleInput() noexcept
 {
 	//Poruszanie sie po tablicy textur
 	ISPressed(KEY_R)
@@ -63,7 +63,7 @@ void Mainapp::HandleInput()
 			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right = RollbackRectRight;
 			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left = RollbackRectLeft;
 			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top = RollbackRectTop;
-			SelectionMode = MODE_SELECT;
+			SelectionMode++;
 		}
 
 	}
@@ -343,9 +343,6 @@ void Mainapp::SaveFileTypeLevel()
 		}
 	}
 	Currentlevel.SaveLevel(TextureHolder, AudioPathHolder, selectedFilePath, CurrentPlayer);
-
-
-
 }
 void Mainapp::LoadFileTypeTexture()
 {
@@ -464,7 +461,7 @@ void Mainapp::DoFrame() {
 
 }
 
-bool Mainapp::IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) //jezeli prostok¹ty siê pokryj¹ zwracana jest odpowiednia wartosc
+bool Mainapp::IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) const noexcept //jezeli prostok¹ty siê pokryj¹ zwracana jest odpowiednia wartosc
 {
 	// Sprawdzamy warunki brzegowe, czyli czy jeden prostok¹t jest po lewej, po prawej, nad lub pod drugim prostok¹tem.
 	if (rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom < rect2.top || rect1.top > rect2.bottom)
@@ -537,7 +534,7 @@ void Mainapp::UpdateCameraPosition()
 }
 
 
-std::filesystem::path Mainapp::CopyFileToProjectFolder(const std::wstring& SourceFilePath)
+std::filesystem::path Mainapp::CopyFileToProjectFolder(const std::wstring& SourceFilePath) const
 {
 	try {
 		std::filesystem::path projectFolder = std::filesystem::current_path();
@@ -564,7 +561,7 @@ std::filesystem::path Mainapp::CopyFileToProjectFolder(const std::wstring& Sourc
 	}
 }
 
-void Mainapp::ProcessMessages()
+void Mainapp::ProcessMessages() noexcept
 {
 	while ((result = PeekMessageA(&msg, nullptr, 0, 0, PM_REMOVE) > 0)) //petla obslugujaca wiadomosci przychodzace
 	{
@@ -574,7 +571,6 @@ void Mainapp::ProcessMessages()
 		}
 		TranslateMessage(&msg);
 		DispatchMessageA(&msg);
-		//WND1.grafika().Draw();
 		while (!WND1.Mk.IsEmpty())
 		{
 			const auto e = WND1.Mk.Read();
