@@ -1,4 +1,6 @@
 #pragma once
+#include<math.h>
+#include"ConstantDefines.h"
 #include"ComManager.h"
 #include "WND.h"
 #include "Player.h"
@@ -35,6 +37,13 @@ private:
 	int CameraSpeed = 10;
 	int TextureCounter = -1;
 	int AudioCounter = -1;
+	int SelectionMode = MODE_PLACE;
+	int SelectionRectCounter = -1;
+private:
+	int RollbackRectBottom;
+	int RollbackRectRight;
+	int RollbackRectLeft;
+	int RollbackRectTop;
 private:
 	UINT32 KeyColour = 0xFFFF00FF;
 	MSG msg;
@@ -43,7 +52,7 @@ private:
 	Timer timer;
 	D2D1_POINT_2F MousePosition;
 	UINT ScaleTwidth = 0, ScaleTheight = 0;
-    LevelInstance Currentlevel;
+	LevelInstance Currentlevel;
 	Player CurrentPlayer;
 	SoundHandler& Soundhandler = SoundHandler::Get();
 	ComManager commanager;
@@ -60,7 +69,7 @@ public:
 	void LoadFileTypeLevel();
 	void SaveFileTypeLevel();
 	void LoadFileTypeTexture();
-public:	
+public:
 	void UpdateCameraPosition();
 	void HandleInput();
 	void ProcessMessages();
@@ -70,7 +79,7 @@ public:
 	std::filesystem::path CopyFileToProjectFolder(const std::wstring& SourceFilePath);
 	std::wstring OpenFileDialog(LPCWSTR Filetype, LPCWSTR FileExtension);
 
-	
+
 
 
 };

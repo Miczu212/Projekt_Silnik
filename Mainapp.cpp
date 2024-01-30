@@ -4,7 +4,7 @@
 
 
 Mainapp::Mainapp()
-	: 
+	:
 	WND1(ScreenWidth, ScreenHeight, "testing") // ustawianie parametrów okna
 {}
 
@@ -26,11 +26,11 @@ void Mainapp::HandleInput()
 		TextureCounter++;
 		if (TextureCounter > TextureHolder.size() - 1)
 			TextureCounter = 0;
-		
+
 	}
 	//Wczytanie Textury
 	ISPressed(KEY_F)
-	{	
+	{
 		LoadFileTypeTexture();
 	}
 	//Skalowanie textury zmniejszenie
@@ -38,25 +38,38 @@ void Mainapp::HandleInput()
 	{
 		ScaleTwidth -= 10;
 		ScaleTheight -= 10;
-		
+
 	}
 	//Skalowanie textury zwiekszenie
 	ISPressed(KEY_M)
 	{
 		ScaleTwidth += 10;
 		ScaleTheight += 10;
-		
+
 	}
 	// Reset do domyslnych width i height
 	ISPressed(KEY_B)
 	{
 		ScaleTwidth = 0;
 		ScaleTheight = 0;
-		
+		if (SelectionMode == MODE_SCALE)
+		{
+			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom = RollbackRectBottom;
+			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right = RollbackRectRight;
+		}
+		else if (SelectionMode == MODE_MOVE)
+		{
+			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom = RollbackRectBottom;
+			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right = RollbackRectRight;
+			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left = RollbackRectLeft;
+			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top = RollbackRectTop;
+			SelectionMode = MODE_SELECT;
+		}
+
 	}
 	//Zapisanie Poziomu
 	ISPressed(KEY_Z)
-	{ 
+	{
 		SaveFileTypeLevel();
 	}
 	//Wczytanie Poziomu
@@ -69,25 +82,25 @@ void Mainapp::HandleInput()
 	{
 		CameraXPosition = CameraSpeed;
 		CameraXState = true;
-		
+
 	}
 	ISPressed(KEY_RIGHT)
 	{
 		CameraXPosition = -CameraSpeed;
 		CameraXState = true;
-		
+
 	}
 	ISPressed(KEY_DOWN)
 	{
 		CameraYPosition = -CameraSpeed;
 		CameraYState = true;
-		
+
 	}
 	ISPressed(KEY_UP)
 	{
 		CameraYPosition = CameraSpeed;
 		CameraYState = true;
-		
+
 	}
 	//Sterowanie
 	//Ustawienie Gracza na obecnie Wybran¹ texture
@@ -107,13 +120,13 @@ void Mainapp::HandleInput()
 			ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2
 		);
 		//zrobione tak by postac byla zawsze na srodku ekranu
-		
+
 	}
 	//Wczytanie dzwiekow
 	ISPressed(KEY_O)
 	{
 		LoadFileTypeAudio();
-		
+
 	}
 	//Poruszanie sie po tablicy dzwiekow
 	ISPressed(KEY_0)
@@ -122,12 +135,12 @@ void Mainapp::HandleInput()
 
 		if (AudioCounter >= AudioHolder.size())
 			AudioCounter = 0;
-		
+
 	}
 	//Odtworzenie dzwieku
 	ISPressed(KEY_9)
 	{
-		AudioHolder[AudioCounter].Play(1.0f,1.0f);
+		AudioHolder[AudioCounter].Play(1.0f, 1.0f);
 	}
 	//Zatrzymanie odtworzenia dzwieku
 	ISPressed(KEY_8)
@@ -143,6 +156,106 @@ void Mainapp::HandleInput()
 	{
 		std::wstring selectedFilePath = OpenFileDialog(L"Binary Files", L"*.bin;*.dat");
 		Currentlevel.ReTargetLevel(selectedFilePath);
+	}
+	//Zmiana Trybu Selekcji
+	ISPressed(KEY_E)
+	{
+		SelectionMode++;
+
+
+		if (SelectionMode == MODE_SCALE)
+		{
+			RollbackRectBottom = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom;
+			RollbackRectRight = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right;
+		}
+		if (SelectionMode == MODE_MOVE)
+		{
+			RollbackRectBottom = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom;
+			RollbackRectRight = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right;
+			RollbackRectTop = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top;
+			RollbackRectLeft = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left;
+
+		}
+
+		if (SelectionMode > 4)
+		{
+			SelectionMode = 0;
+		}
+	}
+	//Za co odpowiada klikniêcie
+	if (WND1.Mk.LeftIsPressed())
+	{
+		int X = WND1.Mk.GetPosX();
+		int Y = WND1.Mk.GetPosY();
+		switch (SelectionMode)
+		{
+		
+		case MODE_MOVE:
+		{
+			SelectionMode++;
+			break;
+		}
+		case MODE_SELECT:
+		{
+
+			int LocalTextureCounter = 0;
+			int LocalRectCounter = 0;
+			for (const auto& texture : TextureHolder)
+			{
+				LocalRectCounter = 0;
+				for (const auto& Rect : texture.destinationRectTab)
+				{
+					if (X > Rect.left && X<Rect.right && Y>Rect.top && Y < Rect.bottom)
+					{
+						TextureCounter = LocalTextureCounter;
+						SelectionRectCounter = LocalRectCounter;
+						break;
+					}
+					LocalRectCounter++;
+				}
+				LocalTextureCounter++;
+			}
+			break;
+		}
+			case MODE_SCALE:
+			{
+				if (SelectionRectCounter != -1) {
+					D2D1_RECT_F& SelectedRect = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter];
+
+					SelectedRect.bottom = Y;
+					SelectedRect.right = X;
+				}
+					break;
+				
+			}
+			case MODE_ROTATE:
+			{
+				//TODO Mo¿e zaimplementowaæ, nie jest must have ale nice by by³o mieæ
+				break;
+			}
+		}
+	}
+	else
+	{
+		if (SelectionMode == MODE_MOVE)
+		{
+
+			int X = WND1.Mk.GetPosX();
+			int Y = WND1.Mk.GetPosY();
+			if (SelectionRectCounter != -1) {
+				TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter] =
+					D2D1::RectF(X, Y,
+
+						X + TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right -
+
+						TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left
+
+						, Y + TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom
+
+						- TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top
+					);
+			}
+		}
 	}
 	WND1.Klt.ClearState();
 }
@@ -168,7 +281,7 @@ void Mainapp::LoadFileTypeLevel()
 		AudioHolder.clear();
 		TextureHolder.clear();
 		AudioPathHolder.clear();
-		Currentlevel.LoadLevel(TextureHolder,AudioPathHolder, selectedFilePath, CurrentPlayer);
+		Currentlevel.LoadLevel(TextureHolder, AudioPathHolder, selectedFilePath, CurrentPlayer);
 		//textury
 		LoadBMPToTexture(
 			CurrentPlayer.CurrentPlayerTexture.Path,
@@ -180,15 +293,15 @@ void Mainapp::LoadFileTypeLevel()
 			LoadBMPToTexture(TextureHolder[TextureCounter].Path,
 				WND1.ReturnGFX().ReturnRenderTarget(),
 				TextureHolder[TextureCounter].pBitmap.GetAddressOf());
-			
+
 		}
 		TextureCounter = TextureHolder.size() - 1;
 		//textury
 
 		//audio
 		AudioHolder.clear();
-		
-		
+
+
 		for (auto& Path : AudioPathHolder)
 		{
 			if (!Path.empty())
@@ -198,7 +311,7 @@ void Mainapp::LoadFileTypeLevel()
 				//po tym jak wyjdziemy ze scopa to destruktor dla s automatycznie siê uruchamia, a audioholder przechowuje kopie
 
 			}
-			
+
 		}
 		AudioCounter = AudioHolder.size() - 1;
 		//audio
@@ -229,7 +342,7 @@ void Mainapp::SaveFileTypeLevel()
 			}
 		}
 	}
-	Currentlevel.SaveLevel(TextureHolder,AudioPathHolder, selectedFilePath, CurrentPlayer);
+	Currentlevel.SaveLevel(TextureHolder, AudioPathHolder, selectedFilePath, CurrentPlayer);
 
 
 
@@ -268,9 +381,9 @@ void Mainapp::LoadFileTypeTexture()
 	}
 }
 //Funkcje Wczytuj¹ce/Zapisuj¹ce
-void Mainapp::DoLogic() 
+void Mainapp::DoLogic()
 {
-	if (timer.Peek() >= 1.0f / 30.0f) //logika bêdzie sprawdzana co 1.0f/30.0f sekundy a nie co klatke, przez co dla wszystkich frameratów gra bedzie podobnie p³ynna
+	if (timer.Peek() >= 1.0f / 120.0f) //logika bêdzie sprawdzana co 1.0f/30.0f sekundy a nie co klatke, przez co dla wszystkich frameratów gra bedzie podobnie p³ynna
 	{
 		timer.Mark();
 		HandleInput();
@@ -280,48 +393,64 @@ void Mainapp::DoDrawing()
 {
 	WND1.ReturnGFX().BeginFrame();
 	WND1.ReturnGFX().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
-	NoAutoclickE(			//Ta funkcja jest tutaj nie w handle input dlatego ¿e jest bezpoœrednio zwi¹zana z rysowaniem 
-			if(czyrysowaclinie==true)
-			WND1.ReturnGFX().Draw(MousePosition, MousePosition);
-			if (TextureCounter != -1) {
-				//TextureHolder[TextureCounter].TexturePointTab.push_back(MousePosition);		
-				D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureHolder[TextureCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
-					TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
-				TextureHolder[TextureCounter].destinationRectTab.push_back(destinationRect);
-			}	
+	if (SelectionMode == MODE_SELECT|| SelectionMode == MODE_MOVE)
+	{
+		if (SelectionRectCounter != -1)
+		{
+			ID2D1SolidColorBrush* pBrush = nullptr;
+			WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
+				D2D1::ColorF(D2D1::ColorF::DeepSkyBlue),
+				&pBrush
+			);
+			WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter], pBrush);
+		}
+	}
+	if (SelectionMode == MODE_PLACE)
+	{
+		NoAutoclickE(			//Ta funkcja jest tutaj nie w handle input dlatego ¿e jest bezpoœrednio zwi¹zana z rysowaniem 
+			if (czyrysowaclinie == true)
+				WND1.ReturnGFX().Draw(MousePosition, MousePosition);
+		if (TextureCounter != -1) {
+			//TextureHolder[TextureCounter].TexturePointTab.push_back(MousePosition);		
+			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureHolder[TextureCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
+				TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
+			TextureHolder[TextureCounter].destinationRectTab.push_back(destinationRect);
+		}
 		, else if (czyrysowaclinie == true) //else if jest po przecinku z powodu struktury makra
 			WND1.ReturnGFX().Draw(MousePosition);
-	)
-			
+		)
+	}
 
-		if (TextureHolder.size()!= 0)
+	if (TextureHolder.size()!= 0)
+	{
+		UpdateCameraPosition();
+		for (auto& texture : TextureHolder)
 		{
-			UpdateCameraPosition();
-			for (auto& texture : TextureHolder)
+			if (texture.pBitmap)
 			{
-				if (texture.pBitmap)
+				// Rysuj wszystkie instancje tekstur na ekranie
+				for (auto& destinationRect : texture.destinationRectTab)
 				{
-					// Rysuj wszystkie instancje tekstur na ekranie
-					for (auto& destinationRect : texture.destinationRectTab)
-					{
-						WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(texture.pBitmap.Get(), destinationRect);
-					}
+					WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(texture.pBitmap.Get(), destinationRect);
 				}
 			}
-
-			if (TextureHolder[TextureCounter].pBitmap)
+		}
+		if (SelectionMode == MODE_PLACE) {
+			if (TextureHolder[TextureCounter].pBitmap) //Rysowanie obecnie wybranej textury w pozycji kursora myszy
 			{
 				D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureHolder[TextureCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
 					TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
 				WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureHolder[TextureCounter].pBitmap.Get(), destinationRect);
 			}
-			
 		}
+	}
+
+
 	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
 	{
 		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(CurrentPlayer.CurrentPlayerTexture.pBitmap.Get(), CurrentPlayer.PlayerRect);
 	}
-		
+
 
 	WND1.ReturnGFX().EndFrame();
 }
@@ -331,8 +460,8 @@ void Mainapp::DoFrame() {
 	SetWindowTextA(WND1.GetHandle(), oss.str().c_str());*/ //potrzebne do debugowania problemów z timerem
 	DoLogic();
 	DoDrawing();
-	
-	
+
+
 }
 
 bool Mainapp::IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) //jezeli prostok¹ty siê pokryj¹ zwracana jest odpowiednia wartosc
@@ -349,55 +478,55 @@ void Mainapp::UpdateCameraPosition()
 	{
 		for (auto& texture : TextureHolder)
 		{
-				for (int i = 0; i < texture.destinationRectTab.size(); i++)
-				{
-					if (CameraXState) {
-
-						texture.destinationRectTab[i].left += CameraXPosition;
-						texture.destinationRectTab[i].right += CameraXPosition;
-						if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
-						{
-							Collision = true;
-							break;
-						}
-
-					}
-					if (CameraYState) {
-						texture.destinationRectTab[i].top += CameraYPosition;
-						texture.destinationRectTab[i].bottom += CameraYPosition;
-						if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
-						{
-							Collision = true;
-							break;
-						}
-					}
-				}
-			}
-		
-	if(Collision) //jezeli doszlo do kolizji, zawroc wszelkie zmiany do kamery
-		TextureHolder = Rollback;
-
-	for (auto& texture : TextureHolder) //Petla co sprawdza textury co maj¹ nie mieæ kolizji
-	{
-		if (!texture.IsCollisionOn) { //czy textura ma kolizje jest przypisane do jakby obrazka nie do pojedynczego recta, dlatego jak chcemy mieæ 2 ró¿ne textury z kolizj¹ i bez to po prostu
-									 //bêdzie trzeba wczytaæ 2 textury i ustawiæ im 2 ró¿ne parametry
 			for (int i = 0; i < texture.destinationRectTab.size(); i++)
 			{
 				if (CameraXState) {
 
 					texture.destinationRectTab[i].left += CameraXPosition;
 					texture.destinationRectTab[i].right += CameraXPosition;
-				
+					if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
+					{
+						Collision = true;
+						break;
+					}
 
 				}
 				if (CameraYState) {
 					texture.destinationRectTab[i].top += CameraYPosition;
 					texture.destinationRectTab[i].bottom += CameraYPosition;
-					
+					if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
+					{
+						Collision = true;
+						break;
+					}
 				}
 			}
 		}
-	}
+
+		if(Collision) //jezeli doszlo do kolizji, zawroc wszelkie zmiany do kamery
+			TextureHolder = Rollback;
+
+		for (auto& texture : TextureHolder) //Petla co sprawdza textury co maj¹ nie mieæ kolizji
+		{
+			if (!texture.IsCollisionOn) { //czy textura ma kolizje jest przypisane do jakby obrazka nie do pojedynczego recta, dlatego jak chcemy mieæ 2 ró¿ne textury z kolizj¹ i bez to po prostu
+				//bêdzie trzeba wczytaæ 2 textury i ustawiæ im 2 ró¿ne parametry
+				for (int i = 0; i < texture.destinationRectTab.size(); i++)
+				{
+					if (CameraXState) {
+
+						texture.destinationRectTab[i].left += CameraXPosition;
+						texture.destinationRectTab[i].right += CameraXPosition;
+
+
+					}
+					if (CameraYState) {
+						texture.destinationRectTab[i].top += CameraYPosition;
+						texture.destinationRectTab[i].bottom += CameraYPosition;
+
+					}
+				}
+			}
+		}
 
 		CameraXPosition = 0;
 		CameraYPosition = 0;
@@ -413,13 +542,13 @@ std::filesystem::path Mainapp::CopyFileToProjectFolder(const std::wstring& Sourc
 	try {
 		std::filesystem::path projectFolder = std::filesystem::current_path();
 		std::filesystem::path sourcePath(SourceFilePath);
-			// Uzyskaj pe³n¹ œcie¿kê do pliku docelowego w folderze projektowym
+		// Uzyskaj pe³n¹ œcie¿kê do pliku docelowego w folderze projektowym
 		std::filesystem::path destinationPath = projectFolder / sourcePath.filename();
-			// Skopiuj plik
+		// Skopiuj plik
 
 		if (std::filesystem::exists(destinationPath)) {
 			MessageBoxA(WND1.GetHandle(), "Plik o takiej samej nazwie, ju¿ istnieje w folderze projektowym.", NULL, MB_OK);
-			return destinationPath; 
+			return destinationPath;
 		}
 
 		else {
@@ -511,15 +640,15 @@ void Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::Com
 					hr = pConverter->Initialize(pFrame.Get(), GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.0, WICBitmapPaletteTypeMedianCut);
 					if (SUCCEEDED(hr))
 					{
-						
+
 						UINT width, height;
 						hr = pConverter->GetSize(&width, &height);
 						if (SUCCEEDED(hr))
 						{
-							
+
 							std::vector<BYTE> pixelData(width * height * 4);
 
-							
+
 							WICRect rect = { 0, 0, static_cast<INT>(width), static_cast<INT>(height) };
 							hr = pConverter->CopyPixels(&rect, width * 4, width * height * 4, pixelData.data());
 							if (SUCCEEDED(hr))
