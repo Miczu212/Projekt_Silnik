@@ -40,10 +40,10 @@ private:
 	int SelectionMode = MODE_PLACE;
 	int SelectionRectCounter = -1;
 private:
-	int RollbackRectBottom;
-	int RollbackRectRight;
-	int RollbackRectLeft;
-	int RollbackRectTop;
+	int RollbackRectBottom=0;
+	int RollbackRectRight=0;
+	int RollbackRectLeft=0;
+	int RollbackRectTop=0;
 private:
 	UINT32 KeyColour = 0xFFFF00FF;
 	MSG msg;
@@ -70,6 +70,8 @@ public:
 	void SaveFileTypeLevel();
 	void LoadFileTypeTexture();
 public:
+	void LoadBMPSubregionToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget,
+		const D2D1_RECT_F& sourceRegion, std::vector<Microsoft::WRL::ComPtr<ID2D1Bitmap>>& ppBitmap) const;
 	void UpdateCameraPosition();
 	void HandleInput() noexcept;
 	void ProcessMessages() noexcept;

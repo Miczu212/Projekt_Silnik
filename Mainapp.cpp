@@ -346,18 +346,18 @@ void Mainapp::SaveFileTypeLevel()
 }
 void Mainapp::LoadFileTypeTexture()
 {
-	std::wstring CopiedPath = OpenFileDialog(L"Bitmap Files", L"*.bmp;*.png;*.jpg");
-	if (!CopiedPath.empty()) {
+	std::wstring SelectedPath = OpenFileDialog(L"Bitmap Files", L"*.bmp;*.png;*.jpg");
+	if (!SelectedPath.empty()) {
 		czyrysowaclinie = false;
 		TextureCounter++;
 		TextureInstance NewTextureInstance;
 		TextureHolder.push_back(NewTextureInstance);
 		LoadBMPToTexture(
-			CopyFileToProjectFolder(CopiedPath),
+			CopyFileToProjectFolder(SelectedPath),
 			WND1.ReturnGFX().ReturnRenderTarget(),
 			TextureHolder[TextureCounter].pBitmap.GetAddressOf()
 		);
-		TextureHolder[TextureCounter].Path = CopiedPath;
+		TextureHolder[TextureCounter].Path = SelectedPath;
 
 		//dostawanie wysokosci i szerokosci textury
 		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
@@ -441,14 +441,10 @@ void Mainapp::DoDrawing()
 			}
 		}
 	}
-
-
 	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
 	{
 		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(CurrentPlayer.CurrentPlayerTexture.pBitmap.Get(), CurrentPlayer.PlayerRect);
 	}
-
-
 	WND1.ReturnGFX().EndFrame();
 }
 void Mainapp::DoFrame() {
@@ -643,7 +639,11 @@ void Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::Com
 						{
 
 							std::vector<BYTE> pixelData(width * height * 4);
-
+							D2D1_BITMAP_PROPERTIES bitmapProperties;
+							bitmapProperties.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
+							bitmapProperties.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
+							bitmapProperties.dpiX = 96.0f;
+							bitmapProperties.dpiY = 96.0f;
 
 							WICRect rect = { 0, 0, static_cast<INT>(width), static_cast<INT>(height) };
 							hr = pConverter->CopyPixels(&rect, width * 4, width * height * 4, pixelData.data());
@@ -657,13 +657,6 @@ void Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::Com
 										*reinterpret_cast<UINT32*>(&pixelData[i * 4]) = 0; //alpha to 0
 									}
 								}
-
-								D2D1_BITMAP_PROPERTIES bitmapProperties;
-								bitmapProperties.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
-								bitmapProperties.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
-								bitmapProperties.dpiX = 96.0f;
-								bitmapProperties.dpiY = 96.0f;
-
 								//faktyczne tworzenie bitmapy
 								hr = pRenderTarget->CreateBitmap(
 									D2D1::SizeU(width, height),
@@ -680,4 +673,77 @@ void Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::Com
 		}
 	}
 }
+
+void Mainapp::LoadBMPSubregionToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, const D2D1_RECT_F& sourceRegion, std::vector< Microsoft::WRL::ComPtr<ID2D1Bitmap>>& ppBitmap) const
+{
+	Microsoft::WRL::ComPtr<IWICImagingFactory> pWICFactory;
+	Microsoft::WRL::ComPtr<IWICBitmapDecoder> pDecoder;
+	Microsoft::WRL::ComPtr<IWICBitmapFrameDecode> pFrame;
+	Microsoft::WRL::ComPtr<IWICFormatConverter> pConverter;
+	HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pWICFactory));
+	if (SUCCEEDED(hr))
+	{
+		hr = pWICFactory->CreateDecoderFromFilename(filePath.c_str(), nullptr, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder);
+		if (SUCCEEDED(hr))
+		{
+			hr = pDecoder->GetFrame(0, &pFrame);
+			if (SUCCEEDED(hr))
+			{
+				hr = pWICFactory->CreateFormatConverter(&pConverter);
+				if (SUCCEEDED(hr))
+				{
+					hr = pConverter->Initialize(pFrame.Get(), GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.0, WICBitmapPaletteTypeMedianCut);
+					if (SUCCEEDED(hr))
+					{
+
+						UINT width, height;
+						hr = pConverter->GetSize(&width, &height);
+						if (SUCCEEDED(hr))
+						{
+							assert(sourceRegion.right < width );
+							assert( sourceRegion.bottom < height);
+								// subregion musi siÍ mieúciÊ w bitmapie
+
+							UINT subWidth = static_cast<UINT>(sourceRegion.right - sourceRegion.left);
+							UINT subHeight = static_cast<UINT>(sourceRegion.bottom - sourceRegion.top);
+
+							std::vector<BYTE> pixelData(subWidth * subHeight * 4);
+							D2D1_BITMAP_PROPERTIES bitmapProperties;
+							bitmapProperties.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
+							bitmapProperties.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
+							bitmapProperties.dpiX = 96.0f;
+							bitmapProperties.dpiY = 96.0f;
+
+							WICRect rect = { static_cast<INT>(sourceRegion.left), static_cast<INT>(sourceRegion.top), static_cast<INT>(sourceRegion.right), static_cast<INT>(sourceRegion.bottom) };
+							hr = pConverter->CopyPixels(&rect, subWidth * 4, subWidth * subHeight * 4, pixelData.data());
+							if (SUCCEEDED(hr))
+							{
+								// zamieniamy kluczowy kolor na przeüroczysty
+								for (UINT i = 0; i < subWidth * subHeight; ++i)
+								{
+									if (*reinterpret_cast<UINT32*>(&pixelData[i * 4]) == KeyColour)
+									{
+										*reinterpret_cast<UINT32*>(&pixelData[i * 4]) = 0; //alpha to 0
+									}
+								}
+								//faktyczne tworzenie bitmapy
+								Microsoft::WRL::ComPtr<ID2D1Bitmap> pBitmap;
+								hr = pRenderTarget->CreateBitmap(
+									D2D1::SizeU(subWidth, subHeight),
+									pixelData.data(),
+									subWidth * 4,
+									&bitmapProperties,
+									pBitmap.GetAddressOf()
+								);
+								ppBitmap.push_back(pBitmap);
+
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 
