@@ -33,7 +33,9 @@ void Font::InitializeFont(Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderT
 }
 void Font::LoadLetter(Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, const D2D1_RECT_F& sourceRegion, std::vector< Microsoft::WRL::ComPtr<ID2D1Bitmap>>& ppBitmap) const
 {
-	const std::wstring filePath = L"Q:\\Studia\\inne\\SILNIK\\Projekt_Silnik\\Fonts\\Consolas13x24.bmp";
+	std::filesystem::path projectFolder = std::filesystem::current_path();
+	 std::wstring filePath = L"\\Fonts\\Consolas13x24.bmp";
+	 filePath = projectFolder.c_str() + filePath;
 	Microsoft::WRL::ComPtr<IWICImagingFactory> pWICFactory;
 	Microsoft::WRL::ComPtr<IWICBitmapDecoder> pDecoder;
 	Microsoft::WRL::ComPtr<IWICBitmapFrameDecode> pFrame;
