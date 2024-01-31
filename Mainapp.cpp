@@ -186,6 +186,17 @@ void Mainapp::HandleInput() noexcept
 			SelectionMode = 0;
 		}
 	}
+	ISPressed(KEY_DELETE)
+	{
+		if (SelectionRectCounter!=-1)
+		{
+			if (SelectionMode == MODE_SELECT)
+			{
+				TextureHolder[TextureCounter].destinationRectTab.erase(TextureHolder[TextureCounter].destinationRectTab.begin() + SelectionRectCounter);
+				SelectionRectCounter = -1;
+			}
+		}
+	}
 	//Za co odpowiada klikniêcie
 	if (WND1.Mk.LeftIsPressed())
 	{
