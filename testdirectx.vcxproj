@@ -135,6 +135,7 @@
   <ItemGroup>
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="Error.cpp" />
+    <ClCompile Include="Font.cpp" />
     <ClCompile Include="GFX.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Input.h" />
@@ -151,6 +152,7 @@
     <ClInclude Include="ConstantDefines.h" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="Error.h" />
+    <ClInclude Include="Font.h" />
     <ClInclude Include="FunctionDefines.h" />
     <ClInclude Include="GFX.h" />
     <ClInclude Include="KeyNames.h" />

@@ -12,6 +12,7 @@
 #include <gdiplus.h>
 #include<vector>
 #include"LevelInstance.h"
+#include"Font.h"
 #include"TextureInstance.h"
 #include"FunctionDefines.h"
 #include <codecvt>
@@ -56,6 +57,7 @@ private:
 	Player CurrentPlayer;
 	SoundHandler& Soundhandler = SoundHandler::Get();
 	ComManager commanager;
+	Font font;
 public:
 	Mainapp();
 	int Go();
@@ -72,6 +74,7 @@ public:
 public:
 	void LoadBMPSubregionToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget,
 		const D2D1_RECT_F& sourceRegion, std::vector<Microsoft::WRL::ComPtr<ID2D1Bitmap>>& ppBitmap) const;
+	void Write(std::string Text, int StartPositionX, int StartPositionY);
 	void UpdateCameraPosition();
 	void HandleInput() noexcept;
 	void ProcessMessages() noexcept;

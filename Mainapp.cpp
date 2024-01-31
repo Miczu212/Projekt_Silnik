@@ -6,7 +6,11 @@
 Mainapp::Mainapp()
 	:
 	WND1(ScreenWidth, ScreenHeight, "testing") // ustawianie parametrów okna
-{}
+{
+
+	font.InitializeFont(WND1.ReturnGFX().ReturnRenderTarget(), font.pSubregions);
+
+}
 
 int Mainapp::Go()
 {
@@ -390,7 +394,10 @@ void Mainapp::DoDrawing()
 {
 	WND1.ReturnGFX().BeginFrame();
 	WND1.ReturnGFX().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
-	if (SelectionMode == MODE_SELECT|| SelectionMode == MODE_MOVE)
+	switch (SelectionMode)
+	{
+
+	case MODE_MOVE:
 	{
 		if (SelectionRectCounter != -1)
 		{
@@ -401,6 +408,57 @@ void Mainapp::DoDrawing()
 			);
 			WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter], pBrush);
 		}
+		Write("Move_Mode", 0, 0);
+		break;
+	}
+	case MODE_SELECT:
+	{
+		if (SelectionRectCounter != -1)
+		{
+			ID2D1SolidColorBrush* pBrush = nullptr;
+			WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
+				D2D1::ColorF(D2D1::ColorF::DeepSkyBlue),
+				&pBrush
+			);
+			WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter], pBrush);
+		}
+		Write("Select_Mode", 0, 0);
+		break;
+
+	}
+	case MODE_SCALE:
+	{
+		if (SelectionRectCounter != -1)
+		{
+			ID2D1SolidColorBrush* pBrush = nullptr;
+			WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
+				D2D1::ColorF(D2D1::ColorF::DeepSkyBlue),
+				&pBrush
+			);
+			WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter], pBrush);
+		}
+		Write("Scale_Mode", 0, 0);
+		break;
+	}
+	case MODE_ROTATE:
+	{
+		if (SelectionRectCounter != -1)
+		{
+			ID2D1SolidColorBrush* pBrush = nullptr;
+			WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
+				D2D1::ColorF(D2D1::ColorF::DeepSkyBlue),
+				&pBrush
+			);
+			WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter], pBrush);
+		}
+		Write("Rotate_Mode", 0, 0);
+		break;
+	}
+	case MODE_PLACE:
+	{
+		Write("Place_Mode", 0, 0);
+		break;
+	}
 	}
 	if (SelectionMode == MODE_PLACE)
 	{
@@ -445,6 +503,7 @@ void Mainapp::DoDrawing()
 	{
 		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(CurrentPlayer.CurrentPlayerTexture.pBitmap.Get(), CurrentPlayer.PlayerRect);
 	}
+	
 	WND1.ReturnGFX().EndFrame();
 }
 void Mainapp::DoFrame() {
@@ -744,6 +803,17 @@ void Mainapp::LoadBMPSubregionToTexture(const std::wstring& filePath, Microsoft:
 			}
 		}
 	}
+}
+void Mainapp::Write(std::string Text,int StartPositionX, int StartPositionY)
+{
+	int temp;
+	for (int i = 0; i < Text.size(); i++)
+	{
+		 temp =int(Text[i])-32;
+		 WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(font.pSubregions[temp].Get(), 
+			 D2D1::RectF(StartPositionX+i*13, StartPositionY, StartPositionX+13+i*13, StartPositionY +24));
+	}
+	
 }
 
 
