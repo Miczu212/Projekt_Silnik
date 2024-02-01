@@ -31,7 +31,7 @@ private:
 	bool Collision = false;
 	bool czyrysowaclinie = true;
 private:
-	const int ScreenWidth = 1024;
+	const int ScreenWidth = 1680;
 	const int ScreenHeight = 820;
 	int CameraXPosition = 0;
 	int CameraYPosition = 0;

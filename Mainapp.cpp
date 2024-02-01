@@ -164,26 +164,30 @@ void Mainapp::HandleInput() noexcept
 	//Zmiana Trybu Selekcji
 	ISPressed(KEY_E)
 	{
-		SelectionMode++;
-
-
-		if (SelectionMode == MODE_SCALE)
+		if (czyrysowaclinie == false)
 		{
-			RollbackRectBottom = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom;
-			RollbackRectRight = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right;
-		}
-		if (SelectionMode == MODE_MOVE)
-		{
-			RollbackRectBottom = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom;
-			RollbackRectRight = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right;
-			RollbackRectTop = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top;
-			RollbackRectLeft = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left;
+			SelectionMode++;
+			if (SelectionMode == MODE_SCALE)
+			{
+				if (!TextureHolder[TextureCounter].destinationRectTab.empty()) {
+					RollbackRectBottom = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom;
+					RollbackRectRight = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right;
+				}
+			}
+			if (SelectionMode == MODE_MOVE)
+			{
+				if (!TextureHolder[TextureCounter].destinationRectTab.empty()) {
+					RollbackRectBottom = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom;
+					RollbackRectRight = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right;
+					RollbackRectTop = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top;
+					RollbackRectLeft = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left;
+				}
+			}
 
-		}
-
-		if (SelectionMode > 4)
-		{
-			SelectionMode = 0;
+			if (SelectionMode > 4)
+			{
+				SelectionMode = 0;
+			}
 		}
 	}
 	ISPressed(KEY_DELETE)
@@ -547,56 +551,40 @@ void Mainapp::UpdateCameraPosition()
 
 					texture.destinationRectTab[i].left += CameraXPosition;
 					texture.destinationRectTab[i].right += CameraXPosition;
-					if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
-					{
-						Collision = true;
-						break;
+					if (texture.IsCollisionOn) {
+						if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
+						{
+							Collision = true;
+							break;
+						}
 					}
 
 				}
 				if (CameraYState) {
 					texture.destinationRectTab[i].top += CameraYPosition;
 					texture.destinationRectTab[i].bottom += CameraYPosition;
-					if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
-					{
-						Collision = true;
-						break;
+					if (texture.IsCollisionOn) {
+						if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
+						{
+							Collision = true;
+							break;
+						}
 					}
 				}
 			}
 		}
-
-		if(Collision) //jezeli doszlo do kolizji, zawroc wszelkie zmiany do kamery
+	}
+		if (Collision) //jezeli doszlo do kolizji, zawroc wszelkie zmiany do kamery
 			TextureHolder = Rollback;
 
-		for (auto& texture : TextureHolder) //Petla co sprawdza textury co maj¹ nie mieæ kolizji
-		{
-			if (!texture.IsCollisionOn) { //czy textura ma kolizje jest przypisane do jakby obrazka nie do pojedynczego recta, dlatego jak chcemy mieæ 2 ró¿ne textury z kolizj¹ i bez to po prostu
-				//bêdzie trzeba wczytaæ 2 textury i ustawiæ im 2 ró¿ne parametry
-				for (int i = 0; i < texture.destinationRectTab.size(); i++)
-				{
-					if (CameraXState) {
 
-						texture.destinationRectTab[i].left += CameraXPosition;
-						texture.destinationRectTab[i].right += CameraXPosition;
-
-
-					}
-					if (CameraYState) {
-						texture.destinationRectTab[i].top += CameraYPosition;
-						texture.destinationRectTab[i].bottom += CameraYPosition;
-
-					}
-				}
-			}
-		}
 
 		CameraXPosition = 0;
 		CameraYPosition = 0;
 		CameraXState = false;
 		CameraYState = false;
 		Collision = false;
-	}
+	
 }
 
 
