@@ -9,7 +9,8 @@
 #define KEY_RETURN 0x0D
 #define KEY_SHIFT 0x10
 #define KEY_CONTROL 0x11
-#define KEY_MENU 0x12
+#define KEY_ALT 0x12
+#define KEY_LEFTALT 0xA4
 #define KEY_PAUSE 0x13
 #define KEY_CAPITAL 0x14
 #define KEY_KANA 0x15

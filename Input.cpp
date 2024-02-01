@@ -167,8 +167,27 @@ void Myszka::OnMyszkaEnter()
 
 void Myszka::OnMyszkaMove(int newx, int newy)
 {
-	x = newx;
-	y = newy;
+	switch (Axis)
+	{
+		case AXIS_NONE:
+			{
+			x = newx;
+			y = newy;
+			break;
+			}
+		case AXIS_X:
+		{
+			x = newx;
+			break;
+		}
+		case AXIS_Y:
+		{
+			y = newy;
+			break;
+		}
+		
+	}
+	
 
 	buffer.push(Myszka::Event(Myszka::Event::Move, *this));
 	TrimBuffer();

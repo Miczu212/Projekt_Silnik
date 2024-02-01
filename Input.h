@@ -1,5 +1,6 @@
 #pragma once
 #include <queue>
+#include"ConstantDefines.h"
 #include <bitset>
 #include"KeyNames.h"
 class Klawiatura
@@ -151,6 +152,7 @@ public:
 	Myszka(const Myszka&) = delete;
 	Myszka& operator=(const Myszka&) = delete;
 	std::pair<int, int> GetPos() const;
+	int Axis = AXIS_NONE;
 	int GetPosX() const;
 	int GetPosY() const;
 	bool LeftIsPressed() const;

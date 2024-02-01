@@ -26,10 +26,12 @@ private:
 	std::vector<Sound> AudioHolder;
 	std::vector<std::wstring> AudioPathHolder;
 private:
+	//flagi
 	bool CameraXState = false;
 	bool CameraYState = false;
 	bool Collision = false;
 	bool czyrysowaclinie = true;
+	bool RepeatIfPossible = false;
 private:
 	const int ScreenWidth = 1680;
 	const int ScreenHeight = 820;
@@ -56,8 +58,10 @@ private:
 	LevelInstance Currentlevel;
 	Player CurrentPlayer;
 	SoundHandler& Soundhandler = SoundHandler::Get();
-	ComManager commanager;
-	Font font;
+    ComManager commanager;
+    Font font;
+	const D2D1_RECT_F Background = D2D1::RectF(0, 0, ScreenWidth, ScreenHeight);
+	ID2D1SolidColorBrush* BackgroundColour = nullptr;
 public:
 	Mainapp();
 	int Go();

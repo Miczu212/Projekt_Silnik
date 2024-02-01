@@ -9,6 +9,9 @@ Mainapp::Mainapp()
 {
 
 	font.InitializeFont(WND1.ReturnGFX().ReturnRenderTarget(), font.pSubregions);
+	WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
+		D2D1::ColorF(D2D1::ColorF::DeepSkyBlue),
+		&BackgroundColour);
 
 }
 
@@ -24,6 +27,81 @@ int Mainapp::Go()
 }
 void Mainapp::HandleInput() noexcept
 {
+	//Za co odpowiada klikniêcie
+	if (WND1.Mk.LeftIsPressed())
+	{
+		int X = WND1.Mk.GetPosX();
+		int Y = WND1.Mk.GetPosY();
+		switch (SelectionMode)
+		{
+
+		case MODE_MOVE:
+		{
+			SelectionMode++;
+			break;
+		}
+		case MODE_SELECT:
+		{
+
+			int LocalTextureCounter = 0;
+			int LocalRectCounter = 0;
+			for (const auto& texture : TextureHolder)
+			{
+				LocalRectCounter = 0;
+				for (const auto& Rect : texture.destinationRectTab)
+				{
+					if (X > Rect.left && X<Rect.right && Y>Rect.top && Y < Rect.bottom)
+					{
+						TextureCounter = LocalTextureCounter;
+						SelectionRectCounter = LocalRectCounter;
+						break;
+					}
+					LocalRectCounter++;
+				}
+				LocalTextureCounter++;
+			}
+			break;
+		}
+		case MODE_SCALE:
+		{
+			if (SelectionRectCounter != -1) {
+				D2D1_RECT_F& SelectedRect = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter];
+
+				SelectedRect.bottom = Y;
+				SelectedRect.right = X;
+			}
+			break;
+
+		}
+		case MODE_ROTATE:
+		{
+			//TODO Mo¿e zaimplementowaæ, nie jest must have ale nice by by³o mieæ
+			break;
+		}
+		}
+	}
+	else
+	{
+		if (SelectionMode == MODE_MOVE)
+		{
+
+			int X = WND1.Mk.GetPosX();
+			int Y = WND1.Mk.GetPosY();
+			if (SelectionRectCounter != -1) {
+				TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter] =
+					D2D1::RectF(X, Y,
+
+						X + TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right -
+
+						TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left
+
+						, Y + TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom
+
+						- TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top
+					);
+			}
+		}
+	}
 	//Poruszanie sie po tablicy textur
 	ISPressed(KEY_R)
 	{
@@ -201,80 +279,18 @@ void Mainapp::HandleInput() noexcept
 			}
 		}
 	}
-	//Za co odpowiada klikniêcie
-	if (WND1.Mk.LeftIsPressed())
+	ISPressed(KEY_CONTROL)
 	{
-		int X = WND1.Mk.GetPosX();
-		int Y = WND1.Mk.GetPosY();
-		switch (SelectionMode)
-		{
-		
-		case MODE_MOVE:
-		{
-			SelectionMode++;
-			break;
-		}
-		case MODE_SELECT:
-		{
-
-			int LocalTextureCounter = 0;
-			int LocalRectCounter = 0;
-			for (const auto& texture : TextureHolder)
-			{
-				LocalRectCounter = 0;
-				for (const auto& Rect : texture.destinationRectTab)
-				{
-					if (X > Rect.left && X<Rect.right && Y>Rect.top && Y < Rect.bottom)
-					{
-						TextureCounter = LocalTextureCounter;
-						SelectionRectCounter = LocalRectCounter;
-						break;
-					}
-					LocalRectCounter++;
-				}
-				LocalTextureCounter++;
-			}
-			break;
-		}
-			case MODE_SCALE:
-			{
-				if (SelectionRectCounter != -1) {
-					D2D1_RECT_F& SelectedRect = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter];
-
-					SelectedRect.bottom = Y;
-					SelectedRect.right = X;
-				}
-					break;
-				
-			}
-			case MODE_ROTATE:
-			{
-				//TODO Mo¿e zaimplementowaæ, nie jest must have ale nice by by³o mieæ
-				break;
-			}
-		}
+		RepeatIfPossible = !RepeatIfPossible;
 	}
-	else
+	ISPressed(KEY_SHIFT)
 	{
-		if (SelectionMode == MODE_MOVE)
-		{
-
-			int X = WND1.Mk.GetPosX();
-			int Y = WND1.Mk.GetPosY();
-			if (SelectionRectCounter != -1) {
-				TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter] =
-					D2D1::RectF(X, Y,
-
-						X + TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right -
-
-						TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left
-
-						, Y + TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom
-
-						- TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top
-					);
+		WND1.Mk.Axis++;
+		
+			if (WND1.Mk.Axis > 2)
+			{
+				WND1.Mk.Axis = AXIS_NONE;
 			}
-		}
 	}
 	WND1.Klt.ClearState();
 }
@@ -408,7 +424,40 @@ void Mainapp::DoLogic()
 void Mainapp::DoDrawing()
 {
 	WND1.ReturnGFX().BeginFrame();
-	WND1.ReturnGFX().ClearBuffer(0, 0, 0); // by wylaczyc tencze wstaw tu sta³e
+	WND1.ReturnGFX().ClearBuffer(0, 0, 0);
+	//kolor t³a
+	WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&Background, BackgroundColour);
+	WND1.ReturnGFX().ReturnRenderTarget()->DrawRectangle(&Background, BackgroundColour);
+	//kolor t³a
+	switch (WND1.Mk.Axis)
+	{
+	case AXIS_Y:
+		{
+		if (RepeatIfPossible)
+		{
+			Write("Axis_Y    AutoReapeat:On", 0, ScreenHeight - 24);
+		}
+		else
+		{
+			Write("Axis_Y", 0, ScreenHeight - 24);
+		}
+		
+		break;
+		}
+		case AXIS_X:
+		{
+			if (RepeatIfPossible)
+			{
+				Write("Axis_X   AutoReapeat:On", 0, ScreenHeight - 24);
+			}
+			else 
+			{
+				Write("Axis_X", 0, ScreenHeight - 24);
+			}
+			
+			break;
+		}
+	}
 	switch (SelectionMode)
 	{
 
@@ -418,7 +467,7 @@ void Mainapp::DoDrawing()
 		{
 			ID2D1SolidColorBrush* pBrush = nullptr;
 			WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
-				D2D1::ColorF(D2D1::ColorF::DeepSkyBlue),
+				D2D1::ColorF(D2D1::ColorF::Blue),
 				&pBrush
 			);
 			WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter], pBrush);
@@ -432,7 +481,7 @@ void Mainapp::DoDrawing()
 		{
 			ID2D1SolidColorBrush* pBrush = nullptr;
 			WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
-				D2D1::ColorF(D2D1::ColorF::DeepSkyBlue),
+				D2D1::ColorF(D2D1::ColorF::Blue),
 				&pBrush
 			);
 			WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter], pBrush);
@@ -447,7 +496,7 @@ void Mainapp::DoDrawing()
 		{
 			ID2D1SolidColorBrush* pBrush = nullptr;
 			WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
-				D2D1::ColorF(D2D1::ColorF::DeepSkyBlue),
+				D2D1::ColorF(D2D1::ColorF::Blue),
 				&pBrush
 			);
 			WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter], pBrush);
@@ -461,7 +510,7 @@ void Mainapp::DoDrawing()
 		{
 			ID2D1SolidColorBrush* pBrush = nullptr;
 			WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
-				D2D1::ColorF(D2D1::ColorF::DeepSkyBlue),
+				D2D1::ColorF(D2D1::ColorF::Blue),
 				&pBrush
 			);
 			WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter], pBrush);
@@ -477,18 +526,60 @@ void Mainapp::DoDrawing()
 	}
 	if (SelectionMode == MODE_PLACE)
 	{
-		NoAutoclickE(			//Ta funkcja jest tutaj nie w handle input dlatego ¿e jest bezpoœrednio zwi¹zana z rysowaniem 
-			if (czyrysowaclinie == true)
-				WND1.ReturnGFX().Draw(MousePosition, MousePosition);
-		if (TextureCounter != -1) {
-			//TextureHolder[TextureCounter].TexturePointTab.push_back(MousePosition);		
-			D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureHolder[TextureCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
-				TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
-			TextureHolder[TextureCounter].destinationRectTab.push_back(destinationRect);
-		}
-		, else if (czyrysowaclinie == true) //else if jest po przecinku z powodu struktury makra
-			WND1.ReturnGFX().Draw(MousePosition);
-		)
+		
+			if (RepeatIfPossible)
+			{
+				bool CanDraw = true;
+				if (WND1.Mk.LeftIsPressed())
+				{
+					
+						for (auto& texture : TextureHolder)
+						{
+							if (texture.pBitmap)
+							{
+
+								for (auto& destinationRect : texture.destinationRectTab)
+								{
+									if (IFColision(D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureHolder[TextureCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
+										TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight), destinationRect))
+									{
+										CanDraw = false;
+										break;
+									}
+
+								}
+							}
+
+						}
+					
+					if (CanDraw)
+					{
+						if (TextureCounter != -1)
+						{
+							D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureHolder[TextureCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
+								TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
+							TextureHolder[TextureCounter].destinationRectTab.push_back(destinationRect);
+						}
+					}
+					
+					
+				}
+			}
+			else
+			{
+				NoAutoclickE(			//Ta funkcja jest tutaj nie w handle input dlatego ¿e jest bezpoœrednio zwi¹zana z rysowaniem 
+					if (czyrysowaclinie == true)
+						WND1.ReturnGFX().Draw(MousePosition, MousePosition);
+				if (TextureCounter != -1)
+				{
+					D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureHolder[TextureCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
+						TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
+					TextureHolder[TextureCounter].destinationRectTab.push_back(destinationRect);
+				}
+				, else if (czyrysowaclinie == true) //else if jest po przecinku z powodu struktury makra
+					WND1.ReturnGFX().Draw(MousePosition);
+				)
+			}
 	}
 
 	if (TextureHolder.size()!= 0)
