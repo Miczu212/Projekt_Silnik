@@ -247,18 +247,22 @@ void Mainapp::HandleInput() noexcept
 			SelectionMode++;
 			if (SelectionMode == MODE_SCALE)
 			{
-				if (!TextureHolder[TextureCounter].destinationRectTab.empty()) {
-					RollbackRectBottom = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom;
-					RollbackRectRight = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right;
+				if (SelectionRectCounter != -1) {
+					if (!TextureHolder[TextureCounter].destinationRectTab.empty()) {
+						RollbackRectBottom = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom;
+						RollbackRectRight = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right;
+					}
 				}
 			}
 			if (SelectionMode == MODE_MOVE)
 			{
-				if (!TextureHolder[TextureCounter].destinationRectTab.empty()) {
-					RollbackRectBottom = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom;
-					RollbackRectRight = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right;
-					RollbackRectTop = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top;
-					RollbackRectLeft = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left;
+				if (SelectionRectCounter != -1) {
+					if (!TextureHolder[TextureCounter].destinationRectTab.empty()) {
+						RollbackRectBottom = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom;
+						RollbackRectRight = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right;
+						RollbackRectTop = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top;
+						RollbackRectLeft = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left;
+					}
 				}
 			}
 
@@ -285,12 +289,16 @@ void Mainapp::HandleInput() noexcept
 	}
 	ISPressed(KEY_SHIFT)
 	{
+		if (SelectionMode == MODE_SELECT)
+		{
+			WND1.Mk.OnMyszkaMove(TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left, TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top);
+		}
 		WND1.Mk.Axis++;
-		
 			if (WND1.Mk.Axis > 2)
 			{
 				WND1.Mk.Axis = AXIS_NONE;
 			}
+
 	}
 	WND1.Klt.ClearState();
 }
@@ -426,9 +434,9 @@ void Mainapp::DoDrawing()
 	WND1.ReturnGFX().BeginFrame();
 	WND1.ReturnGFX().ClearBuffer(0, 0, 0);
 	//kolor t³a
-	WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&Background, BackgroundColour);
-	WND1.ReturnGFX().ReturnRenderTarget()->DrawRectangle(&Background, BackgroundColour);
-	//kolor t³a
+//	WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&Background, BackgroundColour);
+//	WND1.ReturnGFX().ReturnRenderTarget()->DrawRectangle(&Background, BackgroundColour);
+	//kolor t³a //zakomentuj by zmieniæ na czarny
 	switch (WND1.Mk.Axis)
 	{
 	case AXIS_Y:
