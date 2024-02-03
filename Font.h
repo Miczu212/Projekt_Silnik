@@ -5,9 +5,11 @@
 class Font
 {
 public:
-	Font();
+	static Font& Get() noexcept;
 	void InitializeFont(Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, std::vector<Microsoft::WRL::ComPtr<ID2D1Bitmap>>& ppBitmap) const;
 	void LoadLetter(Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, const D2D1_RECT_F& sourceRegion, std::vector<Microsoft::WRL::ComPtr<ID2D1Bitmap>>& ppBitmap) const;
 public:
 	 std::vector< Microsoft::WRL::ComPtr<ID2D1Bitmap>> pSubregions;
+private:
+	Font();
 };

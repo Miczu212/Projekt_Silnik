@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "SoundHandler.h"
 
-SoundHandler& SoundHandler::Get()
+SoundHandler& SoundHandler::Get() noexcept
 {
 	static SoundHandler instance;
 	return instance;

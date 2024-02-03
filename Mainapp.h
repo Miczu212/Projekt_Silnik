@@ -21,36 +21,38 @@
 #pragma comment(lib, "gdiplus.lib")
 class Mainapp
 {
-private:
+private: //Tablice
 	std::vector<LevelInstance> LevelHolder;
 	std::vector<TextureInstance> TextureHolder;
 	std::vector<Sound> AudioHolder;
 	std::vector<std::wstring> AudioPathHolder;
 private:
-	//flagi
+	//Flagi bool
 	bool CameraXState = false;
 	bool CameraYState = false;
 	bool Collision = false;
 	bool czyrysowaclinie = true;
 	bool RepeatIfPossible = false;
 	bool GravityChanged = false;
-private:
+private: //Wartoœci int
 	const int ScreenWidth = 1680;
 	const int ScreenHeight = 820;
 	int GravitySpeed = 1;
 	int CameraXPosition = 0;
 	int CameraYPosition = 0;
 	int CameraSpeed = 10;
+private: // Flagi int
 	int TextureCounter = -1;
 	int AudioCounter = -1;
 	int SelectionMode = MODE_PLACE;
 	int SelectionRectCounter = -1;
-private:
+private: //Wszystkie rollbacki (kopie zapasowe do wczytania pozycji)
 	int RollbackRectBottom=0;
 	int RollbackRectRight=0;
 	int RollbackRectLeft=0;
 	int RollbackRectTop=0;
-private:
+private: //Ró¿ne
+	const D2D1_RECT_F Background = D2D1::RectF(0, 0, ScreenWidth, ScreenHeight);
 	UINT32 KeyColour = 0xFFFF00FF;
 	MSG msg;
 	BOOL result;
@@ -60,36 +62,36 @@ private:
 	UINT ScaleTwidth = 0, ScaleTheight = 0;
 	LevelInstance Currentlevel;
 	Player CurrentPlayer;
-	SoundHandler& Soundhandler = SoundHandler::Get();
-    ComManager commanager;
-    Font font;
-	const D2D1_RECT_F Background = D2D1::RectF(0, 0, ScreenWidth, ScreenHeight);
 	ID2D1SolidColorBrush* BackgroundColour = nullptr;
-public:
+public: // Wszystko co ma model Singelton (¿e ma byæ tylko jedno)
+	SoundHandler& Soundhandler = SoundHandler::Get();
+	ComManager commanager = ComManager::Get();
+	Font font = Font::Get();
+public: //Podstawowe metody
 	Mainapp();
 	int Go();
 	void DoFrame();
 	void DoLogic();
 	void DoDrawing();
-public:
-
-public:
+	void ProcessMessages() noexcept;
+	void HandleInput() noexcept;
+public: //Metody Wczytywania
 	void LoadFileTypeAudio();
 	void LoadFileTypeLevel();
 	void SaveFileTypeLevel();
 	void LoadFileTypeTexture();
-public:
-	void UpdateGravity();
-	int IFColisionWithSides(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) const noexcept;
+public: //Inicjalizacja textury wczytanej do postaci czytelnej przez program
+	void LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, ID2D1Bitmap** ppBitmap);
 	void LoadBMPSubregionToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget,
 		const D2D1_RECT_F& sourceRegion, std::vector<Microsoft::WRL::ComPtr<ID2D1Bitmap>>& ppBitmap) const;
-	void Write(std::string Text, int StartPositionX, int StartPositionY);
+public: //Metody zmieniaj¹ce postaæ ekranu
+	void UpdateGravity();
 	void UpdateCameraPosition();
-	void HandleInput() noexcept;
-	void ProcessMessages() noexcept;
-	void LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, ID2D1Bitmap** ppBitmap);
+	void Write(std::string Text, int StartPositionX, int StartPositionY);
+public: //Metody Kolizyjne
 	bool IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) const noexcept;
-public:
+	int IFColisionWithSides(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) const noexcept;
+public: //Ró¿ne
 	std::filesystem::path CopyFileToProjectFolder(const std::wstring& SourceFilePath) const;
 	std::wstring OpenFileDialog(LPCWSTR Filetype, LPCWSTR FileExtension);
 

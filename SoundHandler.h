@@ -84,7 +84,7 @@ public:
 	};
 public:
 	SoundHandler(const SoundHandler&) = delete; //Usuwamy Copy Konstruktor dla SoundHandlera
-	static SoundHandler& Get(); //funkcja która upewnia nas ze system zostanie zainicjalizowany tylko raz
+	static SoundHandler& Get() noexcept; //funkcja która upewnia nas ze system zostanie zainicjalizowany tylko raz
 	static WAVEFORMATEX& GetFormat()
 	{
 		return Get().format;

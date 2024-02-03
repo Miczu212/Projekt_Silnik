@@ -16,9 +16,10 @@
 #include"FunctionDefines.h"
 #include <codecvt>
 #include "SoundHandler.h"
-Font::Font()
+ Font& Font::Get() noexcept
 {
-
+	static Font instance;
+	return instance;
 }
 void Font::InitializeFont(Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, std::vector< Microsoft::WRL::ComPtr<ID2D1Bitmap>>& ppBitmap) const
 
@@ -103,4 +104,8 @@ void Font::LoadLetter(Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarge
 			}
 		}
 	}
+}
+Font::Font()
+{
+
 }

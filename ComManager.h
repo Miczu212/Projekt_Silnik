@@ -2,13 +2,19 @@
 #include <ObjBase.h>
 class ComManager
 {
-public:
+private:
 	ComManager()
 	{
 		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 	}
+public:
 	~ComManager()
 	{
 		CoUninitialize();
+	}
+	static ComManager& Get() noexcept
+	{
+		static ComManager instance;
+		return instance;
 	}
 };
