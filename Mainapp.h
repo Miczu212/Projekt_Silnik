@@ -34,13 +34,18 @@ private:
 	bool czyrysowaclinie = true;
 	bool RepeatIfPossible = false;
 	bool GravityChanged = false;
+	bool IsGravityTurnedOn = true;
+	bool IsJumping = false;
 private: //Wartoœci int
 	const int ScreenWidth = 1680;
 	const int ScreenHeight = 820;
 	int GravitySpeed = 1;
 	int CameraXPosition = 0;
 	int CameraYPosition = 0;
-	int CameraSpeed = 10;
+	int CameraSpeed = 5;
+	int ScaleDirection = 1;
+	int CurrentJumpHeight = 0;
+	int MaxJumpHeight = 200;
 private: // Flagi int
 	int TextureCounter = -1;
 	int AudioCounter = -1;
@@ -85,6 +90,7 @@ public: //Inicjalizacja textury wczytanej do postaci czytelnej przez program
 	void LoadBMPSubregionToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget,
 		const D2D1_RECT_F& sourceRegion, std::vector<Microsoft::WRL::ComPtr<ID2D1Bitmap>>& ppBitmap) const;
 public: //Metody zmieniaj¹ce postaæ ekranu
+	void Jump();
 	void UpdateGravity();
 	void UpdateCameraPosition();
 	void Write(std::string Text, int StartPositionX, int StartPositionY);

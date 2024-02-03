@@ -115,24 +115,30 @@ void Mainapp::HandleInput() noexcept
 	{
 		LoadFileTypeTexture();
 	}
-	//Skalowanie textury zmniejszenie
+	//Zmiana Kierunku skalowania
+	ISPressed(KEY_SPACE)
+	{
+		ScaleDirection = -(ScaleDirection);
+	}
+	//Skalowanie szerokoœci
 	ISPressed(KEY_N)
 	{
-		ScaleTwidth -= 10;
-		ScaleTheight -= 10;
-
+			ScaleTwidth -= 10*ScaleDirection;
 	}
-	//Skalowanie textury zwiekszenie
+	//Skalowanie Wysokoœci
 	ISPressed(KEY_M)
 	{
-		ScaleTwidth += 10;
-		ScaleTheight += 10;
-
+			ScaleTheight -= 10 * ScaleDirection;
 	}
-	// Reset do domyslnych width i height
+	//Skalowanie textury 
+	ISPressed(KEY_J)
+	{
+		ScaleTheight -= 10 * ScaleDirection;
+		ScaleTwidth -= 10 * ScaleDirection;
+	}
+	// Reset do domyslnej skali | Reset do domyœlnej pozycji
 	ISPressed(KEY_B)
 	{
-
 		ScaleTwidth = 0;
 		ScaleTheight = 0;
 		if (SelectionMode == MODE_SCALE)
@@ -185,9 +191,8 @@ void Mainapp::HandleInput() noexcept
 	}
 	ISPressed(KEY_UP)
 	{
-		CameraYPosition = CameraSpeed;
-		CameraYState = true;
 		GravityChanged = false;
+		IsJumping = true;
 	}
 	//Sterowanie
 	//Ustawienie Gracza na obecnie Wybran¹ texture
@@ -307,6 +312,10 @@ void Mainapp::HandleInput() noexcept
 				WND1.Mk.Axis = AXIS_NONE;
 			}
 
+	}
+	ISPressed(KEY_G)
+	{
+		IsGravityTurnedOn = !IsGravityTurnedOn;
 	}
 	WND1.Klt.ClearState();
 }
@@ -433,7 +442,7 @@ void Mainapp::DoLogic()
 {
 	if (timer.Peek() >= 1.0f / 120.0f) //logika bêdzie sprawdzana co 1.0f/30.0f sekundy a nie co klatke, przez co dla wszystkich frameratów gra bedzie podobnie p³ynna
 	{
-		GravityChanged = true; //musi byc przed HandleInputem w celu mozliwosci zmiany tego stanu
+		GravityChanged = IsGravityTurnedOn; //musi byc przed HandleInputem w celu mozliwosci zmiany tego stanu
 		timer.Mark();
 		HandleInput();
 	}
@@ -602,10 +611,17 @@ void Mainapp::DoDrawing()
 	if (TextureHolder.size()!= 0)
 	{
 		if (CurrentPlayer.CurrentPlayerTexture.pBitmap) {
+			if (IsJumping)
+			{
+				Jump();
+			}
+		}
+		if (CurrentPlayer.CurrentPlayerTexture.pBitmap) {
 			if (GravityChanged)
 				UpdateGravity();
 		}
-
+		
+		
 		UpdateCameraPosition();
 		for (auto& texture : TextureHolder)
 		{
@@ -662,7 +678,7 @@ void Mainapp::UpdateGravity()
 		}
 
 	}
-	if (GravityChanged) {
+	if (GravityChanged) { 
 		bool go = true;
 		for (auto& texture : TextureHolder)
 		{
@@ -672,8 +688,10 @@ void Mainapp::UpdateGravity()
 					rect.top -= GravitySpeed;
 					rect.bottom -= GravitySpeed;
 					if (texture.IsCollisionOn) {
-						if (IFColision(CurrentPlayer.PlayerRect, rect))
+						if (IFColision(CurrentPlayer.PlayerRect, rect)) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
 						{
+							CurrentJumpHeight = 0;
+							IsJumping = false;
 							TextureHolder = Rollback;
 							go = false;
 							break;
@@ -685,7 +703,25 @@ void Mainapp::UpdateGravity()
 
 	}
 }
+void Mainapp::Jump()
+{
+	if (CurrentJumpHeight <= MaxJumpHeight) 
+	{
+		for (auto& texture : TextureHolder)
+		{
 
+			for (auto& rect : texture.destinationRectTab)
+			{
+				
+				rect.top += 5;
+				rect.bottom += 5;
+
+			}
+
+		}
+		CurrentJumpHeight += 5;
+	}
+}
 bool Mainapp::IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) const noexcept //jezeli prostok¹ty siê pokryj¹ zwracana jest odpowiednia wartosc
 {
 	// Sprawdzamy warunki brzegowe, czyli czy jeden prostok¹t jest po lewej, po prawej, nad lub pod drugim prostok¹tem.
