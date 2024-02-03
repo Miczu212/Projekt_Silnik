@@ -2,6 +2,7 @@
 #include<math.h>
 #include"ConstantDefines.h"
 #include"ComManager.h"
+#include <algorithm>
 #include "WND.h"
 #include "Player.h"
 #include "Timer.h"
@@ -32,9 +33,11 @@ private:
 	bool Collision = false;
 	bool czyrysowaclinie = true;
 	bool RepeatIfPossible = false;
+	bool GravityChanged = false;
 private:
 	const int ScreenWidth = 1680;
 	const int ScreenHeight = 820;
+	int GravitySpeed = 1;
 	int CameraXPosition = 0;
 	int CameraYPosition = 0;
 	int CameraSpeed = 10;
@@ -76,6 +79,8 @@ public:
 	void SaveFileTypeLevel();
 	void LoadFileTypeTexture();
 public:
+	void UpdateGravity();
+	int IFColisionWithSides(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) const noexcept;
 	void LoadBMPSubregionToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget,
 		const D2D1_RECT_F& sourceRegion, std::vector<Microsoft::WRL::ComPtr<ID2D1Bitmap>>& ppBitmap) const;
 	void Write(std::string Text, int StartPositionX, int StartPositionY);

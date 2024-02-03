@@ -165,6 +165,7 @@ void Mainapp::HandleInput() noexcept
 		CameraXPosition = CameraSpeed;
 		CameraXState = true;
 
+
 	}
 	ISPressed(KEY_RIGHT)
 	{
@@ -175,14 +176,13 @@ void Mainapp::HandleInput() noexcept
 	ISPressed(KEY_DOWN)
 	{
 		CameraYPosition = -CameraSpeed;
-		CameraYState = true;
 
 	}
 	ISPressed(KEY_UP)
 	{
 		CameraYPosition = CameraSpeed;
 		CameraYState = true;
-
+		GravityChanged = false;
 	}
 	//Sterowanie
 	//Ustawienie Gracza na obecnie Wybran¹ texture
@@ -425,6 +425,7 @@ void Mainapp::DoLogic()
 {
 	if (timer.Peek() >= 1.0f / 120.0f) //logika bêdzie sprawdzana co 1.0f/30.0f sekundy a nie co klatke, przez co dla wszystkich frameratów gra bedzie podobnie p³ynna
 	{
+		GravityChanged = true; //musi byc przed HandleInputem w celu mozliwosci zmiany tego stanu
 		timer.Mark();
 		HandleInput();
 	}
@@ -592,6 +593,11 @@ void Mainapp::DoDrawing()
 
 	if (TextureHolder.size()!= 0)
 	{
+		if (CurrentPlayer.CurrentPlayerTexture.pBitmap) {
+			if (GravityChanged)
+				UpdateGravity();
+		}
+
 		UpdateCameraPosition();
 		for (auto& texture : TextureHolder)
 		{
@@ -629,6 +635,48 @@ void Mainapp::DoFrame() {
 
 
 }
+void Mainapp::UpdateGravity()
+{
+	std::vector<TextureInstance> Rollback = TextureHolder;
+
+	for (auto& texture : TextureHolder)
+	{
+		for (auto& rect : texture.destinationRectTab)
+		{
+			if (texture.IsCollisionOn) {
+				if (IFColisionWithSides(CurrentPlayer.PlayerRect, rect) == TOP)
+				{
+					TextureHolder = Rollback;
+					GravityChanged = false;
+					break;
+				}
+			}
+		}
+
+	}
+	if (GravityChanged) {
+		bool go = true;
+		for (auto& texture : TextureHolder)
+		{
+			if (go) {
+				for (auto& rect : texture.destinationRectTab)
+				{
+					rect.top -= GravitySpeed;
+					rect.bottom -= GravitySpeed;
+					if (texture.IsCollisionOn) {
+						if (IFColision(CurrentPlayer.PlayerRect, rect))
+						{
+							TextureHolder = Rollback;
+							go = false;
+							break;
+						}
+					}
+				}
+			}
+		}
+
+	}
+}
 
 bool Mainapp::IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) const noexcept //jezeli prostok¹ty siê pokryj¹ zwracana jest odpowiednia wartosc
 {
@@ -637,6 +685,31 @@ bool Mainapp::IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) con
 		return false;
 	return true;
 }
+
+int Mainapp::IFColisionWithSides(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) const noexcept 
+{
+	if (IFColision(rect1, rect2))
+	{
+		// Obliczamy przeciêcia krawêdzi prostok¹tów.
+		bool leftCollision = rect1.right >= rect2.left && rect1.left <= rect2.left;
+		bool rightCollision = rect1.left <= rect2.right && rect1.right >= rect2.right;
+		bool topCollision = rect1.bottom >= rect2.top && rect1.top <= rect2.top;
+		bool bottomCollision = rect1.top <= rect2.bottom && rect1.bottom >= rect2.bottom;
+
+		// Sprawdzamy, z któr¹ stron¹ dosz³o do kolizji i zwracamy odpowiedni¹ wartoœæ.
+		if (topCollision)
+			return TOP; // Kolizja z górnej strony	
+		else if (rightCollision)
+			return RIGHT; // Kolizja z prawej strony
+		else if (leftCollision)
+			return LEFT; // Kolizja z lewej strony
+		else if (bottomCollision)
+			return BOTTOM; // Kolizja z dolnej strony
+	}
+
+}
+
+
 void Mainapp::UpdateCameraPosition()
 {
 	std::vector<TextureInstance> Rollback = TextureHolder;
