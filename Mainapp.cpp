@@ -132,20 +132,25 @@ void Mainapp::HandleInput() noexcept
 	// Reset do domyslnych width i height
 	ISPressed(KEY_B)
 	{
+
 		ScaleTwidth = 0;
 		ScaleTheight = 0;
 		if (SelectionMode == MODE_SCALE)
 		{
-			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom = RollbackRectBottom;
-			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right = RollbackRectRight;
+			if (SelectionRectCounter != -1 && TextureCounter != -1) {
+				TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom = RollbackRectBottom;
+				TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right = RollbackRectRight;
+			}
 		}
 		else if (SelectionMode == MODE_MOVE)
 		{
-			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom = RollbackRectBottom;
-			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right = RollbackRectRight;
-			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left = RollbackRectLeft;
-			TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top = RollbackRectTop;
-			SelectionMode++;
+			if (SelectionRectCounter != -1 && TextureCounter != -1) {
+				TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].bottom = RollbackRectBottom;
+				TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].right = RollbackRectRight;
+				TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].left = RollbackRectLeft;
+				TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top = RollbackRectTop;
+				SelectionMode++;
+			}
 		}
 
 	}
@@ -222,16 +227,19 @@ void Mainapp::HandleInput() noexcept
 	//Odtworzenie dzwieku
 	ISPressed(KEY_9)
 	{
+		if(AudioCounter!=-1)
 		AudioHolder[AudioCounter].Play(1.0f, 1.0f);
 	}
 	//Zatrzymanie odtworzenia dzwieku
 	ISPressed(KEY_8)
 	{
+		if (AudioCounter != -1)
 		AudioHolder[AudioCounter].Stop();
 	}
 	//Prze³¹czenie Kolizji Dla Wybranej Textury
 	ISPressed(KEY_Q)
 	{
+		if (TextureCounter != -1)
 		TextureHolder[TextureCounter].IsCollisionOn = !TextureHolder[TextureCounter].IsCollisionOn;
 	}
 	ISPressed(KEY_W)
@@ -765,10 +773,21 @@ std::filesystem::path Mainapp::CopyFileToProjectFolder(const std::wstring& Sourc
 	try {
 		std::filesystem::path projectFolder = std::filesystem::current_path();
 		std::filesystem::path sourcePath(SourceFilePath);
+		std::filesystem::path destinationFolder;
 		// Uzyskaj pe³n¹ œcie¿kê do pliku docelowego w folderze projektowym
-		std::filesystem::path destinationPath = projectFolder / sourcePath.filename();
-		// Skopiuj plik
-
+		std::string extension = sourcePath.extension().string();
+		if (extension == ".jpg" || extension == ".png" || extension == ".bmp") {
+			destinationFolder ="Textures";
+		}
+		else if (extension == ".dat" || extension == ".bin") {
+			destinationFolder = "Levels";
+		}
+		else if (extension == ".wav" || extension == ".mp3" || extension == ".ogg")
+		{
+			destinationFolder = "Audio";
+		}
+		std::filesystem::path destinationPath = projectFolder/destinationFolder/sourcePath.filename();
+		
 		if (std::filesystem::exists(destinationPath)) {
 			MessageBoxA(WND1.GetHandle(), "Plik o takiej samej nazwie, ju¿ istnieje w folderze projektowym.", NULL, MB_OK);
 			return destinationPath;
@@ -887,6 +906,7 @@ void Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::Com
 										*reinterpret_cast<UINT32*>(&pixelData[i * 4]) = 0; //alpha to 0
 									}
 								}
+
 								//faktyczne tworzenie bitmapy
 								hr = pRenderTarget->CreateBitmap(
 									D2D1::SizeU(width, height),
