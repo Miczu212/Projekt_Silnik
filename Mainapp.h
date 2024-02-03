@@ -34,7 +34,7 @@ private:
 	bool czyrysowaclinie = true;
 	bool RepeatIfPossible = false;
 	bool GravityChanged = false;
-	bool IsGravityTurnedOn = true;
+	bool IsGravityTurnedOn = false;
 	bool IsJumping = false;
 private: //Wartoœci int
 	const int ScreenWidth = 1680;
