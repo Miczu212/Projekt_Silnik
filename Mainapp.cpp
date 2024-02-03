@@ -187,10 +187,16 @@ void Mainapp::HandleInput() noexcept
 	ISPressed(KEY_DOWN)
 	{
 		CameraYPosition = -CameraSpeed;
+		CameraYState = true;
 
 	}
 	ISPressed(KEY_UP)
 	{
+		if (!IsGravityTurnedOn)
+		{
+			CameraYPosition = CameraSpeed;
+			CameraYState = true;
+		}
 		GravityChanged = false;
 		IsJumping = true;
 	}
