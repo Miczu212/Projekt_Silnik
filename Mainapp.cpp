@@ -173,20 +173,20 @@ void Mainapp::HandleInput() noexcept
 	//Sterowanie
 	ISPressed(KEY_LEFT)
 	{
-		CameraXPosition = CameraSpeed;
+		CameraXPosition = MOVMENT_SPEED;
 		CameraXState = true;
 
 
 	}
 	ISPressed(KEY_RIGHT)
 	{
-		CameraXPosition = -CameraSpeed;
+		CameraXPosition = -MOVMENT_SPEED;
 		CameraXState = true;
 
 	}
 	ISPressed(KEY_DOWN)
 	{
-		CameraYPosition = -CameraSpeed;
+		CameraYPosition = -MOVMENT_SPEED;
 		CameraYState = true;
 
 	}
@@ -194,7 +194,7 @@ void Mainapp::HandleInput() noexcept
 	{
 		if (!IsGravityTurnedOn)
 		{
-			CameraYPosition = CameraSpeed;
+			CameraYPosition = MOVMENT_SPEED;
 			CameraYState = true;
 		}
 		GravityChanged = false;
@@ -762,9 +762,8 @@ int Mainapp::IFColisionWithSides(const D2D1_RECT_F& rect1, const D2D1_RECT_F& re
 
 void Mainapp::UpdateCameraPosition()
 {
-	std::vector<TextureInstance> Rollback = TextureHolder;
-	if (CameraXState || CameraYState)
-	{
+	if(CurrentCameraSpeed<=MaxCameraSpeed){
+		std::vector<TextureInstance> Rollback = TextureHolder;
 		for (auto& texture : TextureHolder)
 		{
 			for (int i = 0; i < texture.destinationRectTab.size(); i++)
@@ -794,19 +793,29 @@ void Mainapp::UpdateCameraPosition()
 					}
 				}
 			}
+		
+		 CurrentCameraSpeed += MOVMENT_SPEED;
+
+		 if (Collision) //jezeli doszlo do kolizji, zawroc wszelkie zmiany do kamery
+		 {
+			 TextureHolder = Rollback;
+			 CameraXState = false;
+			 CameraYState = false;
+			 Collision = false;
+			 CurrentCameraSpeed = 0;
+		 }
+			
+
+		
 		}
 	}
-		if (Collision) //jezeli doszlo do kolizji, zawroc wszelkie zmiany do kamery
-			TextureHolder = Rollback;
-
-
-
-		CameraXPosition = 0;
-		CameraYPosition = 0;
+	else
+	{
 		CameraXState = false;
 		CameraYState = false;
 		Collision = false;
-	
+		CurrentCameraSpeed = 0;
+	}
 }
 
 

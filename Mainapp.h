@@ -42,7 +42,8 @@ private: //Wartoœci int
 	int GravitySpeed = 1;
 	int CameraXPosition = 0;
 	int CameraYPosition = 0;
-	int CameraSpeed = 20;
+	int CurrentCameraSpeed = 0;
+	int MaxCameraSpeed = 400;
 	int ScaleDirection = 1;
 	int CurrentJumpHeight = 0;
 	int MaxJumpHeight = 200;
