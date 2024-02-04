@@ -323,7 +323,6 @@ void Mainapp::HandleInput() noexcept
 	{
 		IsGravityTurnedOn = !IsGravityTurnedOn;
 	}
-	WND1.Klt.ClearState();
 }
 //Funkcje Wczytuj¹ce/Zapisuj¹ce
 void Mainapp::LoadFileTypeAudio()

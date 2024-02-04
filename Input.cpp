@@ -75,16 +75,19 @@ bool Klawiatura::AutorepeatIsEnabled() const
 
 void Klawiatura::OnKeyPressed(unsigned char keycode)
 {
-	keystates[keycode] = true;
-	keybuffer.push(Klawiatura::Event(Klawiatura::Event::Press, keycode));
-	TrimBuffer(keybuffer);
+		keystates[keycode] = true;
+		keybuffer.push(Klawiatura::Event(Klawiatura::Event::Press, keycode));
+		TrimBuffer(keybuffer);
+	
 }
 
 void Klawiatura::OnKeyReleased(unsigned char keycode)
 {
-	keystates[keycode] = false;
-	keybuffer.push(Klawiatura::Event(Klawiatura::Event::Release, keycode));
-	TrimBuffer(keybuffer);
+
+		keystates[keycode] = false;
+		keybuffer.push(Klawiatura::Event(Klawiatura::Event::Release, keycode));
+		TrimBuffer(keybuffer);
+	
 }
 
 void Klawiatura::OnChar(char character)

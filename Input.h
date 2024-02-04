@@ -71,7 +71,7 @@ public:
 private:
 	static constexpr unsigned int nKeys = 256u; //ustawiamy rozmiar na 256 bitów poniewaz ilosc ró¿nych keycodów nie przekracza bajta
 	static constexpr unsigned int bufferSize = 4u;
-	bool autorepeatEnabled = false;
+	bool autorepeatEnabled = true;
 	std::bitset<nKeys> keystates;
 	std::queue<Event> keybuffer;
 	std::queue<Event> Clearbuffer;
