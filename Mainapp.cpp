@@ -719,13 +719,13 @@ void Mainapp::Jump()
 			for (auto& rect : texture.destinationRectTab)
 			{
 				
-				rect.top += 5;
-				rect.bottom += 5;
+				rect.top += 10;
+				rect.bottom += 10;
 
 			}
 
 		}
-		CurrentJumpHeight += 5;
+		CurrentJumpHeight += 10;
 	}
 }
 bool Mainapp::IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) const noexcept //jezeli prostok¹ty siê pokryj¹ zwracana jest odpowiednia wartosc
