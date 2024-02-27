@@ -1,0 +1,21 @@
+G-Zmienia stan grawitacji
+Shift-Ustawia Oś po której myszka ma się poruszać
+CTRL-Zmienia stan autorepeata stawiania bloków
+DEL-Usuwa zaznaczony blok
+E-Zmiana Trybu Selekcji
+W-Retargetlevela na obecną sciezke
+Q-Zmienia stan Kolizji dla wszystkich tekstur wybranej textury
+9-Uruchamia wybrany dźwięk
+8-Zatrzymuje uruchomiony dzwiek
+0-Poruszanie sie po tablicy dzwieków
+O-Wczytanie dzwieku
+P-Ustawienie Gracza jako obecnie wybraną texture
+Strzałki-Sterowanie
+L-Wczytanie Poziomu
+Z-Zapisanie Poziomu
+B-Reset do domyślnej skali/pozycji
+J-Skalowanie textury na obu bokach
+M/N Skalowanie boku textury
+Spacja-Zmiana Kierunku Skalowania
+F-Wczytanie Tekstury
+R-Poruszanie Się po tablicy tekstury
