@@ -108,33 +108,38 @@ void Mainapp::HandleInput() noexcept
 		TextureCounter++;
 		if (TextureCounter > TextureHolder.size() - 1)
 			TextureCounter = 0;
-
+		WND1.Klt.ClearState();
 	}
 	//Wczytanie Textury
 	ISPressed(KEY_F)
 	{
 		LoadFileTypeTexture();
+		WND1.Klt.ClearState();
 	}
 	//Zmiana Kierunku skalowania
 	ISPressed(KEY_SPACE)
 	{
 		ScaleDirection = -(ScaleDirection);
+		WND1.Klt.ClearState();
 	}
 	//Skalowanie szerokoœci
 	ISPressed(KEY_N)
 	{
 			ScaleTwidth -= 10*ScaleDirection;
+			WND1.Klt.ClearState();
 	}
 	//Skalowanie Wysokoœci
 	ISPressed(KEY_M)
 	{
 			ScaleTheight -= 10 * ScaleDirection;
+			WND1.Klt.ClearState();
 	}
 	//Skalowanie textury 
 	ISPressed(KEY_J)
 	{
 		ScaleTheight -= 10 * ScaleDirection;
 		ScaleTwidth -= 10 * ScaleDirection;
+		WND1.Klt.ClearState();
 	}
 	// Reset do domyslnej skali | Reset do domyœlnej pozycji
 	ISPressed(KEY_B)
@@ -158,17 +163,20 @@ void Mainapp::HandleInput() noexcept
 				SelectionMode++;
 			}
 		}
+		WND1.Klt.ClearState();
 
 	}
 	//Zapisanie Poziomu
 	ISPressed(KEY_Z)
 	{
 		SaveFileTypeLevel();
+		WND1.Klt.ClearState();
 	}
 	//Wczytanie Poziomu
 	ISPressed(KEY_L)
 	{
 		LoadFileTypeLevel();
+		WND1.Klt.ClearState();
 	}
 	//Sterowanie
 	ISPressed(KEY_LEFT)
@@ -233,25 +241,28 @@ void Mainapp::HandleInput() noexcept
 
 		if (AudioCounter >= AudioHolder.size())
 			AudioCounter = 0;
-
+		WND1.Klt.ClearState();
 	}
 	//Odtworzenie dzwieku
 	ISPressed(KEY_9)
 	{
 		if(AudioCounter!=-1)
 		AudioHolder[AudioCounter].Play(1.0f, 1.0f);
+		WND1.Klt.ClearState();
 	}
 	//Zatrzymanie odtworzenia dzwieku
 	ISPressed(KEY_8)
 	{
 		if (AudioCounter != -1)
 		AudioHolder[AudioCounter].Stop();
+		WND1.Klt.ClearState();
 	}
 	//Prze³¹czenie Kolizji Dla Wybranej Textury
 	ISPressed(KEY_Q)
 	{
 		if (TextureCounter != -1)
 		TextureHolder[TextureCounter].IsCollisionOn = !TextureHolder[TextureCounter].IsCollisionOn;
+		WND1.Klt.ClearState();
 	}
 	ISPressed(KEY_W)
 	{
@@ -290,6 +301,7 @@ void Mainapp::HandleInput() noexcept
 				SelectionMode = 0;
 			}
 		}
+		WND1.Klt.ClearState();
 	}
 	ISPressed(KEY_DELETE)
 	{
@@ -301,10 +313,12 @@ void Mainapp::HandleInput() noexcept
 				SelectionRectCounter = -1;
 			}
 		}
+		WND1.Klt.ClearState();
 	}
 	ISPressed(KEY_CONTROL)
 	{
 		RepeatIfPossible = !RepeatIfPossible;
+		WND1.Klt.ClearState();
 	}
 	ISPressed(KEY_SHIFT)
 	{
@@ -317,11 +331,12 @@ void Mainapp::HandleInput() noexcept
 			{
 				WND1.Mk.Axis = AXIS_NONE;
 			}
-
+			WND1.Klt.ClearState();
 	}
 	ISPressed(KEY_G)
 	{
 		IsGravityTurnedOn = !IsGravityTurnedOn;
+		WND1.Klt.ClearState();
 	}
 }
 //Funkcje Wczytuj¹ce/Zapisuj¹ce
