@@ -119,17 +119,19 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
 
         //Po wczytaniu zmieniamy nazwy sciezek
         std::filesystem::path projectFolder = std::filesystem::current_path();
-        PlayerInstance.CurrentPlayerTexture.Path = projectFolder.c_str() + GetNameOfFile(PlayerInstance.CurrentPlayerTexture.Path);
+        std::wstring TextureFolder = L"\\Textures";
+        std::wstring AudioFolder = L"\\Audio";
+        PlayerInstance.CurrentPlayerTexture.Path = projectFolder.c_str() +TextureFolder+ GetNameOfFile(PlayerInstance.CurrentPlayerTexture.Path);
 
         for ( auto& texture : ToLoadT)
         {
-        texture.Path = projectFolder.c_str()+ GetNameOfFile(texture.Path);
+            texture.Path = projectFolder.c_str()+ TextureFolder + GetNameOfFile(texture.Path);
   
         }
 
         for ( auto& Path : ToLoadA)
         {
-            Path = projectFolder.c_str() + GetNameOfFile(Path);
+            Path = projectFolder.c_str() + AudioFolder + GetNameOfFile(Path);
         }
         //Zapisywanie nowych sciezek
         std::ofstream fileS;
