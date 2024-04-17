@@ -18,23 +18,29 @@ SoundHandler::SoundHandler()
 	format.cbSize = 0;
 	XAudio2Create(&pEngine);
 	pEngine->CreateMasteringVoice(&pMaster);
-	for (int i = 0; i < nChannels; i++)
-	{
-		idleChannelPtrs.push_back(std::make_unique<Channel>(*this));
-	}
+
+	idleChannelPtrs.push_back(std::make_unique<Channel>(*this));
+
 }
 
 void SoundHandler::Channel::VoiceCallback::OnBufferEnd(void* pBufferContext)
 {
+	
 	Channel& chan = *(Channel*)pBufferContext;
 	chan.Stop();
 	chan.pSound->RemoveChannel(chan);
 	chan.pSound = nullptr;
 	SoundHandler::Get().DeactivateChannel(chan);
+	SoundHandler& soundhandler = SoundHandler::Get();
+	if (soundhandler.idleChannelPtrs.size() >= soundhandler.nChannels)
+		soundhandler.idleChannelPtrs.pop_back();
 }
 
 void SoundHandler::Channel::PlaySoundBuffer(Sound& s, float freqMod, float vol)
 {
+	SoundHandler& soundhandler = SoundHandler::Get();
+	if (soundhandler.idleChannelPtrs.size() == 0)
+		soundhandler.idleChannelPtrs.push_back(std::make_unique<Channel>(soundhandler));
 	assert(pSource && !pSound);
 	s.AddChannel(*this);
 	pSound = &s;

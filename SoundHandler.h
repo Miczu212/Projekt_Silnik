@@ -116,7 +116,7 @@ private:
 	Microsoft::WRL::ComPtr<IXAudio2> pEngine;
 	IXAudio2MasteringVoice* pMaster = nullptr;
 	WAVEFORMATEX format;
-	const int nChannels = 64;
+	const int nChannels = 16;
 	std::mutex mutex;
 	std::vector<std::unique_ptr<Channel>> idleChannelPtrs;
 	std::vector<std::unique_ptr<Channel>> activeChannelPtrs;
