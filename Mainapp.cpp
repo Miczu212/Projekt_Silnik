@@ -105,10 +105,14 @@ void Mainapp::HandleInput() noexcept
 	//Poruszanie sie po tablicy textur
 	ISPressed(KEY_R)
 	{
-		TextureCounter++;
-		if (TextureCounter > TextureHolder.size() - 1)
-			TextureCounter = 0;
-		WND1.Klt.ClearState();
+		if (TextureHolder.size() != 0) {
+
+
+			TextureCounter++;
+			if (TextureCounter > TextureHolder.size() - 1)
+				TextureCounter = 0;
+			WND1.Klt.ClearState();
+		}
 	}
 	//Wczytanie Textury
 	ISPressed(KEY_F)
@@ -237,11 +241,13 @@ void Mainapp::HandleInput() noexcept
 	//Poruszanie sie po tablicy dzwiekow
 	ISPressed(KEY_0)
 	{
-		AudioCounter++;
+		if (AudioHolder.size() != 0) {
+			AudioCounter++;
 
-		if (AudioCounter >= AudioHolder.size())
-			AudioCounter = 0;
-		WND1.Klt.ClearState();
+			if (AudioCounter >= AudioHolder.size())
+				AudioCounter = 0;
+			WND1.Klt.ClearState();
+		}
 	}
 	//Odtworzenie dzwieku
 	ISPressed(KEY_9)
@@ -380,7 +386,8 @@ void Mainapp::LoadFileTypeLevel()
 				TextureHolder[TextureCounter].pBitmap.GetAddressOf());
 
 		}
-		TextureCounter = TextureHolder.size() - 1;
+		if (TextureHolder.size() != 0)
+			TextureCounter = 0;
 		//textury
 
 		//audio
@@ -398,7 +405,8 @@ void Mainapp::LoadFileTypeLevel()
 			}
 
 		}
-		AudioCounter = AudioHolder.size() - 1;
+		if(AudioHolder.size()!=0)
+		AudioCounter = 0;
 		//audio
 	}
 }
