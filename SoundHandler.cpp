@@ -18,8 +18,10 @@ SoundHandler::SoundHandler()
 	format.cbSize = 0;
 	XAudio2Create(&pEngine);
 	pEngine->CreateMasteringVoice(&pMaster);
-
-	idleChannelPtrs.push_back(std::make_unique<Channel>(*this));
+	for (int i = 0; i <= nChannels; i++)
+	{
+		idleChannelPtrs.push_back(std::make_unique<Channel>(*this));
+	}
 
 }
 
