@@ -204,13 +204,15 @@ void Mainapp::HandleInput() noexcept
 	}
 	ISPressed(KEY_UP)
 	{
-		if (!IsGravityTurnedOn)
-		{
-			CameraYPosition = MOVMENT_SPEED;
-			CameraYState = true;
+		if (!IsJumping) {
+			if (!IsGravityTurnedOn)
+			{
+				CameraYPosition = MOVMENT_SPEED;
+				CameraYState = true;
+			}
+			GravityChanged = false;
+			IsJumping = true;
 		}
-		GravityChanged = false;
-		IsJumping = true;
 	}
 	//Sterowanie
 	//Ustawienie Gracza na obecnie Wybran¹ texture
