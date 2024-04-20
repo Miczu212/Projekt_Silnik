@@ -249,6 +249,18 @@ void Mainapp::HandleInput() noexcept
 			WND1.Klt.ClearState();
 		}
 	}
+	ISPressed(KEY_A)
+	{
+		Animation Anim;
+		std::wstring filepath = OpenFileDialog(L"Bitmap Files", L"*.bmp;*.png;*.jpg");
+		
+		AnimHolder.push_back(Anim);
+		AnimHolder[AnimHolder.size()-1].InitializeAnimation(AnimHold,90, 90, 5, 4, WND1.ReturnGFX().ReturnRenderTarget(), filepath);
+	}
+	ISPressed(KEY_I)
+	{
+		DrawAnim = !DrawAnim;
+	}
 	//Odtworzenie dzwieku
 	ISPressed(KEY_9)
 	{
@@ -480,6 +492,19 @@ void Mainapp::DoLogic()
 		HandleInput();
 	}
 }
+void Mainapp::PlayAnimation(int AnimationIndex)
+{
+	if (AnimationTimer.Peek() >= 1.0f / 5.0f)
+	{
+		AnimHolder[AnimationIndex].CurrentFrame++;
+		AnimationTimer.Mark();
+		if (AnimHolder[AnimationIndex].CurrentFrame >= AnimHold.AnimationFrames[AnimationIndex].size())
+			AnimHolder[AnimationIndex].CurrentFrame = 0;
+	}
+	WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(AnimHold.AnimationFrames[AnimHolder[AnimationIndex].AnimationHolderIndex][AnimHolder[AnimationIndex].CurrentFrame].pBitmap.Get(),
+		D2D1::RectF(200, 200, 290, 290));
+}
+
 void Mainapp::DoDrawing()
 {
 	WND1.ReturnGFX().BeginFrame();
@@ -640,7 +665,10 @@ void Mainapp::DoDrawing()
 				)
 			}
 	}
-
+	if (DrawAnim)
+	{
+		PlayAnimation(0);
+	}
 	if (TextureHolder.size()!= 0)
 	{
 		if (CurrentPlayer.CurrentPlayerTexture.pBitmap) {

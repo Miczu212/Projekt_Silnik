@@ -18,6 +18,8 @@
 #include"FunctionDefines.h"
 #include <codecvt>
 #include "SoundHandler.h"
+#include "Animation.h"
+#include"AnimationHolder.h"
 #pragma comment(lib, "gdiplus.lib")
 class Mainapp
 {
@@ -26,8 +28,10 @@ private: //Tablice
 	std::vector<TextureInstance> TextureHolder;
 	std::vector<Sound> AudioHolder;
 	std::vector<std::wstring> AudioPathHolder;
+	std::vector<Animation> AnimHolder;
 private:
 	//Flagi bool
+	bool DrawAnim = false;
 	bool CameraXState = false;
 	bool CameraYState = false;
 	bool Collision = false;
@@ -64,6 +68,7 @@ private: //Ró¿ne
 	BOOL result;
 	WND WND1;
 	Timer timer;
+	Timer AnimationTimer;
 	D2D1_POINT_2F MousePosition;
 	UINT ScaleTwidth = 0, ScaleTheight = 0;
 	LevelInstance Currentlevel;
@@ -71,11 +76,13 @@ private: //Ró¿ne
 	ID2D1SolidColorBrush* BackgroundColour = nullptr;
 public: // Wszystko co ma model Singelton (¿e ma byæ tylko jedno)
 	SoundHandler& Soundhandler = SoundHandler::Get();
-	ComManager commanager = ComManager::Get();
-	Font font = Font::Get();
+	ComManager& commanager = ComManager::Get();
+	AnimationHolder& AnimHold = AnimationHolder::Get();
+	Font& font = Font::Get();
 public: //Podstawowe metody
 	Mainapp();
 	int Go();
+	void PlayAnimation(int AnimationIndex);
 	void DoFrame();
 	void DoLogic();
 	void DoDrawing();

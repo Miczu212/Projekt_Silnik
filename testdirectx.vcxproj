@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -148,6 +149,8 @@
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="AnimationHolder.h" />
     <ClInclude Include="ComManager.h" />
     <ClInclude Include="ConstantDefines.h" />
     <ClInclude Include="dxerr.h" />
