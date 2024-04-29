@@ -17,6 +17,7 @@ public:
 	public:
 		PlayerTexture operator=(TextureInstance& Texture)
 		{
+			this->pBitmap = Texture.pBitmap;
 			this->Path = Texture.Path;
 			this->Theight = Texture.Theight;
 			this->Twidth = Texture.Twidth;

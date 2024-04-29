@@ -150,7 +150,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
-    <ClInclude Include="AnimationHolder.h" />
     <ClInclude Include="ComManager.h" />
     <ClInclude Include="ConstantDefines.h" />
     <ClInclude Include="dxerr.h" />

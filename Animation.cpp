@@ -15,16 +15,14 @@ void Animation::InitializeAnimation(AnimationHolder& animhold,int Framesizex, in
 		for (int i = 0; i < FrameAmmountx; i++)
 		{
 			 TextureInstance TempTextuerInstance;		
-			 LoadFrame(filePath, pRenderTarget, D2D1::RectF(i * Framesizex, j * Framesizey, i * Framesizex + Framesizex, j * Framesizey + Framesizey), TempTextuerInstance.pBitmap);
+			 LoadFrame(filePath, pRenderTarget, D2D1::RectF(i * Framesizex, j * Framesizey, i * Framesizex + Framesizex, j * Framesizey + Framesizey), TempTextuerInstance);
 			 TextureHolder.push_back(TempTextuerInstance);
 		}
 	}
 	animhold.AnimationFrames.push_back(TextureHolder);
-	Frames = &animhold.AnimationFrames[animhold.AnimationFrames.size() - 1];
-	AnimationHolderIndex = animhold.AnimationFrames.size() - 1;
 }
 
-void Animation::LoadFrame(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, const D2D1_RECT_F& sourceRegion,Microsoft::WRL::ComPtr<ID2D1Bitmap> &pBitmap)
+void Animation::LoadFrame(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, const D2D1_RECT_F& sourceRegion,TextureInstance &TempInstance)
 {
 	Microsoft::WRL::ComPtr<IWICImagingFactory> pWICFactory;
 	Microsoft::WRL::ComPtr<IWICBitmapDecoder> pDecoder;
@@ -81,8 +79,11 @@ void Animation::LoadFrame(const std::wstring& filePath, Microsoft::WRL::ComPtr<I
 									pixelData.data(),
 									subWidth * 4,
 									&bitmapProperties,
-									pBitmap.GetAddressOf()
+									TempInstance.pBitmap.GetAddressOf()
 								);
+								TempInstance.Theight = subHeight;
+								TempInstance.Twidth = subWidth;
+								TempInstance.Path = filePath;
 
 							}
 						}

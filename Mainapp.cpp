@@ -219,12 +219,6 @@ void Mainapp::HandleInput() noexcept
 	ISPressed(KEY_P)
 	{
 		CurrentPlayer.CurrentPlayerTexture = TextureHolder[TextureCounter];
-
-		LoadBMPToTexture(
-			CurrentPlayer.CurrentPlayerTexture.Path,
-			WND1.ReturnGFX().ReturnRenderTarget(),
-			CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf()
-		);
 		CurrentPlayer.PlayerRect = D2D1::RectF(
 			ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
 			ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2,
@@ -256,8 +250,8 @@ void Mainapp::HandleInput() noexcept
 		Animation Anim;
 		std::wstring filepath = OpenFileDialog(L"Bitmap Files", L"*.bmp;*.png;*.jpg");
 		
-		AnimHolder.push_back(Anim);
-		AnimHolder[AnimHolder.size()-1].InitializeAnimation(AnimHold,90, 90, 5, 4, WND1.ReturnGFX().ReturnRenderTarget(), filepath);
+		AnimHolder.Animations.push_back(Anim);
+		AnimHolder.Animations[AnimHolder.Animations.size()-1].InitializeAnimation(AnimHolder, 90, 90, 5, 4, WND1.ReturnGFX().ReturnRenderTarget(), filepath);
 	}
 	ISPressed(KEY_I)
 	{
@@ -360,7 +354,14 @@ void Mainapp::HandleInput() noexcept
 	}
 	ISPressed(KEY_T)
 	{
+		CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][5];
 
+		CurrentPlayer.PlayerRect = D2D1::RectF(
+			ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
+			ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2,
+			ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
+			ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2
+		);
 		WND1.Klt.ClearState();
 	}
 }
@@ -494,16 +495,16 @@ void Mainapp::DoLogic()
 		HandleInput();
 	}
 }
-void Mainapp::PlayAnimation(int AnimationIndex)
+void Mainapp::PlayAnimation()
 {
-	if (AnimationTimer.Peek() >= 1.0f / 5.0f)
+	if (AnimHolder.Animations[AnimationIndex].AnimationTimer.Peek() >= 1.0f / 5.0f)
 	{
-		AnimHolder[AnimationIndex].CurrentFrame++;
-		AnimationTimer.Mark();
-		if (AnimHolder[AnimationIndex].CurrentFrame >= AnimHold.AnimationFrames[AnimationIndex].size())
-			AnimHolder[AnimationIndex].CurrentFrame = 0;
+		AnimHolder.Animations[AnimationIndex].CurrentFrame++;
+		AnimHolder.Animations[AnimationIndex].AnimationTimer.Mark();
+		if (AnimHolder.Animations[AnimationIndex].CurrentFrame >= AnimHolder.AnimationFrames[AnimationIndex].size())
+			AnimHolder.Animations[AnimationIndex].CurrentFrame = 0;
 	}
-	WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(AnimHold.AnimationFrames[AnimHolder[AnimationIndex].AnimationHolderIndex][AnimHolder[AnimationIndex].CurrentFrame].pBitmap.Get(),
+	WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(AnimHolder.AnimationFrames[AnimationIndex][AnimHolder.Animations[AnimationIndex].CurrentFrame].pBitmap.Get(),
 		D2D1::RectF(200, 200, 290, 290));
 }
 
@@ -669,20 +670,19 @@ void Mainapp::DoDrawing()
 	}
 	if (DrawAnim)
 	{
-		PlayAnimation(0);
+		PlayAnimation();
+	}
+	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
+	{
+			if (IsJumping)			
+				Jump();
+			if (GravityChanged)
+				UpdateGravity();
+		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(CurrentPlayer.CurrentPlayerTexture.pBitmap.Get(), CurrentPlayer.PlayerRect);
 	}
 	if (TextureHolder.size()!= 0)
 	{
-		if (CurrentPlayer.CurrentPlayerTexture.pBitmap) {
-			if (IsJumping)
-			{
-				Jump();
-			}
-		}
-		if (CurrentPlayer.CurrentPlayerTexture.pBitmap) {
-			if (GravityChanged)
-				UpdateGravity();
-		}
+		
 		
 		
 		UpdateCameraPosition();
@@ -706,10 +706,7 @@ void Mainapp::DoDrawing()
 			}
 		}
 	}
-	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
-	{
-		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(CurrentPlayer.CurrentPlayerTexture.pBitmap.Get(), CurrentPlayer.PlayerRect);
-	}
+
 	
 	WND1.ReturnGFX().EndFrame();
 }

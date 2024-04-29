@@ -11,5 +11,4 @@ public:
 	std::wstring Path;
 	bool IsCollisionOn = true;
 
-
 };

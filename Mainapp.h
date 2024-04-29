@@ -19,7 +19,6 @@
 #include <codecvt>
 #include "SoundHandler.h"
 #include "Animation.h"
-#include"AnimationHolder.h"
 #pragma comment(lib, "gdiplus.lib")
 class Mainapp
 {
@@ -28,7 +27,6 @@ private: //Tablice
 	std::vector<TextureInstance> TextureHolder;
 	std::vector<Sound> AudioHolder;
 	std::vector<std::wstring> AudioPathHolder;
-	std::vector<Animation> AnimHolder;
 private:
 	//Flagi bool
 	bool DrawAnim = false;
@@ -52,6 +50,7 @@ private: //Wartoœci int
 	int CurrentJumpHeight = 0;
 	int MaxJumpHeight = 400;
 private: // Flagi int
+	int AnimationIndex = 0;
 	int TextureCounter = -1;
 	int AudioCounter = -1;
 	int SelectionMode = MODE_PLACE;
@@ -68,7 +67,6 @@ private: //Ró¿ne
 	BOOL result;
 	WND WND1;
 	Timer timer;
-	Timer AnimationTimer;
 	D2D1_POINT_2F MousePosition;
 	UINT ScaleTwidth = 0, ScaleTheight = 0;
 	LevelInstance Currentlevel;
@@ -77,12 +75,12 @@ private: //Ró¿ne
 public: // Wszystko co ma model Singelton (¿e ma byæ tylko jedno)
 	SoundHandler& Soundhandler = SoundHandler::Get();
 	ComManager& commanager = ComManager::Get();
-	AnimationHolder& AnimHold = AnimationHolder::Get();
+	AnimationHolder& AnimHolder = AnimationHolder::Get();
 	Font& font = Font::Get();
 public: //Podstawowe metody
 	Mainapp();
 	int Go();
-	void PlayAnimation(int AnimationIndex);
+	void PlayAnimation();
 	void DoFrame();
 	void DoLogic();
 	void DoDrawing();
