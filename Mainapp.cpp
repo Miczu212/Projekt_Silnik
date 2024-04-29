@@ -187,22 +187,24 @@ void Mainapp::HandleInput() noexcept
 	{
 		CameraXPosition = MOVMENT_SPEED;
 		CameraXState = true;
-		PlayPlayerAnimation(0, 4);
-
+		AnimationRollback = LEFT;
+		//PlayPlayerAnimation(0, 4);
 	}
 	ISPressed(KEY_RIGHT)
 	{
 		CameraXPosition = -MOVMENT_SPEED;
 		CameraXState = true;
-		PlayPlayerAnimation(5, 9);
+		//PlayPlayerAnimation(5, 9);
+		AnimationRollback = RIGHT;
 
 	}
+
 	ISPressed(KEY_DOWN)
 	{
-		PlayPlayerAnimation(15, 19);
+		//PlayPlayerAnimation(15, 19);
 		CameraYPosition = -MOVMENT_SPEED;
 		CameraYState = true;
-
+		AnimationRollback = BOTTOM;
 	}
 	ISPressed(KEY_UP)
 	{
@@ -215,7 +217,8 @@ void Mainapp::HandleInput() noexcept
 			GravityChanged = false;
 			IsJumping = true;
 		}
-		PlayPlayerAnimation(10, 14); // na blache poniewaz ustalam jaka animacja z animation spreadsheeta sie uruchomi
+		//PlayPlayerAnimation(10, 14); // na blache poniewaz ustalam jaka animacja z animation spreadsheeta sie uruchomi
+		AnimationRollback = TOP;
 	}
 	//Sterowanie
 	//Ustawienie Gracza na obecnie Wybran¹ texture
@@ -495,6 +498,8 @@ void Mainapp::DoLogic()
 	{
 		GravityChanged = IsGravityTurnedOn; //musi byc przed HandleInputem w celu mozliwosci zmiany tego stanu
 		timer.Mark();
+		if (AnimHolder.Animations.size() != 0) //reset animacji
+			AnimationRollback = -1;
 		HandleInput();
 	}
 }
@@ -691,15 +696,50 @@ void Mainapp::DoDrawing()
 				)
 			}
 	}
-
+	switch (AnimationRollback)
+	{
+		case TOP: {
+			PlayPlayerAnimation(10, 14);
+			break;
+		}
+		case BOTTOM: {
+			PlayPlayerAnimation(15, 19);
+			break;
+		}
+		case LEFT: {
+			PlayPlayerAnimation(0, 4);
+			break;
+		}
+		case RIGHT: {
+			PlayPlayerAnimation(5, 9);
+			break;
+		}
+		case -1:
+		{
+			CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][5]; //5 to klatka do ktorej bedzie defaultowac
+			CurrentPlayer.PlayerRect = D2D1::RectF(
+				ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+				ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
+				ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+				ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
+			);
+			break;
+		}
+	}
 	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
 	{
+
+
+
 			if (IsJumping)			
 				Jump();
 			if (GravityChanged)
 				UpdateGravity();
 		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(CurrentPlayer.CurrentPlayerTexture.pBitmap.Get(), CurrentPlayer.PlayerRect);
+
+
 	}
+
 	if (TextureHolder.size()!= 0)
 	{
 		
@@ -726,8 +766,6 @@ void Mainapp::DoDrawing()
 			}
 		}
 	}
-
-	
 	WND1.ReturnGFX().EndFrame();
 }
 void Mainapp::DoFrame() {
