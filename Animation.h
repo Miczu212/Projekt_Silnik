@@ -14,6 +14,7 @@ public:
 	void LoadFrame(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, const D2D1_RECT_F& sourceRegion, TextureInstance &TempInstance);
 	Timer AnimationTimer;
 	int CurrentFrame=0;
+	std::wstring SpreadSheetPath;
 };
 class AnimationHolder
 {

@@ -1,5 +1,5 @@
 #include "LevelInstance.h"
-void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT,std::vector<std::wstring>& ToSaveA, const std::wstring& Filename,const Player PlayerInstance) const //pamietaj by jak cokolwiek dodasz co wymaga zapisania to to tutaj zapisac
+void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT, const AnimationHolder& AnimHolder,std::vector<std::wstring>& ToSaveA,const std::wstring& Filename,const Player PlayerInstance) const //pamietaj by jak cokolwiek dodasz co wymaga zapisania to to tutaj zapisac
 {
     std::ofstream file;
     file.open(Filename + L".dat", std::ios::binary);
@@ -9,7 +9,7 @@ void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT,std::v
         std::wstring::size_type sizepath = PlayerInstance.CurrentPlayerTexture.Path.size();
         file.write(reinterpret_cast<char*>(&sizepath), sizeof(sizepath));
         file.write(reinterpret_cast<const char*>(PlayerInstance.CurrentPlayerTexture.Path.c_str()), sizepath * sizeof(wchar_t)); //path to texture instance
-
+        
         size_t TextureCount = ToSaveT.size();
         file.write(reinterpret_cast<char*>(&TextureCount), sizeof(TextureCount)); //ilosc textur
 
@@ -39,6 +39,15 @@ void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT,std::v
             file.write(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
             file.write(reinterpret_cast<const char*>(Path.c_str()), sizepathA * sizeof(wchar_t)); //path to Audio instance
         }
+        std::wstring::size_type sizepathAnim;
+        size_t TabsizeAnim = AnimHolder.Animations.size();
+        file.write(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
+        for (const auto& Files : AnimHolder.Animations)
+        {
+            sizepathAnim = Files.SpreadSheetPath.size();
+            file.write(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
+            file.write(reinterpret_cast<const char*>(Files.SpreadSheetPath.c_str()), sizepathAnim * sizeof(wchar_t)); //path to Animation instance
+        }
         file.close();
     }
 }
@@ -66,6 +75,7 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
     std::vector<TextureInstance> ToLoadT;
     std::vector<std::wstring> ToLoadA;
     std::ifstream fileL;
+    AnimationHolder AnimHolder;
     fileL.open(Filename, std::ios::binary);
     if (fileL.is_open())
     {
@@ -111,7 +121,17 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
             ToLoadA[i].resize(sizepathA);
             fileL.read(reinterpret_cast<char*>(&ToLoadA[i][0]), sizepathA * sizeof(wchar_t));//path to Audio instance
         }
+        std::wstring::size_type sizepathAnim;
+        size_t TabsizeAnim;
+        fileL.read(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
+        AnimHolder.Animations.resize(TabsizeAnim);
+        for (size_t i = 0; i < TabsizeAnim; ++i)
+        {
 
+            fileL.read(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
+            AnimHolder.Animations[i].SpreadSheetPath.resize(sizepathAnim);
+            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].SpreadSheetPath[0]), sizepathAnim * sizeof(wchar_t));//path to Animation instance
+        }
 
         fileL.close();
     }
@@ -121,8 +141,14 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
         std::filesystem::path projectFolder = std::filesystem::current_path();
         std::wstring TextureFolder = L"\\Textures";
         std::wstring AudioFolder = L"\\Audio";
-        PlayerInstance.CurrentPlayerTexture.Path = projectFolder.c_str() +TextureFolder+ GetNameOfFile(PlayerInstance.CurrentPlayerTexture.Path);
+        std::wstring AnimatinoFolder= L"\\Animations";
 
+        PlayerInstance.CurrentPlayerTexture.Path = projectFolder.c_str() +TextureFolder+ GetNameOfFile(PlayerInstance.CurrentPlayerTexture.Path);
+        for (auto& Animation : AnimHolder.Animations)
+        {
+            Animation.SpreadSheetPath = projectFolder.c_str() + AnimatinoFolder + GetNameOfFile(Animation.SpreadSheetPath);
+
+        }
         for ( auto& texture : ToLoadT)
         {
             texture.Path = projectFolder.c_str()+ TextureFolder + GetNameOfFile(texture.Path);
@@ -172,11 +198,20 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
                 fileS.write(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
                 fileS.write(reinterpret_cast<const char*>(Path.c_str()), sizepathA * sizeof(wchar_t)); //path to Audio instance
             }
+            std::wstring::size_type sizepathAnim;
+            size_t TabsizeAnim = AnimHolder.Animations.size();
+            fileS.write(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
+            for (const auto& Files : AnimHolder.Animations)
+            {
+                sizepathAnim = Files.SpreadSheetPath.size();
+                fileS.write(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
+                fileS.write(reinterpret_cast<const char*>(Files.SpreadSheetPath.c_str()), sizepathAnim * sizeof(wchar_t)); //path to Animation instance
+            }
             fileS.close();
         }
 
     }
-void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, std::vector<std::wstring>& ToLoadA, const std::wstring& Filename, Player& PlayerInstance) //pamiêtaj ¿e jak chcesz cokolwiek wczytac to musisz parametr przekazac by reference &
+void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, AnimationHolder& AnimHolder, std::vector<std::wstring>& ToLoadA, const std::wstring& Filename, Player& PlayerInstance) //pamiêtaj ¿e jak chcesz cokolwiek wczytac to musisz parametr przekazac by reference &
 {
     PlayerInstance.CurrentPlayerTexture.Path.clear();
     ToLoadT.clear();
@@ -226,6 +261,18 @@ void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, std::vector
             file.read(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
             ToLoadA[i].resize(sizepathA);
             file.read(reinterpret_cast<char*>(&ToLoadA[i][0]), sizepathA * sizeof(wchar_t));//path to Audio instance
+        }
+
+        std::wstring::size_type sizepathAnim;
+        size_t TabsizeAnim;
+        file.read(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
+        AnimHolder.Animations.resize(TabsizeAnim);
+        for (size_t i = 0; i < TabsizeAnim; ++i)
+        {
+
+            file.read(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
+            AnimHolder.Animations[i].SpreadSheetPath.resize(sizepathAnim);
+            file.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].SpreadSheetPath[0]), sizepathAnim * sizeof(wchar_t));//path to Animation instance
         }
 
 

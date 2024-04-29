@@ -272,6 +272,7 @@ void Mainapp::HandleInput() noexcept
 
 				MessageBoxA(WND1.GetHandle(), "Plik skopiowany pomyœlnie.", NULL, MB_OK);
 			}
+			Anim.SpreadSheetPath = destinationPath;
 			AnimHolder.Animations.push_back(Anim);
 			AnimHolder.Animations[AnimHolder.Animations.size() - 1].InitializeAnimation(AnimHolder, 90, 90, 5, 4, WND1.ReturnGFX().ReturnRenderTarget(), destinationPath);
 			AnimationIndex++;
@@ -423,7 +424,12 @@ void Mainapp::LoadFileTypeLevel()
 		AudioHolder.clear();
 		TextureHolder.clear();
 		AudioPathHolder.clear();
-		Currentlevel.LoadLevel(TextureHolder, AudioPathHolder, selectedFilePath, CurrentPlayer);
+		Currentlevel.LoadLevel(TextureHolder,AnimHolder, AudioPathHolder, selectedFilePath, CurrentPlayer);
+		//Animacje
+		for (auto& Files : AnimHolder.Animations)
+		{
+			Files.InitializeAnimation(AnimHolder, 90, 90, 5, 4, WND1.ReturnGFX().ReturnRenderTarget(), Files.SpreadSheetPath); AnimationIndex++;
+		}
 		//textury
 		LoadBMPToTexture(
 			CurrentPlayer.CurrentPlayerTexture.Path,
@@ -486,7 +492,7 @@ void Mainapp::SaveFileTypeLevel()
 			}
 		}
 	}
-	Currentlevel.SaveLevel(TextureHolder, AudioPathHolder, selectedFilePath, CurrentPlayer);
+	Currentlevel.SaveLevel(TextureHolder,AnimHolder,AudioPathHolder, selectedFilePath, CurrentPlayer);
 }
 void Mainapp::LoadFileTypeTexture()
 {
