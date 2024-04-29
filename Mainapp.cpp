@@ -187,17 +187,19 @@ void Mainapp::HandleInput() noexcept
 	{
 		CameraXPosition = MOVMENT_SPEED;
 		CameraXState = true;
-
+		PlayPlayerAnimation(0, 4);
 
 	}
 	ISPressed(KEY_RIGHT)
 	{
 		CameraXPosition = -MOVMENT_SPEED;
 		CameraXState = true;
+		PlayPlayerAnimation(5, 9);
 
 	}
 	ISPressed(KEY_DOWN)
 	{
+		PlayPlayerAnimation(15, 19);
 		CameraYPosition = -MOVMENT_SPEED;
 		CameraYState = true;
 
@@ -213,6 +215,7 @@ void Mainapp::HandleInput() noexcept
 			GravityChanged = false;
 			IsJumping = true;
 		}
+		PlayPlayerAnimation(10, 14); // na blache poniewaz ustalam jaka animacja z animation spreadsheeta sie uruchomi
 	}
 	//Sterowanie
 	//Ustawienie Gracza na obecnie Wybran¹ texture
@@ -507,6 +510,26 @@ void Mainapp::PlayAnimation()
 	WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(AnimHolder.AnimationFrames[AnimationIndex][AnimHolder.Animations[AnimationIndex].CurrentFrame].pBitmap.Get(),
 		D2D1::RectF(200, 200, 290, 290));
 }
+void Mainapp::PlayPlayerAnimation(int StartFrame, int EndFrame)
+{
+	if (AnimHolder.Animations[AnimationIndex].CurrentFrame > EndFrame || AnimHolder.Animations[AnimationIndex].CurrentFrame < StartFrame)
+		AnimHolder.Animations[AnimationIndex].CurrentFrame = StartFrame;
+	if (AnimHolder.Animations[AnimationIndex].AnimationTimer.Peek() >= 1.0f / 5.0f)
+	{
+		
+		AnimHolder.Animations[AnimationIndex].CurrentFrame++;
+		AnimHolder.Animations[AnimationIndex].AnimationTimer.Mark();
+		if (AnimHolder.Animations[AnimationIndex].CurrentFrame > EndFrame)
+			AnimHolder.Animations[AnimationIndex].CurrentFrame = StartFrame;
+	}
+	CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][AnimHolder.Animations[AnimationIndex].CurrentFrame];
+	CurrentPlayer.PlayerRect = D2D1::RectF(
+		ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth ) / 2,
+		ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight ) / 2,
+		ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth ) / 2,
+		ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight ) / 2
+	);
+}
 
 void Mainapp::DoDrawing()
 {
@@ -668,10 +691,7 @@ void Mainapp::DoDrawing()
 				)
 			}
 	}
-	if (DrawAnim)
-	{
-		PlayAnimation();
-	}
+
 	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
 	{
 			if (IsJumping)			

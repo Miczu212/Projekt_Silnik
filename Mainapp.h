@@ -81,6 +81,7 @@ public: //Podstawowe metody
 	Mainapp();
 	int Go();
 	void PlayAnimation();
+	void PlayPlayerAnimation(int StartFrame, int EndFrame);
 	void DoFrame();
 	void DoLogic();
 	void DoDrawing();
