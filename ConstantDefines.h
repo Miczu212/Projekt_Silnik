@@ -12,4 +12,4 @@
 #define TOP 3
 #define BOTTOM 4
 #define NONE 0
-#define MOVMENT_SPEED 5
+#define MOVMENT_SPEED 1

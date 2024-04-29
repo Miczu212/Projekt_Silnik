@@ -208,15 +208,15 @@ void Mainapp::HandleInput() noexcept
 	}
 	ISPressed(KEY_UP)
 	{
-		if (!IsJumping) {
+		//if (!IsJumping) {
 			if (!IsGravityTurnedOn)
 			{
 				CameraYPosition = MOVMENT_SPEED;
 				CameraYState = true;
 			}
 			GravityChanged = false;
-			IsJumping = true;
-		}
+		//	IsJumping = true;
+	//	}
 		//PlayPlayerAnimation(10, 14); // na blache poniewaz ustalam jaka animacja z animation spreadsheeta sie uruchomi
 		AnimationRollback = TOP;
 	}
