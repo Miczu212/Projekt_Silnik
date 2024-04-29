@@ -50,7 +50,7 @@ private: //Wartoœci int
 	int CurrentJumpHeight = 0;
 	int MaxJumpHeight = 400;
 private: // Flagi int
-	int AnimationIndex = 0;
+	int AnimationIndex = -1;
 	int TextureCounter = -1;
 	int AudioCounter = -1;
 	int SelectionMode = MODE_PLACE;

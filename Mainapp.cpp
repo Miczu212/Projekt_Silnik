@@ -224,15 +224,16 @@ void Mainapp::HandleInput() noexcept
 	//Ustawienie Gracza na obecnie Wybran¹ texture
 	ISPressed(KEY_P)
 	{
-		CurrentPlayer.CurrentPlayerTexture = TextureHolder[TextureCounter];
-		CurrentPlayer.PlayerRect = D2D1::RectF(
-			ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
-			ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2,
-			ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
-			ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2
-		);
-		//zrobione tak by postac byla zawsze na srodku ekranu
-
+		if (TextureHolder.size() != 0) {
+			CurrentPlayer.CurrentPlayerTexture = TextureHolder[TextureCounter];
+			CurrentPlayer.PlayerRect = D2D1::RectF(
+				ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
+				ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2,
+				ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
+				ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2
+			);
+			//zrobione tak by postac byla zawsze na srodku ekranu
+		}
 	}
 	//Wczytanie dzwiekow
 	ISPressed(KEY_O)
@@ -255,13 +256,31 @@ void Mainapp::HandleInput() noexcept
 	{
 		Animation Anim;
 		std::wstring filepath = OpenFileDialog(L"Bitmap Files", L"*.bmp;*.png;*.jpg");
+		try {
+			std::filesystem::path projectFolder = std::filesystem::current_path();
+			std::filesystem::path sourcePath(filepath);
+			std::filesystem::path destinationFolder="Animations";
+			// Uzyskaj pe³n¹ œcie¿kê do pliku docelowego w folderze projektowym
+			std::filesystem::path destinationPath = projectFolder / destinationFolder / sourcePath.filename();
+
+			if (std::filesystem::exists(destinationPath)) {
+				MessageBoxA(WND1.GetHandle(), "Plik o takiej samej nazwie, ju¿ istnieje w folderze projektowym.", NULL, MB_OK);
+			}
+
+			else {
+				std::filesystem::copy_file(sourcePath, destinationPath, std::filesystem::copy_options::overwrite_existing);
+
+				MessageBoxA(WND1.GetHandle(), "Plik skopiowany pomyœlnie.", NULL, MB_OK);
+			}
+			AnimHolder.Animations.push_back(Anim);
+			AnimHolder.Animations[AnimHolder.Animations.size() - 1].InitializeAnimation(AnimHolder, 90, 90, 5, 4, WND1.ReturnGFX().ReturnRenderTarget(), destinationPath);
+			AnimationIndex++;
+		}
+		catch (const std::exception& e)
+		{
+			MessageBoxA(WND1.GetHandle(), "B³¹d podczas kopiowania pliku: ", NULL, MB_OK);
+		}
 		
-		AnimHolder.Animations.push_back(Anim);
-		AnimHolder.Animations[AnimHolder.Animations.size()-1].InitializeAnimation(AnimHolder, 90, 90, 5, 4, WND1.ReturnGFX().ReturnRenderTarget(), filepath);
-	}
-	ISPressed(KEY_I)
-	{
-		DrawAnim = !DrawAnim;
 	}
 	//Odtworzenie dzwieku
 	ISPressed(KEY_9)
@@ -360,16 +379,27 @@ void Mainapp::HandleInput() noexcept
 	}
 	ISPressed(KEY_T)
 	{
-		CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][5];
+		if (AnimHolder.Animations.size() != 0) {
+			CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][5];
 
-		CurrentPlayer.PlayerRect = D2D1::RectF(
-			ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
-			ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2,
-			ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
-			ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2
-		);
+			CurrentPlayer.PlayerRect = D2D1::RectF(
+				ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
+				ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2,
+				ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
+				ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2
+			);
+		}
 		WND1.Klt.ClearState();
 	}
+	ISPressed(KEY_I)
+	{
+		if (AnimHolder.Animations.size() != 0) {
+			AnimationIndex++;
+			if (AnimationIndex >= AnimHolder.Animations.size())
+				AnimationIndex = 0;
+		}
+	}
+
 }
 //Funkcje Wczytuj¹ce/Zapisuj¹ce
 void Mainapp::LoadFileTypeAudio()
