@@ -37,8 +37,10 @@ void Mainapp::HandleInput() noexcept
 
 		case MODE_MOVE:
 		{
-			SelectionMode++;
-			break;
+
+				SelectionMode++;
+				break;
+			
 		}
 		case MODE_SELECT:
 		{
@@ -72,11 +74,6 @@ void Mainapp::HandleInput() noexcept
 			}
 			break;
 
-		}
-		case MODE_ROTATE:
-		{
-			//TODO Mo¿e zaimplementowaæ, nie jest must have ale nice by by³o mieæ
-			break;
 		}
 		}
 	}
@@ -117,6 +114,7 @@ void Mainapp::HandleInput() noexcept
 	//Wczytanie Textury
 	ISPressed(KEY_F)
 	{
+		if(SelectionMode==MODE_PLACE)
 		LoadFileTypeTexture();
 		WND1.Klt.ClearState();
 	}
@@ -167,6 +165,8 @@ void Mainapp::HandleInput() noexcept
 				SelectionMode++;
 			}
 		}
+		else if (SelectionMode == MODE_SELECT)
+			SelectionRectCounter = -1;
 		WND1.Klt.ClearState();
 
 	}
@@ -336,7 +336,7 @@ void Mainapp::HandleInput() noexcept
 				}
 			}
 
-			if (SelectionMode > 4)
+			if (SelectionMode > 3)
 			{
 				SelectionMode = 0;
 			}
@@ -653,20 +653,6 @@ void Mainapp::DoDrawing()
 			WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter], pBrush);
 		}
 		Write("Scale_Mode", 0, 0);
-		break;
-	}
-	case MODE_ROTATE:
-	{
-		if (SelectionRectCounter != -1)
-		{
-			ID2D1SolidColorBrush* pBrush = nullptr;
-			WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
-				D2D1::ColorF(D2D1::ColorF::Blue),
-				&pBrush
-			);
-			WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter], pBrush);
-		}
-		Write("Rotate_Mode", 0, 0);
 		break;
 	}
 	case MODE_PLACE:
