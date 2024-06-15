@@ -216,10 +216,16 @@ void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, AnimationHo
     PlayerInstance.CurrentPlayerTexture.Path.clear();
     ToLoadT.clear();
     ToLoadA.clear();
+    AnimHolder.Animations.clear();
+    AnimHolder.AnimationFrames.clear();
     std::ifstream file;
     file.open(Filename, std::ios::binary);
     if (file.is_open())
     {
+        try
+        {
+
+       
         file.read(reinterpret_cast<char*>(&PlayerInstance.PlayerRect), sizeof(D2D1_RECT_F));
         std::wstring::size_type sizepath;
         file.read(reinterpret_cast<char*>(&sizepath), sizeof(sizepath));
@@ -231,50 +237,60 @@ void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, AnimationHo
 
         ToLoadT.resize(TextureCount);
 
-        for (size_t i = 0; i < TextureCount; ++i)
-        {
-            TextureInstance& TempTexture = ToLoadT[i];
+            for (size_t i = 0; i < TextureCount; ++i)
+            {
+                TextureInstance& TempTexture = ToLoadT[i];
 
-            size_t destinationRectTabSize;
-            file.read(reinterpret_cast<char*>(&destinationRectTabSize), sizeof(destinationRectTabSize));
-            TempTexture.destinationRectTab.resize(destinationRectTabSize);
+                size_t destinationRectTabSize;
+                file.read(reinterpret_cast<char*>(&destinationRectTabSize), sizeof(destinationRectTabSize));
+                TempTexture.destinationRectTab.resize(destinationRectTabSize);
 
-            // Odczytaj ca³¹ tablicê destinationRectTab jako jeden blok danych
-            file.read(reinterpret_cast<char*>(TempTexture.destinationRectTab.data()),destinationRectTabSize * sizeof(D2D1_RECT_F));
+                // Odczytaj ca³¹ tablicê destinationRectTab jako jeden blok danych
+                file.read(reinterpret_cast<char*>(TempTexture.destinationRectTab.data()),destinationRectTabSize * sizeof(D2D1_RECT_F));
 
-            std::wstring::size_type sizepath1;
-            file.read(reinterpret_cast<char*>(&sizepath1), sizeof(sizepath1));
-            TempTexture.Path.resize(sizepath1);
-            file.read(reinterpret_cast<char*>(&TempTexture.Path[0]), sizepath1 * sizeof(wchar_t));
-            file.read(reinterpret_cast<char*>(&TempTexture.IsCollisionOn), sizeof(TempTexture.IsCollisionOn));
-            file.read(reinterpret_cast<char*>(&TempTexture.Theight), sizeof(TempTexture.Theight));
-            file.read(reinterpret_cast<char*>(&TempTexture.Twidth), sizeof(TempTexture.Twidth));
-        }
+                std::wstring::size_type sizepath1;
+                file.read(reinterpret_cast<char*>(&sizepath1), sizeof(sizepath1));
+                TempTexture.Path.resize(sizepath1);
+                file.read(reinterpret_cast<char*>(&TempTexture.Path[0]), sizepath1 * sizeof(wchar_t));
+                file.read(reinterpret_cast<char*>(&TempTexture.IsCollisionOn), sizeof(TempTexture.IsCollisionOn));
+                file.read(reinterpret_cast<char*>(&TempTexture.Theight), sizeof(TempTexture.Theight));
+                file.read(reinterpret_cast<char*>(&TempTexture.Twidth), sizeof(TempTexture.Twidth));
+            }
 
         std::wstring::size_type sizepathA;
         size_t Tabsize;
         file.read(reinterpret_cast<char*>(&Tabsize), sizeof(Tabsize));
         ToLoadA.resize(Tabsize);
-        for (size_t i = 0; i < Tabsize; ++i)
-        {
+            for (size_t i = 0; i < Tabsize; ++i)
+            {
             
-            file.read(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
-            ToLoadA[i].resize(sizepathA);
-            file.read(reinterpret_cast<char*>(&ToLoadA[i][0]), sizepathA * sizeof(wchar_t));//path to Audio instance
+                file.read(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
+                ToLoadA[i].resize(sizepathA);
+                file.read(reinterpret_cast<char*>(&ToLoadA[i][0]), sizepathA * sizeof(wchar_t));//path to Audio instance
+            }
         }
+            catch (...)
+            {
 
-        std::wstring::size_type sizepathAnim;
-        size_t TabsizeAnim;
-        file.read(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
-        AnimHolder.Animations.resize(TabsizeAnim);
-        for (size_t i = 0; i < TabsizeAnim; ++i)
-        {
+            }
+            try {
+                std::wstring::size_type sizepathAnim;
+                size_t TabsizeAnim;
+                file.read(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
+                AnimHolder.Animations.resize(TabsizeAnim);
+                for (size_t i = 0; i < TabsizeAnim; ++i)
+                {
 
-            file.read(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
-            AnimHolder.Animations[i].SpreadSheetPath.resize(sizepathAnim);
-            file.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].SpreadSheetPath[0]), sizepathAnim * sizeof(wchar_t));//path to Animation instance
-        }
+                    file.read(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
+                    AnimHolder.Animations[i].SpreadSheetPath.resize(sizepathAnim);
+                    file.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].SpreadSheetPath[0]), sizepathAnim * sizeof(wchar_t));//path to Animation instance
+                }
+            }
+            catch (...)
+            {
 
+            }
+            //nastêpne elementy wczytywania plików musz¹ znaleŸæ siê w osobnych try-catchach ¿eby by³a kompatybilnoœæ wsteczna
 
         file.close();
     }
