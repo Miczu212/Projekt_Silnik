@@ -473,6 +473,7 @@ void Mainapp::LoadFileTypeLevel()
 		AudioHolder.clear();
 		TextureHolder.clear();
 		AudioPathHolder.clear();
+		TrigerBoxHolder.clear();
 		Currentlevel.LoadLevel(TextureHolder,AnimHolder, AudioPathHolder, selectedFilePath, CurrentPlayer,TrigerBoxHolder);
 		//Animacje
 		for (auto& Files : AnimHolder.Animations)
@@ -514,6 +515,11 @@ void Mainapp::LoadFileTypeLevel()
 		if(AudioHolder.size()!=0)
 		AudioCounter = 0;
 		//audio
+		if (AnimHolder.AnimationFrames.size() != 0)
+			AnimationIndex = 0;
+		//animacje
+		
+		
 	}
 }
 void Mainapp::SaveFileTypeLevel()
@@ -730,8 +736,11 @@ void Mainapp::DoDrawing()
 					WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(TrigerBoxHolder[i].TrigerBoxPosition, pBrushR);
 			}
 		}
-
+		std::ostringstream oss;
+		oss << "Selected TrigerBox nr "<<TrigerBoxCounter;
 		Write("Triger_Mode", 0, 0);
+		if(TrigerBoxCounter!=-1)
+		Write(oss.str(), 0, 60);
 		break;
 	}
 	}

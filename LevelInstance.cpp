@@ -81,6 +81,7 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
     std::vector<std::wstring> ToLoadA;
     std::ifstream fileL;
     AnimationHolder AnimHolder;
+    std::vector<TrigerBoxInstance> ToLoadTriger;
     fileL.open(Filename, std::ios::binary);
     if (fileL.is_open())
     {
@@ -137,7 +138,19 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
             AnimHolder.Animations[i].SpreadSheetPath.resize(sizepathAnim);
             fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].SpreadSheetPath[0]), sizepathAnim * sizeof(wchar_t));//path to Animation instance
         }
+        try
+        {
+            size_t TrigerCount;
+            fileL.read(reinterpret_cast<char*>(&TrigerCount), sizeof(TrigerCount));
+            ToLoadTriger.resize(TrigerCount);
+            for (size_t i = 0; i < TrigerCount; ++i)
+                fileL.read(reinterpret_cast<char*>(&ToLoadTriger[i].TrigerBoxPosition), sizeof(D2D1_RECT_F));
 
+        }
+        catch (...)
+        {
+
+        }
         fileL.close();
     }
 
@@ -212,6 +225,11 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
             fileS.write(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
             fileS.write(reinterpret_cast<const char*>(Files.SpreadSheetPath.c_str()), sizepathAnim * sizeof(wchar_t)); //path to Animation instance
         }
+        size_t TrigerCount = ToLoadTriger.size();
+        fileS.write(reinterpret_cast<char*>(&TrigerCount), sizeof(TrigerCount));
+        for (const auto& Boxes : ToLoadTriger)
+            fileS.write(reinterpret_cast<const char*>(&Boxes.TrigerBoxPosition), sizeof(D2D1_RECT_F));
+
         fileS.close();
     }
 
