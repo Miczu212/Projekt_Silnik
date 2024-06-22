@@ -473,7 +473,7 @@ void Mainapp::LoadFileTypeLevel()
 		AudioHolder.clear();
 		TextureHolder.clear();
 		AudioPathHolder.clear();
-		Currentlevel.LoadLevel(TextureHolder,AnimHolder, AudioPathHolder, selectedFilePath, CurrentPlayer);
+		Currentlevel.LoadLevel(TextureHolder,AnimHolder, AudioPathHolder, selectedFilePath, CurrentPlayer,TrigerBoxHolder);
 		//Animacje
 		for (auto& Files : AnimHolder.Animations)
 		{
@@ -541,7 +541,7 @@ void Mainapp::SaveFileTypeLevel()
 			}
 		}
 	}
-	Currentlevel.SaveLevel(TextureHolder,AnimHolder,AudioPathHolder, selectedFilePath, CurrentPlayer);
+	Currentlevel.SaveLevel(TextureHolder,AnimHolder,AudioPathHolder, selectedFilePath, CurrentPlayer,TrigerBoxHolder);
 }
 void Mainapp::LoadFileTypeTexture()
 {

@@ -1,5 +1,5 @@
 #pragma once
-#include "Mainapp.h"
+#include "D2D1.h"
 class TrigerBoxInstance
 {
 public:
