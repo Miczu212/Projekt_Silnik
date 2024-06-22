@@ -35,55 +35,81 @@ void Mainapp::HandleInput() noexcept
 		switch (SelectionMode)
 		{
 
-		case MODE_MOVE:
-		{
-
-				SelectionMode++;
-				break;
-			
-		}
-		case MODE_SELECT:
-		{
-
-			int LocalTextureCounter = 0;
-			int LocalRectCounter = 0;
-			for (const auto& texture : TextureHolder)
+			case MODE_MOVE:
 			{
-				LocalRectCounter = 0;
-				for (const auto& Rect : texture.destinationRectTab)
+
+					SelectionMode++;
+					break;
+			
+			}
+			case MODE_SELECT:
+			{
+
+				int LocalTextureCounter = 0;
+				int LocalRectCounter = 0;
+				for (const auto& texture : TextureHolder)
 				{
-					if (X > Rect.left && X<Rect.right && Y>Rect.top && Y < Rect.bottom)
+					LocalRectCounter = 0;
+					for (const auto& Rect : texture.destinationRectTab)
 					{
-						TextureCounter = LocalTextureCounter;
-						SelectionRectCounter = LocalRectCounter;
-						break;
+						if (X > Rect.left && X<Rect.right && Y>Rect.top && Y < Rect.bottom)
+						{
+							TextureCounter = LocalTextureCounter;
+							SelectionRectCounter = LocalRectCounter;
+							break;
+						}
+						LocalRectCounter++;
 					}
-					LocalRectCounter++;
+					LocalTextureCounter++;
 				}
-				LocalTextureCounter++;
+				break;
 			}
-			break;
-		}
-		case MODE_SCALE:
-		{
-			if (SelectionRectCounter != -1) {
-				D2D1_RECT_F& SelectedRect = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter];
+			case MODE_SCALE:
+			{
+				if (SelectionRectCounter != -1) {
+					D2D1_RECT_F& SelectedRect = TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter];
 
-				SelectedRect.bottom = Y;
-				SelectedRect.right = X;
+					SelectedRect.bottom = Y;
+					SelectedRect.right = X;
+				}
+				break;
+
 			}
-			break;
-
-		}
+			case MODE_TRIGERS:
+			{
+				if (AddTrigerbox) 
+				{
+					StartTempPos = D2D1::Point2F(X, Y);
+					AddTrigerbox = !AddTrigerbox;
+					FinalizeTrigerbox = true;
+				}
+				else
+				{
+					TrigerBoxCounter = 0;
+						for (const auto& Rect : TrigerBoxHolder)
+						{
+							if (X > Rect.TrigerBoxPosition.left && X<Rect.TrigerBoxPosition.right && Y>Rect.TrigerBoxPosition.top && Y < Rect.TrigerBoxPosition.bottom)
+							{
+								break;
+							}
+							TrigerBoxCounter++;
+						}
+						if (TrigerBoxCounter > TrigerBoxHolder.size() - 1)
+							TrigerBoxCounter = -1;
+					
+				}
+				break;
+			}
 		}
 	}
 	else
 	{
+		int X = WND1.Mk.GetPosX();
+		int Y = WND1.Mk.GetPosY();
 		if (SelectionMode == MODE_MOVE)
 		{
 
-			int X = WND1.Mk.GetPosX();
-			int Y = WND1.Mk.GetPosY();
+			
 			if (SelectionRectCounter != -1) {
 				TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter] =
 					D2D1::RectF(X, Y,
@@ -96,6 +122,16 @@ void Mainapp::HandleInput() noexcept
 
 						- TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter].top
 					);
+			}
+		}
+		else if (SelectionMode == MODE_TRIGERS)
+		{
+			if (FinalizeTrigerbox)
+			{
+				TrigerBoxInstance Temp;
+				Temp.TrigerBoxPosition = D2D1::RectF(StartTempPos.x, StartTempPos.y, X, Y);
+				TrigerBoxHolder.push_back(Temp);
+				FinalizeTrigerbox = false;
 			}
 		}
 	}
@@ -336,7 +372,7 @@ void Mainapp::HandleInput() noexcept
 				}
 			}
 
-			if (SelectionMode > 3)
+			if (SelectionMode > 4)
 			{
 				SelectionMode = 0;
 			}
@@ -351,6 +387,14 @@ void Mainapp::HandleInput() noexcept
 			{
 				TextureHolder[TextureCounter].destinationRectTab.erase(TextureHolder[TextureCounter].destinationRectTab.begin() + SelectionRectCounter);
 				SelectionRectCounter = -1;
+			}
+		}
+		if (TrigerBoxCounter != -1)
+		{
+			if (SelectionMode == MODE_TRIGERS)
+			{
+				TrigerBoxHolder.erase(TrigerBoxHolder.begin()+ TrigerBoxCounter);
+				TrigerBoxCounter = -1;
 			}
 		}
 		WND1.Klt.ClearState();
@@ -399,6 +443,11 @@ void Mainapp::HandleInput() noexcept
 			if (AnimationIndex >= AnimHolder.Animations.size())
 				AnimationIndex = 0;
 		}
+	}
+	ISPressed(KEY_Y) //Dodanie TrigerBoxa
+	{
+		if(SelectionMode==MODE_TRIGERS)
+		AddTrigerbox = true;
 	}
 
 }
@@ -658,6 +707,31 @@ void Mainapp::DoDrawing()
 	case MODE_PLACE:
 	{
 		Write("Place_Mode", 0, 0);
+		break;
+	}
+	case MODE_TRIGERS:
+	{
+		if (TrigerBoxHolder.size()!=0)
+		{
+			ID2D1SolidColorBrush* pBrushB = nullptr;
+			ID2D1SolidColorBrush* pBrushR = nullptr;
+			WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
+				D2D1::ColorF(D2D1::ColorF::Blue),
+				&pBrushB
+			);
+			WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
+				D2D1::ColorF(D2D1::ColorF::Red),
+				&pBrushR
+			);
+			for (int i = 0; i < TrigerBoxHolder.size(); i++)
+			{		
+				WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(TrigerBoxHolder[i].TrigerBoxPosition, pBrushB);
+				if (i == TrigerBoxCounter)
+					WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(TrigerBoxHolder[i].TrigerBoxPosition, pBrushR);
+			}
+		}
+
+		Write("Triger_Mode", 0, 0);
 		break;
 	}
 	}

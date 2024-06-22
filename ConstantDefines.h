@@ -3,6 +3,7 @@
 #define MODE_SELECT 1
 #define MODE_SCALE 3
 #define MODE_MOVE 2
+#define MODE_TRIGERS 4
 #define AXIS_NONE 0
 #define AXIS_X 1
 #define AXIS_Y 2

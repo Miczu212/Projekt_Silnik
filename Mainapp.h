@@ -19,10 +19,12 @@
 #include <codecvt>
 #include "SoundHandler.h"
 #include "Animation.h"
+#include"TrigerBoxInstance.h"
 #pragma comment(lib, "gdiplus.lib")
 class Mainapp
 {
 private: //Tablice
+	std::vector<TrigerBoxInstance> TrigerBoxHolder;
 	std::vector<LevelInstance> LevelHolder;
 	std::vector<TextureInstance> TextureHolder;
 	std::vector<Sound> AudioHolder;
@@ -38,6 +40,8 @@ private:
 	bool GravityChanged = false;
 	bool IsGravityTurnedOn = false;
 	bool IsJumping = false;
+	bool AddTrigerbox = false;
+	bool FinalizeTrigerbox = false;
 private: //Wartoœci int
 	const int ScreenWidth = 1680;
 	const int ScreenHeight = 820;
@@ -55,6 +59,7 @@ private: // Flagi int
 	int AudioCounter = -1;
 	int SelectionMode = MODE_PLACE;
 	int SelectionRectCounter = -1;
+	int TrigerBoxCounter = -1;
 private: //Wszystkie rollbacki (kopie zapasowe do wczytania pozycji)
 	int RollbackRectBottom=0;
 	int RollbackRectRight=0;
@@ -69,6 +74,7 @@ private: //Ró¿ne
 	WND WND1;
 	Timer timer;
 	D2D1_POINT_2F MousePosition;
+	D2D1_POINT_2F StartTempPos;
 	UINT ScaleTwidth = 0, ScaleTheight = 0;
 	LevelInstance Currentlevel;
 	Player CurrentPlayer;

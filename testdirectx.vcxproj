@@ -162,6 +162,7 @@
     <ClInclude Include="Mainapp.h" />
     <ClInclude Include="SoundHandler.h" />
     <ClInclude Include="TextureInstance.h" />
+    <ClInclude Include="TrigerBoxInstance.h" />
     <ClInclude Include="WND.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
