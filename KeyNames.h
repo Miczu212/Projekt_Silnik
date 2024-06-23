@@ -103,5 +103,12 @@
 #define KEY_F3 0x72
 #define KEY_F4 0x73
 #define KEY_F5 0x74
+#define KEY_F6 0x75
+#define KEY_F7 0x76
+#define KEY_F8 0x77
+#define KEY_F9 0x78
+#define KEY_F10 0x79
+#define KEY_F11 0x7A
+#define KEY_F12 0x7B
 
 //Zdefiniowanie virtualnych kluczy na cos bardziej czytelnego

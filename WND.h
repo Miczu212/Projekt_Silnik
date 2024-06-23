@@ -38,11 +38,13 @@ private:
 	const char* wName = "WND1"; //to nie jest nazwa pokazywana na gorze tylko nazwa okna 
 	HINSTANCE hInstance; //handle do instancji okna 
 	std::unique_ptr<GFX> pGFX;
+	bool fullscreen=true;
 public:
 	void Merge();
 	HWND GetHandle() const;
 	Myszka Mk;
 	Klawiatura Klt;
 	bool CurrentMouseState=false; // Dodane w celu wy³¹czenia autoklika w myszce
+	void ResizeWindow();
 
 };

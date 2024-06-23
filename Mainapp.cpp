@@ -310,7 +310,7 @@ void Mainapp::HandleInput() noexcept
 			}
 			Anim.SpreadSheetPath = destinationPath;
 			AnimHolder.Animations.push_back(Anim);
-			AnimHolder.Animations[AnimHolder.Animations.size() - 1].InitializeAnimation(AnimHolder, 90, 90, 5, 4, WND1.ReturnGFX().ReturnRenderTarget(), destinationPath);
+			AnimHolder.Animations[AnimHolder.Animations.size() - 1].InitializeAnimation(AnimHolder, 614, 564, 15, 1, WND1.ReturnGFX().ReturnRenderTarget(), destinationPath);
 			AnimationIndex++;
 		}
 		catch (const std::exception& e)
@@ -448,6 +448,16 @@ void Mainapp::HandleInput() noexcept
 	{
 		if(SelectionMode==MODE_TRIGERS)
 		AddTrigerbox = true;
+	}
+	ISPressed(KEY_ESCAPE)
+	{
+		DestroyWindow(WND1.GetHandle());
+		PostQuitMessage(0);
+	}
+	ISPressed(KEY_F11)
+	{
+		WND1.ResizeWindow();
+		WND1.Klt.ClearState();
 	}
 
 }
@@ -803,7 +813,7 @@ void Mainapp::DoDrawing()
 	}
 	switch (AnimationRollback)
 	{
-		case TOP: {
+		/*case TOP: {
 			PlayPlayerAnimation(10, 14);
 			break;
 		}
@@ -818,10 +828,10 @@ void Mainapp::DoDrawing()
 		case RIGHT: {
 			PlayPlayerAnimation(5, 9);
 			break;
-		}
+		}*/
 		case -1:
 		{
-			CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][5]; //5 to klatka do ktorej bedzie defaultowac
+			CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][1]; //5 to klatka do ktorej bedzie defaultowac
 			CurrentPlayer.PlayerRect = D2D1::RectF(
 				ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
 				ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,

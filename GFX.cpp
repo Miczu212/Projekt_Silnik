@@ -25,6 +25,11 @@ void GFX::ClearBuffer(float r, float g, float b)
 	pRTarget->Clear(D2D1_COLOR_F(r, g, b));
 }
 
+void GFX::Resize(UINT width, UINT Height)
+{
+	pRTarget->Resize(D2D1::SizeU(width, Height));
+}
+
 
 void GFX::BeginFrame()
 {

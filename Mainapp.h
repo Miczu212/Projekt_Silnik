@@ -44,7 +44,7 @@ private:
 	bool FinalizeTrigerbox = false;
 private: //Wartoœci int
 	const int ScreenWidth = 1680;
-	const int ScreenHeight = 820;
+	const int ScreenHeight = 1028;
 	int GravitySpeed = 3;
 	int CameraXPosition = 0;
 	int CameraYPosition = 0;

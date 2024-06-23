@@ -38,6 +38,7 @@ public:
 	~GFX();//wprowadzone bo rule of 3/5
 	void EndFrame();
 	void ClearBuffer(float r, float g, float b);
+	void Resize(UINT width, UINT Height);
 	int ScreenWidth, ScreenHeight;
 	void BeginFrame();
 	void Draw(D2D1_POINT_2F mousepoint1, D2D1_POINT_2F mousepoint2);

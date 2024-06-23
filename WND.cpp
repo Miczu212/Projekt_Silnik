@@ -11,19 +11,25 @@ WND::WND(int Width, int Height, const char* nazwa) //definicja konstruktora
 		winclass.lpszClassName = wName;//zrozumiale przez sie
 	
 	RegisterClassA(&winclass); 
-		
+	int TempWidth;
+	int	TempHeight;
+	if (fullscreen)
+	{
+		TempWidth= GetSystemMetrics(SM_CXSCREEN);
+		TempHeight=GetSystemMetrics(SM_CYSCREEN);
+	}
 	RECT winRect; //polozenie okna
 		winRect.left = 100;
-		winRect.right = Width + winRect.left;
+		winRect.right = TempWidth + winRect.left;
 		winRect.top = 100;
-		winRect.bottom = Height + winRect.top;
+		winRect.bottom = TempHeight + winRect.top;
 		
 		if (		//error handling
-			AdjustWindowRect(&winRect, WS_CAPTION |WS_MINIMIZEBOX |  WS_SYSMENU, FALSE)==0) //cos jak rejestracja winclass tylko dla recta
+			AdjustWindowRect(&winRect, WS_POPUP, FALSE)==0) //cos jak rejestracja winclass tylko dla recta //
 		{
 			throw CHWND_LAST_EXCEPT();
 		}
-	hwnd = CreateWindowA(wName, nazwa, WS_CAPTION | WS_MINIMIZEBOX  | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT,
+	hwnd = CreateWindowA(wName, nazwa, WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
 		 winRect.right - winRect.left,winRect.bottom - winRect.top, nullptr, nullptr, hInstance, this);// dokumentacja jest na stronie microsoftu 
 	if (hwnd == nullptr)
 	{
@@ -145,6 +151,72 @@ GFX& WND::ReturnGFX()
  HWND WND::GetHandle() const
  {
 	 return hwnd;
+ }
+
+ void WND::ResizeWindow()
+ {
+	 int TempWidth;
+	 int TempHeight;
+	 fullscreen = !fullscreen;
+	 RECT winRect; // po³o¿enie okna
+	 
+	 if (fullscreen)
+	 {
+		 
+		 TempWidth = GetSystemMetrics(SM_CXSCREEN);
+		 TempHeight = GetSystemMetrics(SM_CYSCREEN);
+		 winRect.left = 0;
+		 winRect.right = TempWidth;
+		 winRect.top = 0;
+		 winRect.bottom = TempHeight;
+
+		 // Ustawienie stylu na pe³noekranowy
+		 DWORD style = GetWindowLong(hwnd, GWL_STYLE);
+		 style &= ~WS_OVERLAPPEDWINDOW;
+		 style |= WS_POPUP;
+		 SetWindowLong(hwnd, GWL_STYLE, style);
+
+		 // Ustawienie pozycji i rozmiaru okna
+		 SetWindowPos(hwnd, HWND_TOPMOST, winRect.left, winRect.top,
+			 winRect.right - winRect.left, winRect.bottom - winRect.top,
+			 SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+		 pGFX->ScreenHeight = TempHeight;
+		 pGFX->ScreenWidth = TempWidth;
+	 }
+	 else
+	 {
+		 // Przywrócenie trybu okienkowego
+		 winRect.left = 100;
+		 winRect.right = Width + winRect.left;
+		 winRect.top = 100;
+		 winRect.bottom = Height + winRect.top;
+
+		 // Ponowne ustawienie stylu na okienkowy
+		 DWORD style = GetWindowLong(hwnd, GWL_STYLE);
+		 style &= ~WS_POPUP;
+		 style |= WS_OVERLAPPEDWINDOW;
+		 SetWindowLong(hwnd, GWL_STYLE, style);
+
+		 // Dostosowanie okna do nowego rozmiaru
+		 AdjustWindowRect(&winRect, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE);
+
+		 // Ustawienie pozycji i rozmiaru okna
+		 SetWindowPos(hwnd, nullptr, winRect.left, winRect.top,
+			 winRect.right - winRect.left, winRect.bottom - winRect.top,
+			 SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+		 pGFX->ScreenHeight = Height;
+		 pGFX->ScreenWidth = Width;
+	 }
+
+	 RECT rect;
+	 GetClientRect(hwnd, &rect);
+	 UINT width = rect.right - rect.left;
+	 UINT height = rect.bottom - rect.top;
+
+	 // Zmodyfikuj rozmiar render targetu
+	 pGFX->Resize(width, height);
+
+	 UpdateWindow(hwnd);
  }
 
  WND::oErrorException::oErrorException(int line, const char* file, HRESULT hr) 
