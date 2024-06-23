@@ -80,7 +80,7 @@ GFX& WND::ReturnGFX()
  LRESULT  WND::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept //Przetwarzanie Wiadomosci
 {
 	switch (msg)
-	{
+	{	
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
@@ -102,40 +102,40 @@ GFX& WND::ReturnGFX()
 		Mk.OnMyszkaMove(points.x, points.y);
 		break;
 	}
-	case WM_RBUTTONDOWN:
-	{
-		const POINTS points = MAKEPOINTS(lparam);
-		Mk.OnRightPressed(points.x, points.y);
-		break;
-	}
-	case WM_RBUTTONUP:
-	{
-		const POINTS points = MAKEPOINTS(lparam);
-		Mk.OnRightReleased(points.x, points.y);
-		CurrentMouseState = false;
-		break;
-	}
+		case WM_RBUTTONDOWN:
+		{
+			const POINTS points = MAKEPOINTS(lparam);
+			Mk.OnRightPressed(points.x, points.y);
+			break;
+		}
+		case WM_RBUTTONUP:
+		{
+			const POINTS points = MAKEPOINTS(lparam);
+			Mk.OnRightReleased(points.x, points.y);
+			CurrentMouseState = false;
+			break;
+		}
 
-	case WM_LBUTTONUP:
-	{
-		const POINTS points = MAKEPOINTS(lparam);
-		Mk.OnLeftReleased(points.x, points.y);
-		CurrentMouseState = false;
-		break;
-	}
-	case WM_MOUSEWHEEL:
-	{
-		const POINTS points = MAKEPOINTS(lparam);
-		if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
+		case WM_LBUTTONUP:
 		{
-			Mk.OnWheelUp(points.x, points.y);
+			const POINTS points = MAKEPOINTS(lparam);
+			Mk.OnLeftReleased(points.x, points.y);
+			CurrentMouseState = false;
+			break;
 		}
-		else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
+		case WM_MOUSEWHEEL:
 		{
-			Mk.OnWheelDown(points.x, points.y);
+			const POINTS points = MAKEPOINTS(lparam);
+			if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
+			{
+				Mk.OnWheelUp(points.x, points.y);
+			}
+			else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
+			{
+				Mk.OnWheelDown(points.x, points.y);
+			}
+			break;
 		}
-		break;
-	}
 	 //wParam musi byc przypisane do Du¿ych liter ale dzia³a równie¿ na ma³e je¿eli chcia³bym rozró¿niæ du¿e i ma³e litery
 						//musialbym uzyc WM_CHAR
 
@@ -143,7 +143,22 @@ GFX& WND::ReturnGFX()
 		const POINTS points = MAKEPOINTS(lparam);
 		Mk.OnLeftPressed(points.x, points.y);
 		break;
+
+		case WM_SIZE:
+		{
+			if (pGFX) {
+				RECT rect;
+				GetClientRect(hwnd, &rect);
+				UINT width = rect.right - rect.left;
+				UINT height = rect.bottom - rect.top;
+				pGFX->Resize(width, height);
+				UpdateWindow(hwnd);
+			}
+			break;
+		}
+
 	}
+	
 	return DefWindowProcA(hwnd, msg, wParam, lparam);
 
 }
@@ -198,7 +213,7 @@ GFX& WND::ReturnGFX()
 		 SetWindowLong(hwnd, GWL_STYLE, style);
 
 		 // Dostosowanie okna do nowego rozmiaru
-		 AdjustWindowRect(&winRect, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE);
+		 AdjustWindowRect(&winRect, WS_CAPTION | WS_MINIMIZEBOX | WS_SIZEBOX | WS_SYSMENU, FALSE);
 
 		 // Ustawienie pozycji i rozmiaru okna
 		 SetWindowPos(hwnd, nullptr, winRect.left, winRect.top,
@@ -207,16 +222,6 @@ GFX& WND::ReturnGFX()
 		 pGFX->ScreenHeight = Height;
 		 pGFX->ScreenWidth = Width;
 	 }
-
-	 RECT rect;
-	 GetClientRect(hwnd, &rect);
-	 UINT width = rect.right - rect.left;
-	 UINT height = rect.bottom - rect.top;
-
-	 // Zmodyfikuj rozmiar render targetu
-	 pGFX->Resize(width, height);
-
-	 UpdateWindow(hwnd);
  }
 
  WND::oErrorException::oErrorException(int line, const char* file, HRESULT hr) 
