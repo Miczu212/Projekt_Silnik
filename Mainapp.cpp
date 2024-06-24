@@ -175,8 +175,15 @@ void Mainapp::HandleInput() noexcept
 	//Skalowanie textury 
 	ISPressed(KEY_J)
 	{
-		ScaleTheight -= 10 * ScaleDirection;
-		ScaleTwidth -= 10 * ScaleDirection;
+		if (TextureCounter != -1) {
+			ScaleTheight -= 10 * ScaleDirection;
+			ScaleTwidth -= 10 * ScaleDirection;
+		}
+		else
+		{
+			CurrentPlayer.CurrentPlayerTexture.Theight -= 10 * ScaleDirection;
+			CurrentPlayer.CurrentPlayerTexture.Twidth -= 10 * ScaleDirection;
+		}
 		WND1.Klt.ClearState();
 	}
 	// Reset do domyslnej skali | Reset do domyœlnej pozycji
@@ -216,6 +223,7 @@ void Mainapp::HandleInput() noexcept
 	ISPressed(KEY_L)
 	{
 		LoadFileTypeLevel();
+		czyrysowaclinie = false;
 		WND1.Klt.ClearState();
 	}
 	//Sterowanie
@@ -223,16 +231,22 @@ void Mainapp::HandleInput() noexcept
 	{
 		CameraXPosition = MOVMENT_SPEED;
 		CameraXState = true;
-		AnimationRollback = LEFT;
-		//PlayPlayerAnimation(0, 4);
+		if (!StartJumpAnimation) {
+			AnimationRollback = LEFT;
+			AnimationIndex = 2;
+			PlayPlayerAnimation(0, 14);
+		}
 	}
 	ISPressed(KEY_RIGHT)
 	{
 		CameraXPosition = -MOVMENT_SPEED;
 		CameraXState = true;
-		//PlayPlayerAnimation(5, 9);
-		AnimationRollback = RIGHT;
-
+		if (!StartJumpAnimation) {
+			AnimationIndex = 1;
+			PlayPlayerAnimation(0, 14);
+			AnimationRollback = RIGHT;
+		}
+		
 	}
 
 	ISPressed(KEY_DOWN)
@@ -244,16 +258,17 @@ void Mainapp::HandleInput() noexcept
 	}
 	ISPressed(KEY_UP)
 	{
-		//if (!IsJumping) {
+		if (!IsJumping) {
 			if (!IsGravityTurnedOn)
 			{
 				CameraYPosition = MOVMENT_SPEED;
 				CameraYState = true;
 			}
 			GravityChanged = false;
-		//	IsJumping = true;
-	//	}
-		//PlayPlayerAnimation(10, 14); // na blache poniewaz ustalam jaka animacja z animation spreadsheeta sie uruchomi
+			IsJumping = true;
+		}
+		AnimationIndex = 0;
+		StartJumpAnimation = true;  // na blache poniewaz ustalam jaka animacja z animation spreadsheeta sie uruchomi
 		AnimationRollback = TOP;
 	}
 	//Sterowanie
@@ -274,6 +289,7 @@ void Mainapp::HandleInput() noexcept
 	//Wczytanie dzwiekow
 	ISPressed(KEY_O)
 	{
+		czyrysowaclinie = false;
 		LoadFileTypeAudio();
 
 	}
@@ -290,6 +306,7 @@ void Mainapp::HandleInput() noexcept
 	}
 	ISPressed(KEY_A)
 	{
+		czyrysowaclinie = false;
 		Animation Anim;
 		std::wstring filepath = OpenFileDialog(L"Bitmap Files", L"*.bmp;*.png;*.jpg");
 		try {
@@ -441,7 +458,7 @@ void Mainapp::HandleInput() noexcept
 		if (AnimHolder.Animations.size() != 0) {
 			AnimationIndex++;
 			if (AnimationIndex >= AnimHolder.Animations.size())
-				AnimationIndex = 0;
+				AnimationIndex = 0; //Defaultuje do animacji skoku, animindex, jest ju¿ czêœci¹ programowania gry, dlatego jest on na blache
 		}
 	}
 	ISPressed(KEY_Y) //Dodanie TrigerBoxa
@@ -484,11 +501,13 @@ void Mainapp::LoadFileTypeLevel()
 		TextureHolder.clear();
 		AudioPathHolder.clear();
 		TrigerBoxHolder.clear();
+		AudioCounter = -1;
+		TrigerBoxCounter=-1;
 		Currentlevel.LoadLevel(TextureHolder,AnimHolder, AudioPathHolder, selectedFilePath, CurrentPlayer,TrigerBoxHolder);
 		//Animacje
 		for (auto& Files : AnimHolder.Animations)
 		{
-			Files.InitializeAnimation(AnimHolder, 90, 90, 5, 4, WND1.ReturnGFX().ReturnRenderTarget(), Files.SpreadSheetPath); AnimationIndex++;
+			Files.InitializeAnimation(AnimHolder, 614, 564, 15, 1, WND1.ReturnGFX().ReturnRenderTarget(), Files.SpreadSheetPath); AnimationIndex++;
 		}
 		//textury
 		LoadBMPToTexture(
@@ -503,7 +522,9 @@ void Mainapp::LoadFileTypeLevel()
 				TextureHolder[TextureCounter].pBitmap.GetAddressOf());
 
 		}
-		if (TextureHolder.size() != 0)
+		if (TextureHolder.size() == 0)
+			TextureCounter = -1;
+		else
 			TextureCounter = 0;
 		//textury
 
@@ -600,7 +621,10 @@ void Mainapp::DoLogic()
 		GravityChanged = IsGravityTurnedOn; //musi byc przed HandleInputem w celu mozliwosci zmiany tego stanu
 		timer.Mark();
 		if (AnimHolder.Animations.size() != 0) //reset animacji
+		{
+			AnimationIndex = 0;
 			AnimationRollback = -1;
+		}
 		HandleInput();
 	}
 }
@@ -616,24 +640,29 @@ void Mainapp::PlayAnimation()
 	WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(AnimHolder.AnimationFrames[AnimationIndex][AnimHolder.Animations[AnimationIndex].CurrentFrame].pBitmap.Get(),
 		D2D1::RectF(200, 200, 290, 290));
 }
-void Mainapp::PlayPlayerAnimation(int StartFrame, int EndFrame)
-{
+void Mainapp::PlayPlayerAnimation(int StartFrame, int EndFrame) //¿eby wszystko dzia³a³o normalnie po prostu wszystkie boole sprawdzaj¹ce czy animacja jest odpalona musz¹ byæ falsowane tutaj 
+{																//, jak zbierze siê ich na tyle ¿e by³o by ich za du¿o to zmienimy to na inta wybieraj¹cego i tutaj tylko bedzie go zmieniac na -1
 	if (AnimHolder.Animations[AnimationIndex].CurrentFrame > EndFrame || AnimHolder.Animations[AnimationIndex].CurrentFrame < StartFrame)
 		AnimHolder.Animations[AnimationIndex].CurrentFrame = StartFrame;
-	if (AnimHolder.Animations[AnimationIndex].AnimationTimer.Peek() >= 1.0f / 5.0f)
+	if (AnimHolder.Animations[AnimationIndex].AnimationTimer.Peek() >= 1.0f / 24.0f)
 	{
 		
 		AnimHolder.Animations[AnimationIndex].CurrentFrame++;
 		AnimHolder.Animations[AnimationIndex].AnimationTimer.Mark();
-		if (AnimHolder.Animations[AnimationIndex].CurrentFrame > EndFrame)
+		if (AnimHolder.Animations[AnimationIndex].CurrentFrame > EndFrame) 
+		{
 			AnimHolder.Animations[AnimationIndex].CurrentFrame = StartFrame;
+			StartJumpAnimation = false;
+		}
 	}
 	CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][AnimHolder.Animations[AnimationIndex].CurrentFrame];
+	CurrentPlayer.CurrentPlayerTexture.Twidth += ScaleTwidth;
+	CurrentPlayer.CurrentPlayerTexture.Theight += ScaleTheight;
 	CurrentPlayer.PlayerRect = D2D1::RectF(
-		ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth ) / 2,
-		ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight ) / 2,
-		ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth ) / 2,
-		ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight ) / 2
+		ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+		ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
+		ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+		ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
 	);
 }
 
@@ -641,6 +670,7 @@ void Mainapp::DoDrawing()
 {
 	WND1.ReturnGFX().BeginFrame();
 	WND1.ReturnGFX().ClearBuffer(0, 0, 0);
+
 	//kolor t³a
 //	WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&Background, BackgroundColour);
 //	WND1.ReturnGFX().ReturnRenderTarget()->DrawRectangle(&Background, BackgroundColour);
@@ -798,7 +828,7 @@ void Mainapp::DoDrawing()
 			else
 			{
 				NoAutoclickE(			//Ta funkcja jest tutaj nie w handle input dlatego ¿e jest bezpoœrednio zwi¹zana z rysowaniem 
-					if (czyrysowaclinie == true)
+					if (czyrysowaclinie)
 						WND1.ReturnGFX().Draw(MousePosition, MousePosition);
 				if (TextureCounter != -1)
 				{
@@ -806,32 +836,37 @@ void Mainapp::DoDrawing()
 						TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
 					TextureHolder[TextureCounter].destinationRectTab.push_back(destinationRect);
 				}
-				, else if (czyrysowaclinie == true) //else if jest po przecinku z powodu struktury makra
+				, else if (czyrysowaclinie) //else if jest po przecinku z powodu struktury makra
 					WND1.ReturnGFX().Draw(MousePosition);
 				)
 			}
 	}
-	switch (AnimationRollback)
+	switch (AnimationRollback) //Rollback s³u¿y do powrotu do startowej pozycji w przypadku przerwania imputu
 	{
-		/*case TOP: {
-			PlayPlayerAnimation(10, 14);
+		case TOP: {
+			AnimationIndex = 0;
+			PlayPlayerAnimation(0, 14);
 			break;
 		}
-		case BOTTOM: {
-			PlayPlayerAnimation(15, 19);
+		/*case BOTTOM: {
+			PlayPlayerAnimation(0, 14);
 			break;
-		}
+		}*/
 		case LEFT: {
-			PlayPlayerAnimation(0, 4);
+			AnimationIndex = 2;
+			PlayPlayerAnimation(0, 14);
 			break;
 		}
 		case RIGHT: {
-			PlayPlayerAnimation(5, 9);
+			AnimationIndex = 1;
+			PlayPlayerAnimation(0, 14);
 			break;
-		}*/
+		}
 		case -1:
 		{
-			CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][1]; //5 to klatka do ktorej bedzie defaultowac
+			CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][0]; // to klatka do ktorej bedzie defaultowac
+			CurrentPlayer.CurrentPlayerTexture.Twidth += ScaleTwidth;
+			CurrentPlayer.CurrentPlayerTexture.Theight += ScaleTheight;
 			CurrentPlayer.PlayerRect = D2D1::RectF(
 				ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
 				ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
@@ -840,6 +875,12 @@ void Mainapp::DoDrawing()
 			);
 			break;
 		}
+		
+		
+	}
+	if (StartJumpAnimation) {
+		PlayPlayerAnimation(0, 14);
+
 	}
 	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
 	{

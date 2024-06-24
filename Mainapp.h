@@ -42,9 +42,11 @@ private:
 	bool IsJumping = false;
 	bool AddTrigerbox = false;
 	bool FinalizeTrigerbox = false;
+private:
+	bool StartJumpAnimation = false;
 private: //Wartoœci int
 	const int ScreenWidth = 1680;
-	const int ScreenHeight = 1028;
+	const int ScreenHeight = 820;
 	int GravitySpeed = 3;
 	int CameraXPosition = 0;
 	int CameraYPosition = 0;

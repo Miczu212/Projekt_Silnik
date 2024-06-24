@@ -15,6 +15,7 @@ public:
 	Timer AnimationTimer;
 	int CurrentFrame=0;
 	std::wstring SpreadSheetPath;
+	UINT TWidth = 0,THeight = 0;
 };
 class AnimationHolder
 {
