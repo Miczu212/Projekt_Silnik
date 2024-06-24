@@ -44,6 +44,8 @@ private:
 	bool FinalizeTrigerbox = false;
 private:
 	bool StartJumpAnimation = false;
+	bool StartWalkLeftAnimation = false;
+	bool StartWalkRightAnimation = false;
 private: //Wartoœci int
 	const int ScreenWidth = 1680;
 	const int ScreenHeight = 820;
@@ -67,7 +69,7 @@ private: //Wszystkie rollbacki (kopie zapasowe do wczytania pozycji)
 	int RollbackRectRight=0;
 	int RollbackRectLeft=0;
 	int RollbackRectTop=0;
-	int AnimationRollback = 0;
+	int AnimationRollback = -1;
 private: //Ró¿ne
 	const D2D1_RECT_F Background = D2D1::RectF(0, 0, ScreenWidth, ScreenHeight);
 	UINT32 KeyColour = 0xFFFF00FF;

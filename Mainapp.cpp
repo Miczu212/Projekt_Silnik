@@ -235,6 +235,7 @@ void Mainapp::HandleInput() noexcept
 			AnimationRollback = LEFT;
 			AnimationIndex = 2;
 			PlayPlayerAnimation(0, 14);
+			StartWalkLeftAnimation = true;
 		}
 	}
 	ISPressed(KEY_RIGHT)
@@ -245,6 +246,7 @@ void Mainapp::HandleInput() noexcept
 			AnimationIndex = 1;
 			PlayPlayerAnimation(0, 14);
 			AnimationRollback = RIGHT;
+			StartWalkRightAnimation = true;
 		}
 		
 	}
@@ -327,7 +329,7 @@ void Mainapp::HandleInput() noexcept
 			}
 			Anim.SpreadSheetPath = destinationPath;
 			AnimHolder.Animations.push_back(Anim);
-			AnimHolder.Animations[AnimHolder.Animations.size() - 1].InitializeAnimation(AnimHolder, 600, 564, 15, 1, WND1.ReturnGFX().ReturnRenderTarget(), destinationPath);
+			AnimHolder.Animations[AnimHolder.Animations.size() - 1].InitializeAnimation(AnimHolder, 614, 564, 15, 1, WND1.ReturnGFX().ReturnRenderTarget(), destinationPath);
 			AnimationIndex++;
 		}
 		catch (const std::exception& e)
@@ -623,7 +625,8 @@ void Mainapp::DoLogic()
 		if (AnimHolder.Animations.size() != 0) //reset animacji
 		{
 			AnimationIndex = 0;
-			AnimationRollback = -1;
+			StartWalkLeftAnimation = false;
+			StartWalkRightAnimation = false;
 		}
 		HandleInput();
 	}
@@ -653,6 +656,9 @@ void Mainapp::PlayPlayerAnimation(int StartFrame, int EndFrame) //¿eby wszystko 
 		{
 			AnimHolder.Animations[AnimationIndex].CurrentFrame = StartFrame;
 			StartJumpAnimation = false;
+			StartWalkLeftAnimation = false;
+			StartWalkRightAnimation = false;
+
 		}
 	}
 	CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][AnimHolder.Animations[AnimationIndex].CurrentFrame];
@@ -843,38 +849,45 @@ void Mainapp::DoDrawing()
 	}
 	switch (AnimationRollback) //Rollback s³u¿y do powrotu do startowej pozycji w przypadku przerwania imputu
 	{
-		case TOP: {
+		/*case TOP: {
 			AnimationIndex = 0;
 			PlayPlayerAnimation(0, 14);
 			break;
-		}
+		}*/
 		/*case BOTTOM: {
 			PlayPlayerAnimation(0, 14);
 			break;
 		}*/
 		case LEFT: {
-			AnimationIndex = 2;
-			PlayPlayerAnimation(0, 14);
+			if (!StartWalkLeftAnimation)
+			{
+				CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[2][14]; // to klatka do ktorej bedzie defaultowac
+				CurrentPlayer.CurrentPlayerTexture.Twidth += ScaleTwidth;
+				CurrentPlayer.CurrentPlayerTexture.Theight += ScaleTheight;
+				CurrentPlayer.PlayerRect = D2D1::RectF(
+					ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+					ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
+					ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+					ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
+				);
+			}
 			break;
 		}
 		case RIGHT: {
-			AnimationIndex = 1;
-			PlayPlayerAnimation(0, 14);
+			if (!StartWalkRightAnimation) {
+				CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[0][0]; // to klatka do ktorej bedzie defaultowac
+				CurrentPlayer.CurrentPlayerTexture.Twidth += ScaleTwidth;
+				CurrentPlayer.CurrentPlayerTexture.Theight += ScaleTheight;
+				CurrentPlayer.PlayerRect = D2D1::RectF(
+					ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+					ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
+					ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+					ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
+				);
+			}
 			break;
 		}
-		case -1:
-		{
-			CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][0]; // to klatka do ktorej bedzie defaultowac
-			CurrentPlayer.CurrentPlayerTexture.Twidth += ScaleTwidth;
-			CurrentPlayer.CurrentPlayerTexture.Theight += ScaleTheight;
-			CurrentPlayer.PlayerRect = D2D1::RectF(
-				ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
-				ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
-				ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
-				ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
-			);
-			break;
-		}
+		
 		
 		
 	}
