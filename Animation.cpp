@@ -14,9 +14,11 @@ void Animation::InitializeAnimation(AnimationHolder& animhold,int Framesizex, in
 	{
 		for (int i = 0; i < FrameAmmountx; i++)
 		{
-			 TextureInstance TempTextuerInstance;		
-			 LoadFrame(filePath, pRenderTarget, D2D1::RectF(i * Framesizex, j * Framesizey, i * Framesizex + Framesizex, j * Framesizey + Framesizey), TempTextuerInstance);
-			 TextureHolder.push_back(TempTextuerInstance);
+																// dodane z powodu stylu w jakim moje sprite sheety s¹ zrobione, bede pomija³ co drug¹ klatke bo to bêdzie gap klatka
+				TextureInstance TempTextuerInstance;
+				LoadFrame(filePath, pRenderTarget, D2D1::RectF(i * Framesizex, j * Framesizey, i * Framesizex + Framesizex, j * Framesizey + Framesizey), TempTextuerInstance);
+				TextureHolder.push_back(TempTextuerInstance);
+			
 		}
 	}
 	animhold.AnimationFrames.push_back(TextureHolder);

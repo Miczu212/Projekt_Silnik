@@ -327,7 +327,7 @@ void Mainapp::HandleInput() noexcept
 			}
 			Anim.SpreadSheetPath = destinationPath;
 			AnimHolder.Animations.push_back(Anim);
-			AnimHolder.Animations[AnimHolder.Animations.size() - 1].InitializeAnimation(AnimHolder, 614, 564, 15, 1, WND1.ReturnGFX().ReturnRenderTarget(), destinationPath);
+			AnimHolder.Animations[AnimHolder.Animations.size() - 1].InitializeAnimation(AnimHolder, 600, 564, 15, 1, WND1.ReturnGFX().ReturnRenderTarget(), destinationPath);
 			AnimationIndex++;
 		}
 		catch (const std::exception& e)
@@ -942,7 +942,8 @@ void Mainapp::UpdateGravity()
 		for (auto& rect : texture.destinationRectTab)
 		{
 			if (texture.IsCollisionOn) {
-				if (IFColisionWithSides(CurrentPlayer.PlayerRect, rect) == TOP)
+				D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 266, CurrentPlayer.PlayerRect.bottom);
+				if (IFColisionWithSides(TempRect, rect) == TOP)
 				{
 					TextureHolder = Rollback;
 					GravityChanged = false;
@@ -962,7 +963,8 @@ void Mainapp::UpdateGravity()
 					rect.top -= GravitySpeed;
 					rect.bottom -= GravitySpeed;
 					if (texture.IsCollisionOn) {
-						if (IFColision(CurrentPlayer.PlayerRect, rect)) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
+						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 266, CurrentPlayer.PlayerRect.bottom);
+						if (IFColision(TempRect, rect)) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
 						{
 							CurrentJumpHeight = 0;
 							IsJumping = false;
@@ -1040,8 +1042,9 @@ void Mainapp::UpdateCameraPosition()
 
 					texture.destinationRectTab[i].left += CameraXPosition;
 					texture.destinationRectTab[i].right += CameraXPosition;
-					if (texture.IsCollisionOn) {
-						if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
+					if (texture.IsCollisionOn) { // dodane z powodu du¿ej pustej przestrzeni w player rectie, po prostu zmienilem kolizje by sie zgadzala z faktycznym stanem rzeczy
+						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 266, CurrentPlayer.PlayerRect.bottom);
+						if (IFColision(TempRect, texture.destinationRectTab[i]))
 						{
 							Collision = true;
 							break;
@@ -1053,7 +1056,8 @@ void Mainapp::UpdateCameraPosition()
 					texture.destinationRectTab[i].top += CameraYPosition;
 					texture.destinationRectTab[i].bottom += CameraYPosition;
 					if (texture.IsCollisionOn) {
-						if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]))
+						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 266, CurrentPlayer.PlayerRect.bottom);
+						if (IFColision(TempRect, texture.destinationRectTab[i]))
 						{
 							Collision = true;
 							break;
