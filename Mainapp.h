@@ -47,14 +47,14 @@ private:
 private: //Wartoœci int
 	const int ScreenWidth = 1680;
 	const int ScreenHeight = 820;
-	int GravitySpeed = 3;
+	int GravitySpeed = 5;
 	int CameraXPosition = 0;
 	int CameraYPosition = 0;
 	int CurrentCameraSpeed = 0;
 	int MaxCameraSpeed = 20;
 	int ScaleDirection = 1;
 	int CurrentJumpHeight = 0;
-	int MaxJumpHeight = 400;
+	int MaxJumpHeight = 600;
 private: // Flagi int
 	int AnimationIndex = -1;
 	int TextureCounter = -1;
