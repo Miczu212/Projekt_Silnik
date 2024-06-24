@@ -6,17 +6,17 @@ Animation::Animation()
 
 }
 
-void Animation::InitializeAnimation(AnimationHolder& animhold,int Framesizex, int Framesizey,int FrameAmmountx,int FrameAmmounty,Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, std::wstring filePath) 
+void Animation::InitializeAnimation(AnimationHolder& animhold,Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, std::wstring filePath) 
 
 {
 	std::vector<TextureInstance> TextureHolder;
-	for (int j = 0; j < FrameAmmounty; j++)
+	for (int j = 0; j < this->FrameAmmountY; j++)
 	{
-		for (int i = 0; i < FrameAmmountx; i++)
+		for (int i = 0; i < this->FrameAmmountX; i++)
 		{
 																// dodane z powodu stylu w jakim moje sprite sheety s¹ zrobione, bede pomija³ co drug¹ klatke bo to bêdzie gap klatka
 				TextureInstance TempTextuerInstance;
-				LoadFrame(filePath, pRenderTarget, D2D1::RectF(i * Framesizex, j * Framesizey, i * Framesizex + Framesizex, j * Framesizey + Framesizey), TempTextuerInstance);
+				LoadFrame(filePath, pRenderTarget, D2D1::RectF(i * this->FrameSizeX, j * this->FrameSizeY, i * this->FrameSizeX + this->FrameSizeX, j * this->FrameSizeY + this->FrameSizeY), TempTextuerInstance);
 				TextureHolder.push_back(TempTextuerInstance);
 			
 		}

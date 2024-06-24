@@ -12,8 +12,8 @@
     <Filter Include="INL">
       <UniqueIdentifier>{f95cf8aa-7177-43e4-8817-78712349be0a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Audio">
-      <UniqueIdentifier>{b2111c84-5597-487a-9425-f584a338c960}</UniqueIdentifier>
+    <Filter Include="OknaDialogowe">
+      <UniqueIdentifier>{8248973d-d913-4482-8b48-53fbe2ec0982}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

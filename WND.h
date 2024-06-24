@@ -47,4 +47,5 @@ public:
 	bool CurrentMouseState=false; // Dodane w celu wy³¹czenia autoklika w myszce
 	void ResizeWindow();
 
+
 };

@@ -110,5 +110,6 @@
 #define KEY_F10 0x79
 #define KEY_F11 0x7A
 #define KEY_F12 0x7B
+#define KEY_ENTER 0x0D
 
 //Zdefiniowanie virtualnych kluczy na cos bardziej czytelnego

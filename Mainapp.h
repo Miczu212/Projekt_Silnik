@@ -31,6 +31,7 @@ private: //Tablice
 	std::vector<std::wstring> AudioPathHolder;
 private:
 	//Flagi bool
+	bool LoadAnimation = false;
 	bool DrawAnim = false;
 	bool CameraXState = false;
 	bool CameraYState = false;
@@ -83,6 +84,9 @@ private: //Ró¿ne
 	LevelInstance Currentlevel;
 	Player CurrentPlayer;
 	ID2D1SolidColorBrush* BackgroundColour = nullptr;
+	Animation TempAnim;
+	int AnimTempCounter = 0;
+	std::ostringstream oss;
 public: // Wszystko co ma model Singelton (¿e ma byæ tylko jedno)
 	SoundHandler& Soundhandler = SoundHandler::Get();
 	ComManager& commanager = ComManager::Get();

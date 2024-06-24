@@ -10,12 +10,13 @@ class Animation
 {
 public:
 	Animation();
-	void InitializeAnimation(AnimationHolder& animhold, int Framesizex, int Framesizey, int FrameAmmountx, int FrameAmmounty, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, std::wstring filePath);
+	void InitializeAnimation(AnimationHolder& animhold, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, std::wstring filePath);
 	void LoadFrame(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, const D2D1_RECT_F& sourceRegion, TextureInstance &TempInstance);
 	Timer AnimationTimer;
 	int CurrentFrame=0;
 	std::wstring SpreadSheetPath;
-	UINT TWidth = 0,THeight = 0;
+	int FrameSizeX,FrameSizeY;
+	int FrameAmmountX, FrameAmmountY;
 };
 class AnimationHolder
 {

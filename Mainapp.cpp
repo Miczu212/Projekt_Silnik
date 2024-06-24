@@ -269,9 +269,11 @@ void Mainapp::HandleInput() noexcept
 			GravityChanged = false;
 			IsJumping = true;
 		}
-		AnimationIndex = 0;
+			AnimationIndex = 0;
+		if(AnimationRollback==LEFT)
+			AnimationIndex = 3;
 		StartJumpAnimation = true;  // na blache poniewaz ustalam jaka animacja z animation spreadsheeta sie uruchomi
-		AnimationRollback = TOP;
+		
 	}
 	//Sterowanie
 	//Ustawienie Gracza na obecnie Wybran¹ texture
@@ -308,6 +310,7 @@ void Mainapp::HandleInput() noexcept
 	}
 	ISPressed(KEY_A)
 	{
+		WND1.Klt.FlushChar();
 		czyrysowaclinie = false;
 		Animation Anim;
 		std::wstring filepath = OpenFileDialog(L"Bitmap Files", L"*.bmp;*.png;*.jpg");
@@ -327,10 +330,8 @@ void Mainapp::HandleInput() noexcept
 
 				MessageBoxA(WND1.GetHandle(), "Plik skopiowany pomyœlnie.", NULL, MB_OK);
 			}
-			Anim.SpreadSheetPath = destinationPath;
-			AnimHolder.Animations.push_back(Anim);
-			AnimHolder.Animations[AnimHolder.Animations.size() - 1].InitializeAnimation(AnimHolder, 614, 564, 15, 1, WND1.ReturnGFX().ReturnRenderTarget(), destinationPath);
-			AnimationIndex++;
+			LoadAnimation = true;
+			TempAnim.SpreadSheetPath = destinationPath;
 		}
 		catch (const std::exception& e)
 		{
@@ -478,6 +479,47 @@ void Mainapp::HandleInput() noexcept
 		WND1.ResizeWindow();
 		WND1.Klt.ClearState();
 	}
+	ISPressed(KEY_ENTER) {
+		
+		try {
+			switch (AnimTempCounter) {
+				case 0:
+				{
+					TempAnim.FrameAmmountX = std::stoi(oss.str());
+					oss.str("");
+					AnimTempCounter++;
+					break;
+				}
+				case 1:
+				{
+					TempAnim.FrameAmmountY = std::stoi(oss.str());
+					oss.str("");
+					AnimTempCounter++;
+					break;
+				}
+				case 2:
+				{
+					TempAnim.FrameSizeX = std::stoi(oss.str());
+					oss.str("");
+					AnimTempCounter++;
+					break;
+				}
+				case 3:
+				{
+					TempAnim.FrameSizeY = std::stoi(oss.str());
+					oss.str("");
+					AnimTempCounter++;
+					break;
+				}
+			}
+			
+		}
+		catch (...)
+		{
+			oss.str("");
+		}
+		WND1.Klt.FlushChar();
+	}
 
 }
 //Funkcje Wczytuj¹ce/Zapisuj¹ce
@@ -509,7 +551,7 @@ void Mainapp::LoadFileTypeLevel()
 		//Animacje
 		for (auto& Files : AnimHolder.Animations)
 		{
-			Files.InitializeAnimation(AnimHolder, 614, 564, 15, 1, WND1.ReturnGFX().ReturnRenderTarget(), Files.SpreadSheetPath); AnimationIndex++;
+			Files.InitializeAnimation(AnimHolder, WND1.ReturnGFX().ReturnRenderTarget(), Files.SpreadSheetPath); AnimationIndex++;
 		}
 		//textury
 		LoadBMPToTexture(
@@ -681,6 +723,52 @@ void Mainapp::DoDrawing()
 //	WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&Background, BackgroundColour);
 //	WND1.ReturnGFX().ReturnRenderTarget()->DrawRectangle(&Background, BackgroundColour);
 	//kolor t³a //zakomentuj by zmieniæ na czarny
+	if (LoadAnimation) {
+
+		if (!WND1.Klt.CharIsEmpty()) {
+			oss << WND1.Klt.ReadChar();
+			
+		}
+		switch (AnimTempCounter)
+		{
+
+			case 0:
+			{
+				Write("Podaj ilosc klatek w osi X", 300, 300);
+				break;
+
+			}
+			case 1:
+			{
+				Write("Podaj ilosc klatek w osi Y", 300, 300);
+				break;
+
+			}
+			case 2:
+			{
+				Write("Podaj Rozmiar klatek w osi X", 300, 300);
+				break;
+
+			}
+			case 3:
+			{
+				Write("Podaj Rozmiar klatek w osi Y", 300, 300);
+				break;
+
+			}
+			case 4:
+			{
+				LoadAnimation = false;
+				AnimHolder.Animations.push_back(TempAnim);
+				AnimHolder.Animations[AnimHolder.Animations.size() - 1].InitializeAnimation(AnimHolder, WND1.ReturnGFX().ReturnRenderTarget(), TempAnim.SpreadSheetPath);
+				AnimationIndex++;
+				Animation Clearer;
+				TempAnim = Clearer;
+				break;
+			}
+		}		
+	}
+
 	switch (WND1.Mk.Axis)
 	{
 	case AXIS_Y:
@@ -861,7 +949,7 @@ void Mainapp::DoDrawing()
 		case LEFT: {
 			if (!StartWalkLeftAnimation)
 			{
-				CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[2][14]; // to klatka do ktorej bedzie defaultowac
+				CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[3][0]; // to klatka do ktorej bedzie defaultowac
 				CurrentPlayer.CurrentPlayerTexture.Twidth += ScaleTwidth;
 				CurrentPlayer.CurrentPlayerTexture.Theight += ScaleTheight;
 				CurrentPlayer.PlayerRect = D2D1::RectF(
@@ -908,7 +996,6 @@ void Mainapp::DoDrawing()
 
 
 	}
-
 	if (TextureHolder.size()!= 0)
 	{
 		

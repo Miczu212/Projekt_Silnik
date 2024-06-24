@@ -270,5 +270,3 @@ const char* WND::oErrorException::ErrorType()
  {
 	 return  TranslateErrorCode(hr);
  }
-
-
