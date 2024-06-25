@@ -142,6 +142,13 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
         for (size_t i = 0; i < TabsizeAnim; ++i)
         {
 
+            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameAmmountX), sizeof(AnimHolder.Animations[i].FrameAmmountX));
+            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameAmmountY), sizeof(AnimHolder.Animations[i].FrameAmmountY));
+            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameSizeX), sizeof(AnimHolder.Animations[i].FrameSizeX));
+            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameSizeY), sizeof(AnimHolder.Animations[i].FrameSizeY));
+            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].ScaleHeight), sizeof(AnimHolder.Animations[i].ScaleHeight));
+            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].ScaleWidth), sizeof(AnimHolder.Animations[i].ScaleWidth));
+
             fileL.read(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
             AnimHolder.Animations[i].SpreadSheetPath.resize(sizepathAnim);
             fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].SpreadSheetPath[0]), sizepathAnim * sizeof(wchar_t));//path to Animation instance
@@ -229,6 +236,13 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
         fileS.write(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
         for (const auto& Files : AnimHolder.Animations)
         {
+            fileS.write(reinterpret_cast<const char*>(&Files.FrameAmmountX), sizeof(Files.FrameAmmountX));
+            fileS.write(reinterpret_cast<const char*>(&Files.FrameAmmountY), sizeof(Files.FrameAmmountY));
+            fileS.write(reinterpret_cast<const char*>(&Files.FrameSizeX), sizeof(Files.FrameSizeX));
+            fileS.write(reinterpret_cast<const char*>(&Files.FrameSizeY), sizeof(Files.FrameSizeY));
+            fileS.write(reinterpret_cast<const char*>(&Files.ScaleHeight), sizeof(Files.ScaleHeight));
+            fileS.write(reinterpret_cast<const char*>(&Files.ScaleWidth), sizeof(Files.ScaleWidth));
+
             sizepathAnim = Files.SpreadSheetPath.size();
             fileS.write(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
             fileS.write(reinterpret_cast<const char*>(Files.SpreadSheetPath.c_str()), sizepathAnim * sizeof(wchar_t)); //path to Animation instance
