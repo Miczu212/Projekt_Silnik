@@ -943,53 +943,37 @@ void Mainapp::DoDrawing()
 				)
 			}
 	}
-	switch (AnimationRollback) //Rollback s³u¿y do powrotu do startowej pozycji w przypadku przerwania imputu
+	
+	if (StartJumpAnimation) {
+		PlayPlayerAnimation(0, 5);
+
+	}
+	else
 	{
-		/*case TOP: {
-			AnimationIndex = 0;
-			PlayPlayerAnimation(0, 14);
-			break;
-		}*/
-		/*case BOTTOM: {
-			PlayPlayerAnimation(0, 14);
-			break;
-		}*/
+		switch (AnimationRollback) //Rollback s³u¿y do powrotu do startowej pozycji w przypadku przerwania imputu
+		{
+			/*case BOTTOM: {
+				PlayPlayerAnimation(0, 14);
+				break;
+			}*/
 		case LEFT: {
-			if (!StartWalkLeftAnimation)
-			{
-				CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[2][0]; // to klatka do ktorej bedzie defaultowac
-				CurrentPlayer.CurrentPlayerTexture.Twidth += AnimHolder.Animations[AnimationIndex].ScaleWidth;
-				CurrentPlayer.CurrentPlayerTexture.Theight += AnimHolder.Animations[AnimationIndex].ScaleHeight;
-				CurrentPlayer.PlayerRect = D2D1::RectF(
-					ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
-					ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
-					ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
-					ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
-				);
+			if (!StartWalkLeftAnimation) {
+				AnimationIndex = 5;
+				PlayPlayerAnimation(0, 3);
 			}
 			break;
 		}
 		case RIGHT: {
 			if (!StartWalkRightAnimation) {
-				CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[1][0]; // to klatka do ktorej bedzie defaultowac
-				CurrentPlayer.CurrentPlayerTexture.Twidth += AnimHolder.Animations[AnimationIndex].ScaleWidth;
-				CurrentPlayer.CurrentPlayerTexture.Theight += AnimHolder.Animations[AnimationIndex].ScaleHeight;
-				CurrentPlayer.PlayerRect = D2D1::RectF(
-					ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
-					ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
-					ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
-					ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
-				);
+				AnimationIndex = 4;
+				PlayPlayerAnimation(0, 3);
 			}
 			break;
 		}
-		
-		
-		
-	}
-	if (StartJumpAnimation) {
-		PlayPlayerAnimation(0, 5);
 
+
+
+		}
 	}
 	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
 	{
@@ -1050,7 +1034,7 @@ void Mainapp::UpdateGravity()
 		for (auto& rect : texture.destinationRectTab)
 		{
 			if (texture.IsCollisionOn) {
-				D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right, CurrentPlayer.PlayerRect.bottom);
+				D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left+33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right-33, CurrentPlayer.PlayerRect.bottom);
 				if (IFColisionWithSides(TempRect, rect) == TOP)
 				{
 					TextureHolder = Rollback;
@@ -1071,7 +1055,7 @@ void Mainapp::UpdateGravity()
 					rect.top -= GravitySpeed;
 					rect.bottom -= GravitySpeed;
 					if (texture.IsCollisionOn) {
-						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right, CurrentPlayer.PlayerRect.bottom);
+						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left+33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right-33, CurrentPlayer.PlayerRect.bottom);
 						if (IFColision(TempRect, rect)) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
 						{
 							CurrentJumpHeight = 0;
@@ -1151,7 +1135,7 @@ void Mainapp::UpdateCameraPosition()
 					texture.destinationRectTab[i].left += CameraXPosition;
 					texture.destinationRectTab[i].right += CameraXPosition;
 					if (texture.IsCollisionOn) { // dodane z powodu du¿ej pustej przestrzeni w player rectie, po prostu zmienilem kolizje by sie zgadzala z faktycznym stanem rzeczy
-						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right, CurrentPlayer.PlayerRect.bottom);
+						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left+33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right-33, CurrentPlayer.PlayerRect.bottom);
 						if (IFColision(TempRect, texture.destinationRectTab[i]))
 						{
 							Collision = true;
@@ -1164,7 +1148,7 @@ void Mainapp::UpdateCameraPosition()
 					texture.destinationRectTab[i].top += CameraYPosition;
 					texture.destinationRectTab[i].bottom += CameraYPosition;
 					if (texture.IsCollisionOn) {
-						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right, CurrentPlayer.PlayerRect.bottom);
+						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left+33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right-33, CurrentPlayer.PlayerRect.bottom);
 						if (IFColision(TempRect, texture.destinationRectTab[i]))
 						{
 							Collision = true;
