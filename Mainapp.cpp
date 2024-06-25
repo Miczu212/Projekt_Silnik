@@ -676,7 +676,6 @@ void Mainapp::DoLogic()
 		timer.Mark();
 		if (AnimHolder.Animations.size() != 0) //reset animacji
 		{
-			AnimationIndex = 0;
 			StartWalkLeftAnimation = false;
 			StartWalkRightAnimation = false;
 		}
@@ -959,8 +958,8 @@ void Mainapp::DoDrawing()
 			if (!StartWalkLeftAnimation)
 			{
 				CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[2][0]; // to klatka do ktorej bedzie defaultowac
-				CurrentPlayer.CurrentPlayerTexture.Twidth += ScaleTwidth;
-				CurrentPlayer.CurrentPlayerTexture.Theight += ScaleTheight;
+				CurrentPlayer.CurrentPlayerTexture.Twidth += AnimHolder.Animations[AnimationIndex].ScaleWidth;
+				CurrentPlayer.CurrentPlayerTexture.Theight += AnimHolder.Animations[AnimationIndex].ScaleHeight;
 				CurrentPlayer.PlayerRect = D2D1::RectF(
 					ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
 					ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
@@ -973,8 +972,8 @@ void Mainapp::DoDrawing()
 		case RIGHT: {
 			if (!StartWalkRightAnimation) {
 				CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[1][0]; // to klatka do ktorej bedzie defaultowac
-				CurrentPlayer.CurrentPlayerTexture.Twidth += ScaleTwidth;
-				CurrentPlayer.CurrentPlayerTexture.Theight += ScaleTheight;
+				CurrentPlayer.CurrentPlayerTexture.Twidth += AnimHolder.Animations[AnimationIndex].ScaleWidth;
+				CurrentPlayer.CurrentPlayerTexture.Theight += AnimHolder.Animations[AnimationIndex].ScaleHeight;
 				CurrentPlayer.PlayerRect = D2D1::RectF(
 					ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
 					ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
