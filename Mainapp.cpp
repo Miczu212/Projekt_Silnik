@@ -234,7 +234,7 @@ void Mainapp::HandleInput() noexcept
 		if (!StartJumpAnimation) {
 			AnimationRollback = LEFT;
 			AnimationIndex = 2;
-			PlayPlayerAnimation(0, 14);
+			PlayPlayerAnimation(0, 5);
 			StartWalkLeftAnimation = true;
 		}
 	}
@@ -244,7 +244,7 @@ void Mainapp::HandleInput() noexcept
 		CameraXState = true;
 		if (!StartJumpAnimation) {
 			AnimationIndex = 1;
-			PlayPlayerAnimation(0, 14);
+			PlayPlayerAnimation(0, 5);
 			AnimationRollback = RIGHT;
 			StartWalkRightAnimation = true;
 		}
@@ -689,7 +689,7 @@ void Mainapp::PlayPlayerAnimation(int StartFrame, int EndFrame) //¿eby wszystko 
 {																//, jak zbierze siê ich na tyle ¿e by³o by ich za du¿o to zmienimy to na inta wybieraj¹cego i tutaj tylko bedzie go zmieniac na -1
 	if (AnimHolder.Animations[AnimationIndex].CurrentFrame > EndFrame || AnimHolder.Animations[AnimationIndex].CurrentFrame < StartFrame)
 		AnimHolder.Animations[AnimationIndex].CurrentFrame = StartFrame;
-	if (AnimHolder.Animations[AnimationIndex].AnimationTimer.Peek() >= 1.0f / 24.0f)
+	if (AnimHolder.Animations[AnimationIndex].AnimationTimer.Peek() >= 1.0f / 10.0f)
 	{
 		
 		AnimHolder.Animations[AnimationIndex].CurrentFrame++;
@@ -762,8 +762,7 @@ void Mainapp::DoDrawing()
 				AnimHolder.Animations.push_back(TempAnim);
 				AnimHolder.Animations[AnimHolder.Animations.size() - 1].InitializeAnimation(AnimHolder, WND1.ReturnGFX().ReturnRenderTarget(), TempAnim.SpreadSheetPath);
 				AnimationIndex++;
-				Animation Clearer;
-				TempAnim = Clearer;
+				AnimTempCounter = 0;
 				break;
 			}
 		}		
@@ -980,7 +979,7 @@ void Mainapp::DoDrawing()
 		
 	}
 	if (StartJumpAnimation) {
-		PlayPlayerAnimation(0, 14);
+		PlayPlayerAnimation(0, 5);
 
 	}
 	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
@@ -1143,7 +1142,7 @@ void Mainapp::UpdateCameraPosition()
 					texture.destinationRectTab[i].left += CameraXPosition;
 					texture.destinationRectTab[i].right += CameraXPosition;
 					if (texture.IsCollisionOn) { // dodane z powodu du¿ej pustej przestrzeni w player rectie, po prostu zmienilem kolizje by sie zgadzala z faktycznym stanem rzeczy
-						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 266, CurrentPlayer.PlayerRect.bottom);
+						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right, CurrentPlayer.PlayerRect.bottom);
 						if (IFColision(TempRect, texture.destinationRectTab[i]))
 						{
 							Collision = true;
@@ -1156,7 +1155,7 @@ void Mainapp::UpdateCameraPosition()
 					texture.destinationRectTab[i].top += CameraYPosition;
 					texture.destinationRectTab[i].bottom += CameraYPosition;
 					if (texture.IsCollisionOn) {
-						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 266, CurrentPlayer.PlayerRect.bottom);
+						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right, CurrentPlayer.PlayerRect.bottom);
 						if (IFColision(TempRect, texture.destinationRectTab[i]))
 						{
 							Collision = true;

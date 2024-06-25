@@ -42,7 +42,7 @@ void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT, const
         std::wstring::size_type sizepathAnim;
         size_t TabsizeAnim = AnimHolder.Animations.size();
         file.write(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
-        for (const auto& Files : AnimHolder.Animations)
+        for (const auto& Files : AnimHolder.Animations) //TODO DODAC SKALOWANIE
         {
             sizepathAnim = Files.SpreadSheetPath.size();
             file.write(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
@@ -302,7 +302,7 @@ void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, AnimationHo
             size_t TabsizeAnim;
             file.read(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
             AnimHolder.Animations.resize(TabsizeAnim);
-            for (size_t i = 0; i < TabsizeAnim; ++i)
+            for (size_t i = 0; i < TabsizeAnim; ++i) //TODO POPRAWIC WCZYTYWANIE ANIMACJI
             {
 
                 file.read(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
