@@ -39,15 +39,23 @@ void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT, const
             file.write(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
             file.write(reinterpret_cast<const char*>(Path.c_str()), sizepathA * sizeof(wchar_t)); //path to Audio instance
         }
+
         std::wstring::size_type sizepathAnim;
         size_t TabsizeAnim = AnimHolder.Animations.size();
         file.write(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
         for (const auto& Files : AnimHolder.Animations) //TODO DODAC SKALOWANIE
         {
+            file.write(reinterpret_cast<const char*>(&Files.FrameAmmountX), sizeof(Files.FrameAmmountX));
+            file.write(reinterpret_cast<const char*>(&Files.FrameAmmountY), sizeof(Files.FrameAmmountY));
+            file.write(reinterpret_cast<const char*>(&Files.FrameSizeX), sizeof(Files.FrameSizeX));
+            file.write(reinterpret_cast<const char*>(&Files.FrameSizeY), sizeof(Files.FrameSizeY));
+            file.write(reinterpret_cast<const char*>(&Files.ScaleHeight), sizeof(Files.ScaleHeight));
+            file.write(reinterpret_cast<const char*>(&Files.ScaleWidth), sizeof(Files.ScaleWidth));
             sizepathAnim = Files.SpreadSheetPath.size();
             file.write(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
             file.write(reinterpret_cast<const char*>(Files.SpreadSheetPath.c_str()), sizepathAnim * sizeof(wchar_t)); //path to Animation instance
         }
+
         size_t TrigerCount = ToSaveTrigers.size();
         file.write(reinterpret_cast<char*>(&TrigerCount), sizeof(TrigerCount));
         for (const auto& Boxes : ToSaveTrigers)
@@ -304,6 +312,12 @@ void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, AnimationHo
             AnimHolder.Animations.resize(TabsizeAnim);
             for (size_t i = 0; i < TabsizeAnim; ++i) //TODO POPRAWIC WCZYTYWANIE ANIMACJI
             {
+                file.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameAmmountX), sizeof(AnimHolder.Animations[i].FrameAmmountX));
+                file.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameAmmountY), sizeof(AnimHolder.Animations[i].FrameAmmountY));
+                file.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameSizeX), sizeof(AnimHolder.Animations[i].FrameSizeX));
+                file.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameSizeY), sizeof(AnimHolder.Animations[i].FrameSizeY));
+                file.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].ScaleHeight), sizeof(AnimHolder.Animations[i].ScaleHeight));
+                file.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].ScaleWidth), sizeof(AnimHolder.Animations[i].ScaleWidth));
 
                 file.read(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
                 AnimHolder.Animations[i].SpreadSheetPath.resize(sizepathAnim);

@@ -17,6 +17,7 @@ public:
 	std::wstring SpreadSheetPath;
 	int FrameSizeX,FrameSizeY;
 	int FrameAmmountX, FrameAmmountY;
+	int ScaleWidth=0, ScaleHeight=0;
 };
 class AnimationHolder
 {

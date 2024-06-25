@@ -520,6 +520,11 @@ void Mainapp::HandleInput() noexcept
 		}
 		WND1.Klt.FlushChar();
 	}
+	ISPressed(KEY_TAB)
+	{
+		AnimHolder.Animations[AnimationIndex].ScaleHeight = ScaleDirection * ScaleTheight;
+		AnimHolder.Animations[AnimationIndex].ScaleWidth = ScaleDirection * ScaleTwidth;
+	}
 
 }
 //Funkcje Wczytuj¹ce/Zapisuj¹ce
@@ -553,12 +558,17 @@ void Mainapp::LoadFileTypeLevel()
 		{
 			Files.InitializeAnimation(AnimHolder, WND1.ReturnGFX().ReturnRenderTarget(), Files.SpreadSheetPath); AnimationIndex++;
 		}
+		try { CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[0][0]; }
+		catch (...)
+		{
+
+		}
 		//textury
-		LoadBMPToTexture(
+		/*LoadBMPToTexture(
 			CurrentPlayer.CurrentPlayerTexture.Path,
 			WND1.ReturnGFX().ReturnRenderTarget(),
 			CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf()
-		);
+		);*/
 		for (TextureCounter = 0; TextureCounter < TextureHolder.size(); TextureCounter++)
 		{
 			LoadBMPToTexture(TextureHolder[TextureCounter].Path,
@@ -704,8 +714,8 @@ void Mainapp::PlayPlayerAnimation(int StartFrame, int EndFrame) //¿eby wszystko 
 		}
 	}
 	CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][AnimHolder.Animations[AnimationIndex].CurrentFrame];
-	CurrentPlayer.CurrentPlayerTexture.Twidth += ScaleTwidth;
-	CurrentPlayer.CurrentPlayerTexture.Theight += ScaleTheight;
+	CurrentPlayer.CurrentPlayerTexture.Twidth += AnimHolder.Animations[AnimationIndex].ScaleWidth;
+	CurrentPlayer.CurrentPlayerTexture.Theight += AnimHolder.Animations[AnimationIndex].ScaleHeight;
 	CurrentPlayer.PlayerRect = D2D1::RectF(
 		ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
 		ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
@@ -948,7 +958,7 @@ void Mainapp::DoDrawing()
 		case LEFT: {
 			if (!StartWalkLeftAnimation)
 			{
-				CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[3][0]; // to klatka do ktorej bedzie defaultowac
+				CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[2][0]; // to klatka do ktorej bedzie defaultowac
 				CurrentPlayer.CurrentPlayerTexture.Twidth += ScaleTwidth;
 				CurrentPlayer.CurrentPlayerTexture.Theight += ScaleTheight;
 				CurrentPlayer.PlayerRect = D2D1::RectF(
@@ -962,7 +972,7 @@ void Mainapp::DoDrawing()
 		}
 		case RIGHT: {
 			if (!StartWalkRightAnimation) {
-				CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[0][0]; // to klatka do ktorej bedzie defaultowac
+				CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[1][0]; // to klatka do ktorej bedzie defaultowac
 				CurrentPlayer.CurrentPlayerTexture.Twidth += ScaleTwidth;
 				CurrentPlayer.CurrentPlayerTexture.Theight += ScaleTheight;
 				CurrentPlayer.PlayerRect = D2D1::RectF(
@@ -1041,7 +1051,7 @@ void Mainapp::UpdateGravity()
 		for (auto& rect : texture.destinationRectTab)
 		{
 			if (texture.IsCollisionOn) {
-				D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 266, CurrentPlayer.PlayerRect.bottom);
+				D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right, CurrentPlayer.PlayerRect.bottom);
 				if (IFColisionWithSides(TempRect, rect) == TOP)
 				{
 					TextureHolder = Rollback;
@@ -1062,7 +1072,7 @@ void Mainapp::UpdateGravity()
 					rect.top -= GravitySpeed;
 					rect.bottom -= GravitySpeed;
 					if (texture.IsCollisionOn) {
-						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 266, CurrentPlayer.PlayerRect.bottom);
+						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right, CurrentPlayer.PlayerRect.bottom);
 						if (IFColision(TempRect, rect)) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
 						{
 							CurrentJumpHeight = 0;
