@@ -120,6 +120,7 @@ private:
 	std::mutex mutex;
 	std::vector<std::unique_ptr<Channel>> idleChannelPtrs;
 	std::vector<std::unique_ptr<Channel>> activeChannelPtrs;
+
 };
 
 class Sound
@@ -128,7 +129,7 @@ class Sound
 public:
 	bool Loop = false;
 	Sound(const Sound& other) //Copy Konstruktor Dla Klasy DŸwiêku
-		: nBytes(other.nBytes), pData(new BYTE[other.nBytes]), activeChannelPtrs(other.activeChannelPtrs) {
+		: nBytes(other.nBytes), pData(new BYTE[other.nBytes]), activeChannelPtrs(other.activeChannelPtrs),Loop(other.Loop) {
 		// Kopiowanie danych z innego obiektu do obecnego obiektu
 		std::copy(other.pData.get(), other.pData.get() + other.nBytes, pData.get());
 	}
@@ -269,7 +270,8 @@ public:
 		:
 		nBytes(donor.nBytes),
 		pData(std::move(donor.pData)),
-		activeChannelPtrs(std::move(donor.activeChannelPtrs))
+		activeChannelPtrs(std::move(donor.activeChannelPtrs)),
+		Loop(donor.Loop)
 	{}
 	void Play(float freqMod, float vol)
 	{

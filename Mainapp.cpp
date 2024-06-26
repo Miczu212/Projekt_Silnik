@@ -236,6 +236,7 @@ void Mainapp::HandleInput() noexcept
 			AnimationIndex = 2;
 			PlayPlayerAnimation(0, 5);
 			StartWalkLeftAnimation = true;
+			
 		}
 	}
 	ISPressed(KEY_RIGHT)
@@ -247,6 +248,8 @@ void Mainapp::HandleInput() noexcept
 			PlayPlayerAnimation(0, 5);
 			AnimationRollback = RIGHT;
 			StartWalkRightAnimation = true;
+			
+
 		}
 		
 	}
@@ -268,11 +271,19 @@ void Mainapp::HandleInput() noexcept
 			}
 			GravityChanged = false;
 			IsJumping = true;
-		}
 			AnimationIndex = 0;
-		if(AnimationRollback==LEFT)
-			AnimationIndex = 3;
-		StartJumpAnimation = true;  // na blache poniewaz ustalam jaka animacja z animation spreadsheeta sie uruchomi
+			if (AnimationRollback == LEFT)
+				AnimationIndex = 3;
+			StartJumpAnimation = true;  // na blache poniewaz ustalam jaka animacja z animation spreadsheeta sie uruchomi
+			try { 
+				AudioHolder[1].Play(1.0f, 1.0f); 
+			}
+			catch (...)
+			{
+
+			}
+		}
+			
 		
 	}
 	//Sterowanie
@@ -697,32 +708,44 @@ void Mainapp::PlayAnimation()
 		D2D1::RectF(200, 200, 290, 290));
 }
 void Mainapp::PlayPlayerAnimation(int StartFrame, int EndFrame) //¿eby wszystko dzia³a³o normalnie po prostu wszystkie boole sprawdzaj¹ce czy animacja jest odpalona musz¹ byæ falsowane tutaj 
-{																//, jak zbierze siê ich na tyle ¿e by³o by ich za du¿o to zmienimy to na inta wybieraj¹cego i tutaj tylko bedzie go zmieniac na -1
-	if (AnimHolder.Animations[AnimationIndex].CurrentFrame > EndFrame || AnimHolder.Animations[AnimationIndex].CurrentFrame < StartFrame)
-		AnimHolder.Animations[AnimationIndex].CurrentFrame = StartFrame;
-	if (AnimHolder.Animations[AnimationIndex].AnimationTimer.Peek() >= 1.0f / 10.0f)
-	{
-		
-		AnimHolder.Animations[AnimationIndex].CurrentFrame++;
-		AnimHolder.Animations[AnimationIndex].AnimationTimer.Mark();
-		if (AnimHolder.Animations[AnimationIndex].CurrentFrame > EndFrame) 
-		{
+{		
+	//, jak zbierze siê ich na tyle ¿e by³o by ich za du¿o to zmienimy to na inta wybieraj¹cego i tutaj tylko bedzie go zmieniac na -1
+	try {
+		if (AnimHolder.Animations[AnimationIndex].CurrentFrame > EndFrame || AnimHolder.Animations[AnimationIndex].CurrentFrame < StartFrame)
 			AnimHolder.Animations[AnimationIndex].CurrentFrame = StartFrame;
-			StartJumpAnimation = false;
-			StartWalkLeftAnimation = false;
-			StartWalkRightAnimation = false;
+		if (AnimHolder.Animations[AnimationIndex].AnimationTimer.Peek() >= 1.0f / 10.0f)
+		{
+			
+			AnimHolder.Animations[AnimationIndex].CurrentFrame++;
+			AnimHolder.Animations[AnimationIndex].AnimationTimer.Mark();
+			if (AnimHolder.Animations[AnimationIndex].CurrentFrame > EndFrame)
+			{
+				if (AnimationIndex == 1 || AnimationIndex == 2)
+				{
+					AudioHolder[2].Play(1.0f, 0.3f);
+				}
+				AnimHolder.Animations[AnimationIndex].CurrentFrame = StartFrame;
+				StartJumpAnimation = false;
+				StartWalkLeftAnimation = false;
+				StartWalkRightAnimation = false;
+				
 
+			}
 		}
+		CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][AnimHolder.Animations[AnimationIndex].CurrentFrame];
+		CurrentPlayer.CurrentPlayerTexture.Twidth += AnimHolder.Animations[AnimationIndex].ScaleWidth;
+		CurrentPlayer.CurrentPlayerTexture.Theight += AnimHolder.Animations[AnimationIndex].ScaleHeight;
+		CurrentPlayer.PlayerRect = D2D1::RectF(
+			ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+			ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
+			ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+			ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
+		);
 	}
-	CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][AnimHolder.Animations[AnimationIndex].CurrentFrame];
-	CurrentPlayer.CurrentPlayerTexture.Twidth += AnimHolder.Animations[AnimationIndex].ScaleWidth;
-	CurrentPlayer.CurrentPlayerTexture.Theight += AnimHolder.Animations[AnimationIndex].ScaleHeight;
-	CurrentPlayer.PlayerRect = D2D1::RectF(
-		ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
-		ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
-		ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
-		ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
-	);
+	catch (...)
+	{
+
+	}
 }
 
 void Mainapp::DoDrawing()
