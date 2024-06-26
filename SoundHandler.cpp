@@ -29,27 +29,62 @@ void SoundHandler::Channel::VoiceCallback::OnBufferEnd(void* pBufferContext)
 {
 	
 	Channel& chan = *(Channel*)pBufferContext;
-	chan.Stop();
-	chan.pSound->RemoveChannel(chan);
-	chan.pSound = nullptr;
-	SoundHandler::Get().DeactivateChannel(chan);
-	SoundHandler& soundhandler = SoundHandler::Get();
-	if (soundhandler.idleChannelPtrs.size() >= soundhandler.nChannels)
-		soundhandler.idleChannelPtrs.pop_back();
+	if (!chan.pSound->Loop) {
+		chan.Stop();
+		chan.pSound->RemoveChannel(chan);
+		chan.pSound = nullptr;
+		SoundHandler::Get().DeactivateChannel(chan);
+		SoundHandler& soundhandler = SoundHandler::Get();
+		if (soundhandler.idleChannelPtrs.size() >= soundhandler.nChannels)
+			soundhandler.idleChannelPtrs.pop_back();
+	}
+	else {
+		// Ponownie odtwórz dŸwiêk
+		chan.PlaySoundBuffer(*chan.pSound, 1.0f, 1.0f); // Przyk³adowe parametry freqMod i vol
+
+	}
 }
 
 void SoundHandler::Channel::PlaySoundBuffer(Sound& s, float freqMod, float vol)
 {
-	SoundHandler& soundhandler = SoundHandler::Get();
-	if (soundhandler.idleChannelPtrs.size() == 0)
-		soundhandler.idleChannelPtrs.push_back(std::make_unique<Channel>(soundhandler));
-	assert(pSource && !pSound);
-	s.AddChannel(*this);
-	pSound = &s;
-	xaBuffer.pAudioData = s.pData.get();
-	xaBuffer.AudioBytes = s.nBytes;
-	pSource->SubmitSourceBuffer(&xaBuffer, nullptr);
-	pSource->SetFrequencyRatio(freqMod);
-	pSource->SetVolume(vol);
-	pSource->Start();
+	if (s.Started == false && s.Loop == true) {
+		SoundHandler& soundhandler = SoundHandler::Get();
+		if (soundhandler.idleChannelPtrs.size() == 0)
+			soundhandler.idleChannelPtrs.push_back(std::make_unique<Channel>(soundhandler));
+		assert(pSource && !pSound);
+		s.AddChannel(*this);
+		pSound = &s;
+		xaBuffer.pAudioData = s.pData.get();
+		xaBuffer.AudioBytes = s.nBytes;
+		pSource->SubmitSourceBuffer(&xaBuffer, nullptr);
+		pSource->SetFrequencyRatio(freqMod);
+		pSource->SetVolume(vol);
+		pSource->Start();
+		s.Started = true;
+	}
+	else if(s.Loop==true && s.Started==true)
+	{
+		SoundHandler& soundhandler = SoundHandler::Get();
+		xaBuffer.pAudioData = s.pData.get();
+		xaBuffer.AudioBytes = s.nBytes;
+		pSource->SubmitSourceBuffer(&xaBuffer, nullptr);
+		pSource->SetFrequencyRatio(freqMod);
+		pSource->SetVolume(vol);
+		pSource->Start();
+	}
+	else
+	{
+		SoundHandler& soundhandler = SoundHandler::Get();
+		if (soundhandler.idleChannelPtrs.size() == 0)
+			soundhandler.idleChannelPtrs.push_back(std::make_unique<Channel>(soundhandler));
+		assert(pSource && !pSound);
+		s.AddChannel(*this);
+		pSound = &s;
+		xaBuffer.pAudioData = s.pData.get();
+		xaBuffer.AudioBytes = s.nBytes;
+		pSource->SubmitSourceBuffer(&xaBuffer, nullptr);
+		pSource->SetFrequencyRatio(freqMod);
+		pSource->SetVolume(vol);
+		pSource->Start();
+	}
 }

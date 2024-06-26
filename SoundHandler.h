@@ -116,7 +116,7 @@ private:
 	Microsoft::WRL::ComPtr<IXAudio2> pEngine;
 	IXAudio2MasteringVoice* pMaster = nullptr;
 	WAVEFORMATEX format;
-	const int nChannels = 8;
+	const int nChannels = 16;
 	std::mutex mutex;
 	std::vector<std::unique_ptr<Channel>> idleChannelPtrs;
 	std::vector<std::unique_ptr<Channel>> activeChannelPtrs;
@@ -126,6 +126,7 @@ class Sound
 {
 	friend SoundHandler::Channel;
 public:
+	bool Loop = false;
 	Sound(const Sound& other) //Copy Konstruktor Dla Klasy DŸwiêku
 		: nBytes(other.nBytes), pData(new BYTE[other.nBytes]), activeChannelPtrs(other.activeChannelPtrs) {
 		// Kopiowanie danych z innego obiektu do obecnego obiektu
@@ -308,4 +309,5 @@ private:
 	std::unique_ptr<BYTE[]> pData;
 	std::mutex mutex;
 	std::vector<SoundHandler::Channel*> activeChannelPtrs;
+	bool Started = false;
 };

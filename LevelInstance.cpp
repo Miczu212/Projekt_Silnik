@@ -1,5 +1,5 @@
 #include "LevelInstance.h"
-void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT, const AnimationHolder& AnimHolder, std::vector<std::wstring>& ToSaveA, const std::wstring& Filename, const Player PlayerInstance, std::vector<TrigerBoxInstance>& ToSaveTrigers) const //pamietaj by jak cokolwiek dodasz co wymaga zapisania to to tutaj zapisac
+void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT, const AnimationHolder& AnimHolder, std::vector<std::wstring>& ToSaveA,std::vector<bool>& IsAudioLooped, const std::wstring& Filename, const Player PlayerInstance, std::vector<TrigerBoxInstance>& ToSaveTrigers) const //pamietaj by jak cokolwiek dodasz co wymaga zapisania to to tutaj zapisac
 {
     std::ofstream file;
     file.open(Filename + L".dat", std::ios::binary);
@@ -33,13 +33,21 @@ void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT, const
         std::wstring::size_type sizepathA;
         size_t Tabsize = ToSaveA.size();
         file.write(reinterpret_cast<char*>(&Tabsize), sizeof(Tabsize));
-        for (const auto& Path : ToSaveA)
+        int True = 1, False = 0;
+        for (int i=0;i<ToSaveA.size();i++)
         {
-            sizepathA = Path.size();
+            sizepathA = ToSaveA[i].size();
             file.write(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
-            file.write(reinterpret_cast<const char*>(Path.c_str()), sizepathA * sizeof(wchar_t)); //path to Audio instance
+            file.write(reinterpret_cast<const char*>(ToSaveA[i].c_str()), sizepathA * sizeof(wchar_t)); //path to Audio instance
+            if (IsAudioLooped[i])
+            {
+                file.write(reinterpret_cast < const char*>(&True),sizeof(True));
+            }
+            else
+            {
+                file.write(reinterpret_cast <const char*>(&False), sizeof(False));
+            }
         }
-
         std::wstring::size_type sizepathAnim;
         size_t TabsizeAnim = AnimHolder.Animations.size();
         file.write(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
@@ -256,7 +264,7 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
     }
 
 }
-void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, AnimationHolder& AnimHolder, std::vector<std::wstring>& ToLoadA, const std::wstring& Filename, Player& PlayerInstance, std::vector<TrigerBoxInstance>& ToLoadTrigers) //pamiêtaj ¿e jak chcesz cokolwiek wczytac to musisz parametr przekazac by reference &
+void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, AnimationHolder& AnimHolder, std::vector<std::wstring>& ToLoadA, std::vector<bool>& IsAudioLooped, const std::wstring& Filename, Player& PlayerInstance, std::vector<TrigerBoxInstance>& ToLoadTrigers) //pamiêtaj ¿e jak chcesz cokolwiek wczytac to musisz parametr przekazac by reference &
 {
     PlayerInstance.CurrentPlayerTexture.Path.clear();
     ToLoadT.clear();
@@ -268,9 +276,9 @@ void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, AnimationHo
     file.open(Filename, std::ios::binary);
     if (file.is_open())
     {
+        
         try
         {
-
 
             file.read(reinterpret_cast<char*>(&PlayerInstance.PlayerRect), sizeof(D2D1_RECT_F));
             std::wstring::size_type sizepath;
@@ -302,9 +310,16 @@ void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, AnimationHo
                 file.read(reinterpret_cast<char*>(&TempTexture.Theight), sizeof(TempTexture.Theight));
                 file.read(reinterpret_cast<char*>(&TempTexture.Twidth), sizeof(TempTexture.Twidth));
             }
+        }
+        catch (...)
+        {
 
+        }
+            try
+            {
             std::wstring::size_type sizepathA;
             size_t Tabsize;
+            int Zapis=-1;
             file.read(reinterpret_cast<char*>(&Tabsize), sizeof(Tabsize));
             ToLoadA.resize(Tabsize);
             for (size_t i = 0; i < Tabsize; ++i)
@@ -313,6 +328,16 @@ void LevelInstance::LoadLevel(std::vector<TextureInstance>& ToLoadT, AnimationHo
                 file.read(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
                 ToLoadA[i].resize(sizepathA);
                 file.read(reinterpret_cast<char*>(&ToLoadA[i][0]), sizepathA * sizeof(wchar_t));//path to Audio instance
+                file.read(reinterpret_cast<char*>(&Zapis), sizeof(Zapis));
+                if (Zapis == 1)
+                {
+                    IsAudioLooped.push_back(true);
+                }
+                else if(Zapis==0)
+                {
+                    IsAudioLooped.push_back(false);
+                }
+               
             }
         }
         catch (...)

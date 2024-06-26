@@ -456,14 +456,6 @@ void Mainapp::HandleInput() noexcept
 		}
 		WND1.Klt.ClearState();
 	}
-	ISPressed(KEY_I)
-	{
-		if (AnimHolder.Animations.size() != 0) {
-			AnimationIndex++;
-			if (AnimationIndex >= AnimHolder.Animations.size())
-				AnimationIndex = 0; //Defaultuje do animacji skoku, animindex, jest ju¿ czêœci¹ programowania gry, dlatego jest on na blache
-		}
-	}
 	ISPressed(KEY_Y) //Dodanie TrigerBoxa
 	{
 		if(SelectionMode==MODE_TRIGERS)
@@ -525,6 +517,10 @@ void Mainapp::HandleInput() noexcept
 		AnimHolder.Animations[AnimationIndex].ScaleHeight = ScaleDirection * ScaleTheight;
 		AnimHolder.Animations[AnimationIndex].ScaleWidth = ScaleDirection * ScaleTwidth;
 	}
+	ISPressed(KEY_I)
+	{
+		AudioHolder[AudioCounter].Loop = !AudioHolder[AudioCounter].Loop;
+	}
 
 }
 //Funkcje Wczytuj¹ce/Zapisuj¹ce
@@ -552,7 +548,8 @@ void Mainapp::LoadFileTypeLevel()
 		TrigerBoxHolder.clear();
 		AudioCounter = -1;
 		TrigerBoxCounter=-1;
-		Currentlevel.LoadLevel(TextureHolder,AnimHolder, AudioPathHolder, selectedFilePath, CurrentPlayer,TrigerBoxHolder);
+		std::vector<bool> IsLoopedVector;
+		Currentlevel.LoadLevel(TextureHolder,AnimHolder, AudioPathHolder,IsLoopedVector, selectedFilePath, CurrentPlayer,TrigerBoxHolder);
 		//Animacje
 		for (auto& Files : AnimHolder.Animations)
 		{
@@ -585,16 +582,18 @@ void Mainapp::LoadFileTypeLevel()
 		//audio
 		AudioHolder.clear();
 
-
+		int i = 0;
 		for (auto& Path : AudioPathHolder)
 		{
 			if (!Path.empty())
 			{
-				Sound s(Path);
+				Sound s(Path);			
 				AudioHolder.push_back(s);
+				AudioHolder[i].Loop= IsLoopedVector[i];
 				//po tym jak wyjdziemy ze scopa to destruktor dla s automatycznie siê uruchamia, a audioholder przechowuje kopie
 
 			}
+			i++;
 
 		}
 		if(AudioHolder.size()!=0)
@@ -632,7 +631,10 @@ void Mainapp::SaveFileTypeLevel()
 			}
 		}
 	}
-	Currentlevel.SaveLevel(TextureHolder,AnimHolder,AudioPathHolder, selectedFilePath, CurrentPlayer,TrigerBoxHolder);
+	std::vector<bool> Loops;
+	for (int i = 0; i < AudioHolder.size(); i++)
+		Loops.push_back(AudioHolder[i].Loop);
+	Currentlevel.SaveLevel(TextureHolder,AnimHolder,AudioPathHolder,Loops, selectedFilePath, CurrentPlayer,TrigerBoxHolder);
 }
 void Mainapp::LoadFileTypeTexture()
 {

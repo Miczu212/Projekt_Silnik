@@ -8,10 +8,10 @@
 class LevelInstance
 {
 public:
-	void SaveLevel(const std::vector<TextureInstance>& ToSave, const AnimationHolder& AnimHolder, std::vector<std::wstring>& ToSaveA, const std::wstring& Filename, const Player PlayerInstance, std::vector<TrigerBoxInstance>& ToSaveTrigers) const;
+	void SaveLevel(const std::vector<TextureInstance>& ToSave, const AnimationHolder& AnimHolder, std::vector<std::wstring>& ToSaveA,std::vector<bool>& IsAudioLooped, const std::wstring& Filename, const Player PlayerInstance, std::vector<TrigerBoxInstance>& ToSaveTrigers) const;
 	std::wstring GetNameOfFile(const std::wstring& path) const;
 	void ReTargetLevel(const std::wstring& Filename);
-	void LoadLevel(std::vector<TextureInstance>& ToLoadT, AnimationHolder& AnimHolder, std::vector<std::wstring>& ToLoadA, const std::wstring& Filename, Player& PlayerInstance, std::vector<TrigerBoxInstance>& ToLoadTrigers);
+	void LoadLevel(std::vector<TextureInstance>& ToLoadT, AnimationHolder& AnimHolder, std::vector<std::wstring>& ToLoadA, std::vector<bool>& IsAudioLooped, const std::wstring& Filename, Player& PlayerInstance, std::vector<TrigerBoxInstance>& ToLoadTrigers);
 
 
 };
