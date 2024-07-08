@@ -98,68 +98,100 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
     std::ifstream fileL;
     AnimationHolder AnimHolder;
     std::vector<TrigerBoxInstance> ToLoadTriger;
+    std::vector<bool>IsAudioLooped;
     fileL.open(Filename, std::ios::binary);
     if (fileL.is_open())
     {
-        fileL.read(reinterpret_cast<char*>(&PlayerInstance.PlayerRect), sizeof(D2D1_RECT_F));
-        std::wstring::size_type sizepath;
-        fileL.read(reinterpret_cast<char*>(&sizepath), sizeof(sizepath));
-        PlayerInstance.CurrentPlayerTexture.Path.resize(sizepath);
-        fileL.read(reinterpret_cast<char*>(&PlayerInstance.CurrentPlayerTexture.Path[0]), sizepath * sizeof(wchar_t));
 
-        size_t TextureCount;
-        fileL.read(reinterpret_cast<char*>(&TextureCount), sizeof(TextureCount));
-
-        ToLoadT.resize(TextureCount);
-
-        for (size_t i = 0; i < TextureCount; ++i)
+        try
         {
-            TextureInstance& TempTexture = ToLoadT[i];
 
-            size_t destinationRectTabSize;
-            fileL.read(reinterpret_cast<char*>(&destinationRectTabSize), sizeof(destinationRectTabSize));
-            TempTexture.destinationRectTab.resize(destinationRectTabSize);
+            fileL.read(reinterpret_cast<char*>(&PlayerInstance.PlayerRect), sizeof(D2D1_RECT_F));
+            std::wstring::size_type sizepath;
+            fileL.read(reinterpret_cast<char*>(&sizepath), sizeof(sizepath));
+            PlayerInstance.CurrentPlayerTexture.Path.resize(sizepath);
+            fileL.read(reinterpret_cast<char*>(&PlayerInstance.CurrentPlayerTexture.Path[0]), sizepath * sizeof(wchar_t));
 
-            // Odczytaj ca³¹ tablicê destinationRectTab jako jeden blok danych
-            fileL.read(reinterpret_cast<char*>(TempTexture.destinationRectTab.data()), destinationRectTabSize * sizeof(D2D1_RECT_F));
+            size_t TextureCount;
+            fileL.read(reinterpret_cast<char*>(&TextureCount), sizeof(TextureCount));
 
-            std::wstring::size_type sizepath1;
-            fileL.read(reinterpret_cast<char*>(&sizepath1), sizeof(sizepath1));
-            TempTexture.Path.resize(sizepath1);
-            fileL.read(reinterpret_cast<char*>(&TempTexture.Path[0]), sizepath1 * sizeof(wchar_t));
-            fileL.read(reinterpret_cast<char*>(&TempTexture.IsCollisionOn), sizeof(TempTexture.IsCollisionOn));
-            fileL.read(reinterpret_cast<char*>(&TempTexture.Theight), sizeof(TempTexture.Theight));
-            fileL.read(reinterpret_cast<char*>(&TempTexture.Twidth), sizeof(TempTexture.Twidth));
+            ToLoadT.resize(TextureCount);
+
+            for (size_t i = 0; i < TextureCount; ++i)
+            {
+                TextureInstance& TempTexture = ToLoadT[i];
+
+                size_t destinationRectTabSize;
+                fileL.read(reinterpret_cast<char*>(&destinationRectTabSize), sizeof(destinationRectTabSize));
+                TempTexture.destinationRectTab.resize(destinationRectTabSize);
+
+                // Odczytaj ca³¹ tablicê destinationRectTab jako jeden blok danych
+                fileL.read(reinterpret_cast<char*>(TempTexture.destinationRectTab.data()), destinationRectTabSize * sizeof(D2D1_RECT_F));
+
+                std::wstring::size_type sizepath1;
+                fileL.read(reinterpret_cast<char*>(&sizepath1), sizeof(sizepath1));
+                TempTexture.Path.resize(sizepath1);
+                fileL.read(reinterpret_cast<char*>(&TempTexture.Path[0]), sizepath1 * sizeof(wchar_t));
+                fileL.read(reinterpret_cast<char*>(&TempTexture.IsCollisionOn), sizeof(TempTexture.IsCollisionOn));
+                fileL.read(reinterpret_cast<char*>(&TempTexture.Theight), sizeof(TempTexture.Theight));
+                fileL.read(reinterpret_cast<char*>(&TempTexture.Twidth), sizeof(TempTexture.Twidth));
+            }
         }
-
-        std::wstring::size_type sizepathA;
-        size_t Tabsize;
-        fileL.read(reinterpret_cast<char*>(&Tabsize), sizeof(Tabsize));
-        ToLoadA.resize(Tabsize);
-        for (size_t i = 0; i < Tabsize; ++i)
+        catch (...)
         {
 
-            fileL.read(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
-            ToLoadA[i].resize(sizepathA);
-            fileL.read(reinterpret_cast<char*>(&ToLoadA[i][0]), sizepathA * sizeof(wchar_t));//path to Audio instance
         }
-        std::wstring::size_type sizepathAnim;
-        size_t TabsizeAnim;
-        fileL.read(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
-        AnimHolder.Animations.resize(TabsizeAnim);
-        for (size_t i = 0; i < TabsizeAnim; ++i)
+        try
+        {
+            std::wstring::size_type sizepathA;
+            size_t Tabsize;
+            int Zapis = -1;
+            fileL.read(reinterpret_cast<char*>(&Tabsize), sizeof(Tabsize));
+            ToLoadA.resize(Tabsize);
+            for (size_t i = 0; i < Tabsize; ++i)
+            {
+
+                fileL.read(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
+                ToLoadA[i].resize(sizepathA);
+                fileL.read(reinterpret_cast<char*>(&ToLoadA[i][0]), sizepathA * sizeof(wchar_t));//path to Audio instance
+                fileL.read(reinterpret_cast<char*>(&Zapis), sizeof(Zapis));
+                if (Zapis == 1)
+                {
+                    IsAudioLooped.push_back(true);
+                }
+                else if (Zapis == 0)
+                {
+                    IsAudioLooped.push_back(false);
+                }
+
+            }
+        }
+        catch (...)
         {
 
-            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameAmmountX), sizeof(AnimHolder.Animations[i].FrameAmmountX));
-            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameAmmountY), sizeof(AnimHolder.Animations[i].FrameAmmountY));
-            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameSizeX), sizeof(AnimHolder.Animations[i].FrameSizeX));
-            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameSizeY), sizeof(AnimHolder.Animations[i].FrameSizeY));
-            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].ScaleHeight), sizeof(AnimHolder.Animations[i].ScaleHeight));
-            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].ScaleWidth), sizeof(AnimHolder.Animations[i].ScaleWidth));
+        }
+        try {
+            std::wstring::size_type sizepathAnim;
+            size_t TabsizeAnim;
+            fileL.read(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
+            AnimHolder.Animations.resize(TabsizeAnim);
+            for (size_t i = 0; i < TabsizeAnim; ++i) //TODO POPRAWIC WCZYTYWANIE ANIMACJI
+            {
+                fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameAmmountX), sizeof(AnimHolder.Animations[i].FrameAmmountX));
+                fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameAmmountY), sizeof(AnimHolder.Animations[i].FrameAmmountY));
+                fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameSizeX), sizeof(AnimHolder.Animations[i].FrameSizeX));
+                fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].FrameSizeY), sizeof(AnimHolder.Animations[i].FrameSizeY));
+                fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].ScaleHeight), sizeof(AnimHolder.Animations[i].ScaleHeight));
+                fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].ScaleWidth), sizeof(AnimHolder.Animations[i].ScaleWidth));
 
-            fileL.read(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
-            AnimHolder.Animations[i].SpreadSheetPath.resize(sizepathAnim);
-            fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].SpreadSheetPath[0]), sizepathAnim * sizeof(wchar_t));//path to Animation instance
+                fileL.read(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
+                AnimHolder.Animations[i].SpreadSheetPath.resize(sizepathAnim);
+                fileL.read(reinterpret_cast<char*>(&AnimHolder.Animations[i].SpreadSheetPath[0]), sizepathAnim * sizeof(wchar_t));//path to Animation instance
+            }
+        }
+        catch (...)
+        {
+
         }
         try
         {
@@ -233,16 +265,25 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
         std::wstring::size_type sizepathA;
         size_t Tabsize = ToLoadA.size();
         fileS.write(reinterpret_cast<char*>(&Tabsize), sizeof(Tabsize));
-        for (const auto& Path : ToLoadA)
+        int True = 1, False = 0;
+        for (int i = 0; i < ToLoadA.size(); i++)
         {
-            sizepathA = Path.size();
+            sizepathA = ToLoadA[i].size();
             fileS.write(reinterpret_cast<char*>(&sizepathA), sizeof(sizepathA));
-            fileS.write(reinterpret_cast<const char*>(Path.c_str()), sizepathA * sizeof(wchar_t)); //path to Audio instance
+            fileS.write(reinterpret_cast<const char*>(ToLoadA[i].c_str()), sizepathA * sizeof(wchar_t)); //path to Audio instance
+            if (IsAudioLooped[i])
+            {
+                fileS.write(reinterpret_cast <const char*>(&True), sizeof(True));
+            }
+            else
+            {
+                fileS.write(reinterpret_cast <const char*>(&False), sizeof(False));
+            }
         }
         std::wstring::size_type sizepathAnim;
         size_t TabsizeAnim = AnimHolder.Animations.size();
         fileS.write(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
-        for (const auto& Files : AnimHolder.Animations)
+        for (const auto& Files : AnimHolder.Animations) //TODO DODAC SKALOWANIE
         {
             fileS.write(reinterpret_cast<const char*>(&Files.FrameAmmountX), sizeof(Files.FrameAmmountX));
             fileS.write(reinterpret_cast<const char*>(&Files.FrameAmmountY), sizeof(Files.FrameAmmountY));
@@ -250,11 +291,11 @@ void LevelInstance::ReTargetLevel(const std::wstring& Filename)
             fileS.write(reinterpret_cast<const char*>(&Files.FrameSizeY), sizeof(Files.FrameSizeY));
             fileS.write(reinterpret_cast<const char*>(&Files.ScaleHeight), sizeof(Files.ScaleHeight));
             fileS.write(reinterpret_cast<const char*>(&Files.ScaleWidth), sizeof(Files.ScaleWidth));
-
             sizepathAnim = Files.SpreadSheetPath.size();
             fileS.write(reinterpret_cast<char*>(&sizepathAnim), sizeof(sizepathAnim));
             fileS.write(reinterpret_cast<const char*>(Files.SpreadSheetPath.c_str()), sizepathAnim * sizeof(wchar_t)); //path to Animation instance
         }
+
         size_t TrigerCount = ToLoadTriger.size();
         fileS.write(reinterpret_cast<char*>(&TrigerCount), sizeof(TrigerCount));
         for (const auto& Boxes : ToLoadTriger)

@@ -435,7 +435,7 @@ void Mainapp::HandleInput() noexcept
 		RepeatIfPossible = !RepeatIfPossible;
 		WND1.Klt.ClearState();
 	}
-	ISPressed(KEY_SHIFT)
+	ISPressed(KEY_SHIFT) 
 	{
 		if (SelectionMode == MODE_SELECT)
 		{
