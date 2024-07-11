@@ -24,7 +24,7 @@ public:
 		HRESULT hr;
 
 	};
-	WND(int Width, int Height, const char* nazwa);
+	WND(const char* nazwa);
 	~WND();	
 	GFX& ReturnGFX();
 private:
@@ -32,14 +32,14 @@ private:
 	static LRESULT CALLBACK WindowprocSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept;
 	LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam) noexcept ;	//handle do okna, unsinged int, liczby,liczby //mesage handling
 private:
-	int Width;
-	int	Height;
 	HWND hwnd;
 	const char* wName = "WND1"; //to nie jest nazwa pokazywana na gorze tylko nazwa okna 
 	HINSTANCE hInstance; //handle do instancji okna 
 	std::unique_ptr<GFX> pGFX;
 	bool fullscreen=true;
 public:
+	int Width;
+	int	Height;
 	void Merge();
 	HWND GetHandle() const;
 	Myszka Mk;

@@ -5,13 +5,15 @@
 
 Mainapp::Mainapp()
 	:
-	WND1(ScreenWidth, ScreenHeight, "testing") // ustawianie parametrów okna
+	WND1("testing") // ustawianie parametrów okna
 {
 
 	font.InitializeFont(WND1.ReturnGFX().ReturnRenderTarget(), font.pSubregions);
 	WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::DeepSkyBlue),
 		&BackgroundColour);
+	ScreenHeight = WND1.Height;
+	ScreenWidth = WND1.Width;
 
 }
 
@@ -263,24 +265,26 @@ void Mainapp::HandleInput() noexcept
 	}
 	ISPressed(KEY_UP)
 	{
-		if (!IsJumping) {
-			if (!IsGravityTurnedOn)
-			{
-				CameraYPosition = MOVMENT_SPEED;
-				CameraYState = true;
-			}
-			GravityChanged = false;
-			IsJumping = true;
-			AnimationIndex = 0;
-			if (AnimationRollback == LEFT)
-				AnimationIndex = 3;
-			StartJumpAnimation = true;  // na blache poniewaz ustalam jaka animacja z animation spreadsheeta sie uruchomi
-			try { 
-				AudioHolder[1].Play(1.0f, 1.0f); 
-			}
-			catch (...)
-			{
+		if (!HadEnoughOfJumping) {
+			if (!IsJumping) {
+				if (!IsGravityTurnedOn)
+				{
+					CameraYPosition = MOVMENT_SPEED;
+					CameraYState = true;
+				}
+				GravityChanged = false;
+				IsJumping = true;
+				AnimationIndex = 0;
+				if (AnimationRollback == LEFT)
+					AnimationIndex = 3;
+				StartJumpAnimation = true;  // na blache poniewaz ustalam jaka animacja z animation spreadsheeta sie uruchomi
+				try {
+					AudioHolder[1].Play(1.0f, 1.0f);
+				}
+				catch (...)
+				{
 
+				}
 			}
 		}
 			
@@ -685,6 +689,7 @@ void Mainapp::DoLogic()
 {
 	if (timer.Peek() >= 1.0f / 120.0f) //logika bêdzie sprawdzana co 1.0f/30.0f sekundy a nie co klatke, przez co dla wszystkich frameratów gra bedzie podobnie p³ynna
 	{
+
 		GravityChanged = IsGravityTurnedOn; //musi byc przed HandleInputem w celu mozliwosci zmiany tego stanu
 		timer.Mark();
 		if (AnimHolder.Animations.size() != 0) //reset animacji
@@ -693,6 +698,20 @@ void Mainapp::DoLogic()
 			StartWalkRightAnimation = false;
 		}
 		HandleInput();
+
+		UpdateCameraPosition();
+		if (IsJumping)
+			Jump();
+		else
+		{
+			UpdateGravityAbsolute(); // updatuje grawitacje gdy po prostu schodzimy z bloku
+		}
+		 if(HadEnoughOfJumping){
+			if (GravityChanged)
+				UpdateGravity();
+
+		}
+
 	}
 }
 void Mainapp::PlayAnimation()
@@ -735,6 +754,7 @@ void Mainapp::PlayPlayerAnimation(int StartFrame, int EndFrame) //¿eby wszystko 
 		CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][AnimHolder.Animations[AnimationIndex].CurrentFrame];
 		CurrentPlayer.CurrentPlayerTexture.Twidth += AnimHolder.Animations[AnimationIndex].ScaleWidth;
 		CurrentPlayer.CurrentPlayerTexture.Theight += AnimHolder.Animations[AnimationIndex].ScaleHeight;
+		
 		CurrentPlayer.PlayerRect = D2D1::RectF(
 			ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
 			ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
@@ -1002,14 +1022,9 @@ void Mainapp::DoDrawing()
 	}
 	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
 	{
-
-
-
-			if (IsJumping)			
-				Jump();
-			if (GravityChanged)
-				UpdateGravity();
-		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(CurrentPlayer.CurrentPlayerTexture.pBitmap.Get(), CurrentPlayer.PlayerRect);
+		
+				WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(CurrentPlayer.CurrentPlayerTexture.pBitmap.Get(), CurrentPlayer.PlayerRect);
+			
 
 
 	}
@@ -1018,7 +1033,7 @@ void Mainapp::DoDrawing()
 		
 		
 		
-		UpdateCameraPosition();
+		
 		for (auto& texture : TextureHolder)
 		{
 			if (texture.pBitmap)
@@ -1049,6 +1064,51 @@ void Mainapp::DoFrame() {
 	DoDrawing();
 
 
+}
+void Mainapp::UpdateGravityAbsolute()
+{
+	std::vector<TextureInstance> Rollback = TextureHolder;
+	bool Gravitas = true;
+	for (auto& texture : TextureHolder)
+	{
+		for (auto& rect : texture.destinationRectTab)
+		{
+			if (texture.IsCollisionOn) {
+				D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left + 33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 33, CurrentPlayer.PlayerRect.bottom);
+				if (IFColisionWithSides(TempRect, rect) == TOP)
+				{
+					TextureHolder = Rollback;
+					Gravitas = false;
+					break;
+				}
+			}
+		}
+
+	}
+	if (Gravitas) {
+		for (auto& texture : TextureHolder)
+		{
+			Rollback = TextureHolder;
+				for (auto& rect : texture.destinationRectTab)
+				{
+					rect.top -= GravitySpeed;
+					rect.bottom -= GravitySpeed;
+					if (texture.IsCollisionOn) {
+						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left + 33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 33, CurrentPlayer.PlayerRect.bottom);
+						if (IFColision(TempRect, rect)) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
+						{
+							CurrentJumpHeight = 0;
+							IsJumping = false;
+							HadEnoughOfJumping = false;
+							TextureHolder = Rollback;
+							break;
+						}
+					}
+				}
+			
+		}
+
+	}
 }
 void Mainapp::UpdateGravity()
 {
@@ -1085,6 +1145,7 @@ void Mainapp::UpdateGravity()
 						{
 							CurrentJumpHeight = 0;
 							IsJumping = false;
+							HadEnoughOfJumping = false;
 							TextureHolder = Rollback;
 							go = false;
 							break;
@@ -1113,6 +1174,10 @@ void Mainapp::Jump()
 
 		}
 		CurrentJumpHeight += 10;
+	}
+	else
+	{
+		HadEnoughOfJumping = true;
 	}
 }
 bool Mainapp::IFColision(const D2D1_RECT_F& rect1, const D2D1_RECT_F& rect2) const noexcept //jezeli prostok¹ty siê pokryj¹ zwracana jest odpowiednia wartosc
@@ -1169,15 +1234,17 @@ void Mainapp::UpdateCameraPosition()
 					}
 
 				}
-				if (CameraYState) {
-					texture.destinationRectTab[i].top += CameraYPosition;
-					texture.destinationRectTab[i].bottom += CameraYPosition;
-					if (texture.IsCollisionOn) {
-						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left+33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right-33, CurrentPlayer.PlayerRect.bottom);
-						if (IFColision(TempRect, texture.destinationRectTab[i]))
-						{
-							Collision = true;
-							break;
+				if (!IsJumping) {
+					if (CameraYState) {
+						texture.destinationRectTab[i].top += CameraYPosition;
+						texture.destinationRectTab[i].bottom += CameraYPosition;
+						if (texture.IsCollisionOn) {
+							D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left + 33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 33, CurrentPlayer.PlayerRect.bottom);
+							if (IFColision(TempRect, texture.destinationRectTab[i]))
+							{
+								Collision = true;
+								break;
+							}
 						}
 					}
 				}
@@ -1446,5 +1513,7 @@ void Mainapp::Write(std::string Text,int StartPositionX, int StartPositionY)
 	}
 	
 }
+
+
 
 

@@ -1,9 +1,7 @@
 #include "WND.h"
-WND::WND(int Width, int Height, const char* nazwa) //definicja konstruktora
+WND::WND(const char* nazwa) //definicja konstruktora
 {
 	this->hInstance = GetModuleHandleA(nullptr);
-	this->Width = Width;
-	this->Height = Height;
 
 	WNDCLASS winclass = {}; //potrzebne by zarejestrowac WND
 		winclass.lpfnWndProc = WindowprocSetup; //wskazniki
@@ -11,18 +9,14 @@ WND::WND(int Width, int Height, const char* nazwa) //definicja konstruktora
 		winclass.lpszClassName = wName;//zrozumiale przez sie
 	
 	RegisterClassA(&winclass); 
-	int TempWidth;
-	int	TempHeight;
-	if (fullscreen)
-	{
-		TempWidth= GetSystemMetrics(SM_CXSCREEN);
-		TempHeight=GetSystemMetrics(SM_CYSCREEN);
-	}
+		Width= GetSystemMetrics(SM_CXSCREEN);
+		Height=GetSystemMetrics(SM_CYSCREEN);
+	
 	RECT winRect; //polozenie okna
 		winRect.left = 100;
-		winRect.right = TempWidth + winRect.left;
+		winRect.right = Width + winRect.left;
 		winRect.top = 100;
-		winRect.bottom = TempHeight + winRect.top;
+		winRect.bottom = Height + winRect.top;
 		
 		if (		//error handling
 			AdjustWindowRect(&winRect, WS_POPUP, FALSE)==0) //cos jak rejestracja winclass tylko dla recta //
@@ -170,20 +164,17 @@ GFX& WND::ReturnGFX()
 
  void WND::ResizeWindow()
  {
-	 int TempWidth;
-	 int TempHeight;
 	 fullscreen = !fullscreen;
 	 RECT winRect; // po³o¿enie okna
 	 
 	 if (fullscreen)
 	 {
-		 
-		 TempWidth = GetSystemMetrics(SM_CXSCREEN);
-		 TempHeight = GetSystemMetrics(SM_CYSCREEN);
+		 Width = GetSystemMetrics(SM_CXSCREEN);
+		 Height = GetSystemMetrics(SM_CYSCREEN);
 		 winRect.left = 0;
-		 winRect.right = TempWidth;
+		 winRect.right = Width;
 		 winRect.top = 0;
-		 winRect.bottom = TempHeight;
+		 winRect.bottom = Height;
 
 		 // Ustawienie stylu na pe³noekranowy
 		 DWORD style = GetWindowLong(hwnd, GWL_STYLE);
@@ -195,8 +186,8 @@ GFX& WND::ReturnGFX()
 		 SetWindowPos(hwnd, HWND_TOPMOST, winRect.left, winRect.top,
 			 winRect.right - winRect.left, winRect.bottom - winRect.top,
 			 SWP_FRAMECHANGED | SWP_SHOWWINDOW);
-		 pGFX->ScreenHeight = TempHeight;
-		 pGFX->ScreenWidth = TempWidth;
+		 pGFX->ScreenHeight = Height;
+		 pGFX->ScreenWidth = Width;
 	 }
 	 else
 	 {

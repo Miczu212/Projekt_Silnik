@@ -43,14 +43,15 @@ private:
 	bool IsJumping = false;
 	bool AddTrigerbox = false;
 	bool FinalizeTrigerbox = false;
+	bool HadEnoughOfJumping = false;
 private:
 	bool StartJumpAnimation = false;
 	bool StartWalkLeftAnimation = false;
 	bool StartWalkRightAnimation = false;
 private: //Wartoœci int
-	const int ScreenWidth = 1680;
-	const int ScreenHeight = 820;
-	int GravitySpeed = 5;
+	int ScreenWidth;
+	int ScreenHeight;
+	int GravitySpeed = 10;
 	int CameraXPosition = 0;
 	int CameraYPosition = 0;
 	int CurrentCameraSpeed = 0;
@@ -114,6 +115,7 @@ public: //Inicjalizacja textury wczytanej do postaci czytelnej przez program
 public: //Metody zmieniaj¹ce postaæ ekranu
 	void Jump();
 	void UpdateGravity();
+	void UpdateGravityAbsolute();
 	void UpdateCameraPosition();
 	void Write(std::string Text, int StartPositionX, int StartPositionY);
 public: //Metody Kolizyjne
