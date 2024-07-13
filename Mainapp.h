@@ -55,10 +55,11 @@ private: //Wartoœci int
 	int CameraXPosition = 0;
 	int CameraYPosition = 0;
 	int CurrentCameraSpeed = 0;
-	int MaxCameraSpeed = 20;
+	int MaxCameraSpeed = 50;
 	int ScaleDirection = 1;
 	int CurrentJumpHeight = 0;
-	int MaxJumpHeight = 600;
+	int MaxJumpHeight = 300;
+	#define MOVMENT_SPEED 10 //tutaj poniewa¿ dotyczy ruchu 
 private: // Flagi int
 	int AnimationIndex = -1;
 	int TextureCounter = -1;
