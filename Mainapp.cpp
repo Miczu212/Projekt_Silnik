@@ -1161,6 +1161,7 @@ void Mainapp::Jump()
 {
 	if (CurrentJumpHeight <= MaxJumpHeight) 
 	{
+		int i = 0;
 		for (auto& texture : TextureHolder)
 		{
 
@@ -1169,6 +1170,23 @@ void Mainapp::Jump()
 				
 				rect.top += 10;
 				rect.bottom += 10;
+				i++;
+				if (IFColision(rect, CurrentPlayer.PlayerRect)) {
+					int j = 0;
+					for (auto& rect : texture.destinationRectTab)
+					{
+						
+						rect.top -= 10;
+						rect.bottom -= 10;
+						j++;
+						if (j == i)
+						{
+							CurrentJumpHeight = MaxJumpHeight + 1;
+							break;
+						}
+
+					}
+				}
 
 			}
 
