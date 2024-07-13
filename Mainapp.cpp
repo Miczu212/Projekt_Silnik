@@ -572,22 +572,16 @@ void Mainapp::LoadFileTypeLevel()
 		{
 			Files.InitializeAnimation(AnimHolder, WND1.ReturnGFX().ReturnRenderTarget(), Files.SpreadSheetPath); AnimationIndex++;
 		}
-		if (!std::filesystem::exists(CurrentPlayer.CurrentPlayerTexture.Path)) {
+		//if (!std::filesystem::exists(CurrentPlayer.CurrentPlayerTexture.Path)) { Zakomentowane z powodu w jaki teraz wczytuje texture, inaczej wczytywa³o by coœ innego
 			if (AnimHolder.AnimationFrames.size() != 0)
 				if (AnimHolder.AnimationFrames[0].size() != 0)
 					CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[0][0];
-		}
-		else
-		{
-			LoadBMPToTexture(CurrentPlayer.CurrentPlayerTexture.Path, WND1.ReturnGFX().ReturnRenderTarget(), CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf());
-		}
+		//}
+		//else
+		//{
+		//	LoadBMPToTexture(CurrentPlayer.CurrentPlayerTexture.Path, WND1.ReturnGFX().ReturnRenderTarget(), CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf());
+		//}
 
-		//textury
-		/*LoadBMPToTexture(
-			CurrentPlayer.CurrentPlayerTexture.Path,
-			WND1.ReturnGFX().ReturnRenderTarget(),
-			CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf()
-		);*/
 		size_t size = TextureHolder.size();
 		int i = 0;
 		for (TextureCounter = 0; i < size;  TextureCounter++)
@@ -742,6 +736,7 @@ void Mainapp::PlayPlayerAnimation(int StartFrame, int EndFrame) //¿eby wszystko 
 {		
 	//, jak zbierze siê ich na tyle ¿e by³o by ich za du¿o to zmienimy to na inta wybieraj¹cego i tutaj tylko bedzie go zmieniac na -1
 	try {
+
 		if (AnimHolder.Animations[AnimationIndex].CurrentFrame > EndFrame || AnimHolder.Animations[AnimationIndex].CurrentFrame < StartFrame)
 			AnimHolder.Animations[AnimationIndex].CurrentFrame = StartFrame;
 		if (AnimHolder.Animations[AnimationIndex].AnimationTimer.Peek() >= 1.0f / 10.0f)
