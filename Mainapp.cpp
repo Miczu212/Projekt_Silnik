@@ -304,6 +304,8 @@ void Mainapp::HandleInput() noexcept
 			);
 			//zrobione tak by postac byla zawsze na srodku ekranu
 		}
+		CollisionRect = D2D1::RectF(CurrentPlayer.PlayerRect.left + 33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 33, CurrentPlayer.PlayerRect.bottom); //sprawdzanie kolizji nie jest prowadzone na player rectie w celu mozliwosci jej korekcji
+
 	}
 	//Wczytanie dzwiekow
 	ISPressed(KEY_O)
@@ -617,7 +619,8 @@ void Mainapp::LoadFileTypeLevel()
 		if (AnimHolder.AnimationFrames.size() != 0)
 			AnimationIndex = 0;
 		//animacje
-		
+		if(CurrentPlayer.CurrentPlayerTexture.pBitmap)
+			CollisionRect = D2D1::RectF(CurrentPlayer.PlayerRect.left + 33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 33, CurrentPlayer.PlayerRect.bottom); //sprawdzanie kolizji nie jest prowadzone na player rectie w celu mozliwosci jej korekcji
 		
 	}
 }
@@ -698,7 +701,7 @@ void Mainapp::DoLogic()
 			StartWalkRightAnimation = false;
 		}
 		HandleInput();
-
+		Rollback = TextureHolder;
 		UpdateCameraPosition();
 		if (IsJumping)
 			Jump();
@@ -1067,15 +1070,14 @@ void Mainapp::DoFrame() {
 }
 void Mainapp::UpdateGravityAbsolute()
 {
-	std::vector<TextureInstance> Rollback = TextureHolder;
+	
 	bool Gravitas = true;
 	for (auto& texture : TextureHolder)
 	{
 		for (auto& rect : texture.destinationRectTab)
 		{
 			if (texture.IsCollisionOn) {
-				D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left + 33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 33, CurrentPlayer.PlayerRect.bottom);
-				if (IFColisionWithSides(TempRect, rect) == TOP)
+				if (IFColisionWithSides(CollisionRect, rect) == TOP)
 				{
 					TextureHolder = Rollback;
 					Gravitas = false;
@@ -1094,8 +1096,7 @@ void Mainapp::UpdateGravityAbsolute()
 					rect.top -= GravitySpeed;
 					rect.bottom -= GravitySpeed;
 					if (texture.IsCollisionOn) {
-						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left + 33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 33, CurrentPlayer.PlayerRect.bottom);
-						if (IFColision(TempRect, rect)) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
+						if (IFColision(CollisionRect, rect)) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
 						{
 							CurrentJumpHeight = 0;
 							IsJumping = false;
@@ -1112,15 +1113,14 @@ void Mainapp::UpdateGravityAbsolute()
 }
 void Mainapp::UpdateGravity()
 {
-	std::vector<TextureInstance> Rollback = TextureHolder;
+	
 
 	for (auto& texture : TextureHolder)
 	{
 		for (auto& rect : texture.destinationRectTab)
 		{
 			if (texture.IsCollisionOn) {
-				D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left+33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right-33, CurrentPlayer.PlayerRect.bottom);
-				if (IFColisionWithSides(TempRect, rect) == TOP)
+				if (IFColisionWithSides(CollisionRect, rect) == TOP)
 				{
 					TextureHolder = Rollback;
 					GravityChanged = false;
@@ -1140,8 +1140,7 @@ void Mainapp::UpdateGravity()
 					rect.top -= GravitySpeed;
 					rect.bottom -= GravitySpeed;
 					if (texture.IsCollisionOn) {
-						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left+33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right-33, CurrentPlayer.PlayerRect.bottom);
-						if (IFColision(TempRect, rect)) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
+						if (IFColision(CollisionRect, rect)) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
 						{
 							CurrentJumpHeight = 0;
 							IsJumping = false;
@@ -1161,7 +1160,6 @@ void Mainapp::Jump()
 {
 	if (CurrentJumpHeight <= MaxJumpHeight) 
 	{
-		int i = 0;
 		for (auto& texture : TextureHolder)
 		{
 
@@ -1170,22 +1168,11 @@ void Mainapp::Jump()
 				
 				rect.top += 10;
 				rect.bottom += 10;
-				i++;
-				if (IFColision(rect, CurrentPlayer.PlayerRect)) {
-					int j = 0;
-					for (auto& rect : texture.destinationRectTab)
-					{
-						
-						rect.top -= 10;
-						rect.bottom -= 10;
-						j++;
-						if (j == i)
-						{
-							CurrentJumpHeight = MaxJumpHeight + 1;
-							break;
-						}
-
-					}
+				if (IFColision(rect, CollisionRect))
+				{
+					CurrentJumpHeight = MaxJumpHeight;
+					TextureHolder = Rollback;
+					break;
 				}
 
 			}
@@ -1233,7 +1220,7 @@ int Mainapp::IFColisionWithSides(const D2D1_RECT_F& rect1, const D2D1_RECT_F& re
 void Mainapp::UpdateCameraPosition()
 {
 	if(CurrentCameraSpeed<=MaxCameraSpeed){
-		std::vector<TextureInstance> Rollback = TextureHolder;
+		
 		for (auto& texture : TextureHolder)
 		{
 			for (int i = 0; i < texture.destinationRectTab.size(); i++)
@@ -1243,8 +1230,7 @@ void Mainapp::UpdateCameraPosition()
 					texture.destinationRectTab[i].left += CameraXPosition;
 					texture.destinationRectTab[i].right += CameraXPosition;
 					if (texture.IsCollisionOn) { // dodane z powodu du¿ej pustej przestrzeni w player rectie, po prostu zmienilem kolizje by sie zgadzala z faktycznym stanem rzeczy
-						D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left+33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right-33, CurrentPlayer.PlayerRect.bottom);
-						if (IFColision(TempRect, texture.destinationRectTab[i]))
+						if (IFColision(CollisionRect, texture.destinationRectTab[i]))
 						{
 							Collision = true;
 							break;
@@ -1257,8 +1243,7 @@ void Mainapp::UpdateCameraPosition()
 						texture.destinationRectTab[i].top += CameraYPosition;
 						texture.destinationRectTab[i].bottom += CameraYPosition;
 						if (texture.IsCollisionOn) {
-							D2D1_RECT_F TempRect = D2D1::RectF(CurrentPlayer.PlayerRect.left + 33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 33, CurrentPlayer.PlayerRect.bottom);
-							if (IFColision(TempRect, texture.destinationRectTab[i]))
+							if (IFColision(CollisionRect, texture.destinationRectTab[i]))
 							{
 								Collision = true;
 								break;

@@ -29,6 +29,7 @@ private: //Tablice
 	std::vector<TextureInstance> TextureHolder;
 	std::vector<Sound> AudioHolder;
 	std::vector<std::wstring> AudioPathHolder;
+	std::vector<TextureInstance> Rollback;
 private:
 	//Flagi bool
 	bool LoadAnimation = false;
@@ -87,6 +88,7 @@ private: //Ró¿ne
 	Player CurrentPlayer;
 	ID2D1SolidColorBrush* BackgroundColour = nullptr;
 	Animation TempAnim;
+	D2D1_RECT_F CollisionRect;
 	int AnimTempCounter = 0;
 	std::ostringstream oss;
 public: // Wszystko co ma model Singelton (¿e ma byæ tylko jedno)
