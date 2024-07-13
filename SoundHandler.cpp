@@ -18,10 +18,8 @@ SoundHandler::SoundHandler()
 	format.cbSize = 0;
 	XAudio2Create(&pEngine);
 	pEngine->CreateMasteringVoice(&pMaster);
-	for (int i = 0; i <= nChannels; i++)
-	{
+	for (int i = 0; i < nChannels; i++)
 		idleChannelPtrs.push_back(std::make_unique<Channel>(*this));
-	}
 
 }
 
@@ -29,19 +27,34 @@ void SoundHandler::Channel::VoiceCallback::OnBufferEnd(void* pBufferContext)
 {
 	
 	Channel& chan = *(Channel*)pBufferContext;
-	if (!chan.pSound->Loop) {
+	if (!chan.pSound->Loop) 
+	{
+		SoundHandler& soundhandler = SoundHandler::Get();
 		chan.Stop();
 		chan.pSound->RemoveChannel(chan);
 		chan.pSound = nullptr;
-		SoundHandler::Get().DeactivateChannel(chan);
-		SoundHandler& soundhandler = SoundHandler::Get();
-		if (soundhandler.idleChannelPtrs.size() >= soundhandler.nChannels)
+		soundhandler.DeactivateChannel(chan);
+		if (soundhandler.idleChannelPtrs.size() > soundhandler.nChannels)
 			soundhandler.idleChannelPtrs.pop_back();
+		
 	}
-	else {
+	else if(chan.pSound->ForcefulStop)
+	{
+		SoundHandler& soundhandler = SoundHandler::Get();
+		if (chan.pSound->activeChannelPtrs.size() == 0)
+			chan.pSound->ForcefulStop = false;
+		chan.pSound->RemoveChannel(chan);
+		chan.pSound = nullptr;
+		soundhandler.DeactivateChannel(chan);
+
+		if (soundhandler.idleChannelPtrs.size() > soundhandler.nChannels)
+			soundhandler.idleChannelPtrs.pop_back();
+		
+	}
+	else
+	{
 		// Ponownie odtwórz dŸwiêk
 		chan.PlaySoundBuffer(*chan.pSound, 1.0f, 1.0f); // Przyk³adowe parametry freqMod i vol
-
 	}
 }
 
@@ -65,6 +78,11 @@ void SoundHandler::Channel::PlaySoundBuffer(Sound& s, float freqMod, float vol)
 	else if(s.Loop==true && s.Started==true)
 	{
 		SoundHandler& soundhandler = SoundHandler::Get();
+		if (soundhandler.idleChannelPtrs.size() == 0)
+			soundhandler.idleChannelPtrs.push_back(std::make_unique<Channel>(soundhandler));
+		assert(pSource && !pSound);
+		s.AddChannel(*this);
+		pSound = &s;
 		xaBuffer.pAudioData = s.pData.get();
 		xaBuffer.AudioBytes = s.nBytes;
 		pSource->SubmitSourceBuffer(&xaBuffer, nullptr);

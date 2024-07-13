@@ -367,8 +367,10 @@ void Mainapp::HandleInput() noexcept
 	ISPressed(KEY_8)
 	{
 		if (AudioCounter != -1)
-		AudioHolder[AudioCounter].Stop();
-		WND1.Klt.ClearState();
+		{
+			AudioHolder[AudioCounter].Stop();
+			WND1.Klt.ClearState();
+		}
 	}
 	//Prze³¹czenie Kolizji Dla Wybranej Textury
 	ISPressed(KEY_Q)

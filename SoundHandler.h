@@ -76,6 +76,7 @@ public:
 			assert(pSource && pSound);
 			pSource->Stop();
 			pSource->FlushSourceBuffers();
+
 		}
 	private:
 		XAUDIO2_BUFFER xaBuffer;
@@ -126,8 +127,10 @@ private:
 class Sound
 {
 	friend SoundHandler::Channel;
+
 public:
 	bool Loop = false;
+	bool ForcefulStop = false;
 	Sound(const Sound& other) //Copy Konstruktor Dla Klasy DŸwiêku
 		: nBytes(other.nBytes), pData(new BYTE[other.nBytes]), activeChannelPtrs(other.activeChannelPtrs),Loop(other.Loop) {
 		// Kopiowanie danych z innego obiektu do obecnego obiektu
@@ -139,7 +142,9 @@ public:
 		std::lock_guard<std::mutex> lock(mutex);
 		for (auto pChannel : activeChannelPtrs)
 		{
+			ForcefulStop = true;
 			pChannel->Stop();
+			
 		}
 	}
 
