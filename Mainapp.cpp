@@ -572,23 +572,32 @@ void Mainapp::LoadFileTypeLevel()
 		{
 			Files.InitializeAnimation(AnimHolder, WND1.ReturnGFX().ReturnRenderTarget(), Files.SpreadSheetPath); AnimationIndex++;
 		}
-		try { CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[0][0]; }
-		catch (...)
-		{
-
+		if (!std::filesystem::exists(CurrentPlayer.CurrentPlayerTexture.Path)) {
+			if (AnimHolder.AnimationFrames.size() != 0)
+				if (AnimHolder.AnimationFrames[0].size() != 0)
+					CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[0][0];
 		}
+		else
+		{
+			LoadBMPToTexture(CurrentPlayer.CurrentPlayerTexture.Path, WND1.ReturnGFX().ReturnRenderTarget(), CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf());
+		}
+
 		//textury
 		/*LoadBMPToTexture(
 			CurrentPlayer.CurrentPlayerTexture.Path,
 			WND1.ReturnGFX().ReturnRenderTarget(),
 			CurrentPlayer.CurrentPlayerTexture.pBitmap.GetAddressOf()
 		);*/
-		for (TextureCounter = 0; TextureCounter < TextureHolder.size(); TextureCounter++)
+		size_t size = TextureHolder.size();
+		int i = 0;
+		for (TextureCounter = 0; i < size;  TextureCounter++)
 		{
-			LoadBMPToTexture(TextureHolder[TextureCounter].Path,
-				WND1.ReturnGFX().ReturnRenderTarget(),
-				TextureHolder[TextureCounter].pBitmap.GetAddressOf());
-
+			if (!LoadBMPToTexture(TextureHolder[TextureCounter].Path, WND1.ReturnGFX().ReturnRenderTarget(), TextureHolder[TextureCounter].pBitmap.GetAddressOf()))
+			{
+				TextureHolder.erase(TextureHolder.begin());
+				TextureCounter--;
+			}
+			i++;
 		}
 		if (TextureHolder.size() == 0)
 			TextureCounter = -1;
@@ -599,10 +608,10 @@ void Mainapp::LoadFileTypeLevel()
 		//audio
 		AudioHolder.clear();
 
-		int i = 0;
+		i = 0;
 		for (auto& Path : AudioPathHolder)
 		{
-			if (!Path.empty())
+			if (std::filesystem::exists(Path))
 			{
 				Sound s(Path);			
 				AudioHolder.push_back(s);
@@ -1370,7 +1379,7 @@ std::wstring Mainapp::OpenFileDialog(LPCWSTR Filetype, LPCWSTR FileExtension)
 	return selectedFilePath;
 }
 
-void Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, ID2D1Bitmap** ppBitmap)
+bool Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, ID2D1Bitmap** ppBitmap)
 {
 	Microsoft::WRL::ComPtr<IWICImagingFactory> pWICFactory;
 	Microsoft::WRL::ComPtr<IWICBitmapDecoder> pDecoder;
@@ -1425,6 +1434,7 @@ void Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::Com
 									&bitmapProperties,
 									ppBitmap
 								);
+								return true;
 							}
 						}
 					}
@@ -1432,9 +1442,10 @@ void Mainapp::LoadBMPToTexture(const std::wstring& filePath, Microsoft::WRL::Com
 			}
 		}
 	}
+	return false;
 }
 
-void Mainapp::LoadBMPSubregionToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, const D2D1_RECT_F& sourceRegion, std::vector< Microsoft::WRL::ComPtr<ID2D1Bitmap>>& ppBitmap) const
+bool Mainapp::LoadBMPSubregionToTexture(const std::wstring& filePath, Microsoft::WRL::ComPtr<ID2D1HwndRenderTarget> pRenderTarget, const D2D1_RECT_F& sourceRegion, std::vector< Microsoft::WRL::ComPtr<ID2D1Bitmap>>& ppBitmap) const
 {
 	Microsoft::WRL::ComPtr<IWICImagingFactory> pWICFactory;
 	Microsoft::WRL::ComPtr<IWICBitmapDecoder> pDecoder;
@@ -1496,6 +1507,7 @@ void Mainapp::LoadBMPSubregionToTexture(const std::wstring& filePath, Microsoft:
 									pBitmap.GetAddressOf()
 								);
 								ppBitmap.push_back(pBitmap);
+								return true;
 
 							}
 						}
@@ -1504,6 +1516,7 @@ void Mainapp::LoadBMPSubregionToTexture(const std::wstring& filePath, Microsoft:
 			}
 		}
 	}
+	return false;
 }
 void Mainapp::Write(std::string Text,int StartPositionX, int StartPositionY)
 {
