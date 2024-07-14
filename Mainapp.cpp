@@ -707,11 +707,13 @@ void Mainapp::DoLogic()
 			Rollback = TextureHolder;
 			Jump();
 		}
-		else {
-			Rollback = TextureHolder;
-			UpdateGravityAbsolute(); // updatuje grawitacje gdy po prostu schodzimy z bloku
+		else if(!HadEnoughOfJumping)// updatuje grawitacje gdy po prostu schodzimy z bloku
+		{
+				Rollback = TextureHolder;
+				UpdateGravity(); 
 		}
-		if (HadEnoughOfJumping) {
+		if (HadEnoughOfJumping) //Updatuje grawitacje gdy skonczylismy skakac
+		{ 
 			Rollback = TextureHolder;
 			UpdateGravity();
 		}
@@ -1071,33 +1073,6 @@ void Mainapp::DoFrame() {
 	DoDrawing();
 
 
-}
-void Mainapp::UpdateGravityAbsolute()
-{
-	if (GravityChanged) {
-		bool go = true;
-		for (auto& texture : TextureHolder)
-		{
-			if (go) {
-				for (auto& rect : texture.destinationRectTab)
-				{
-					rect.top -= GravitySpeed;
-					rect.bottom -= GravitySpeed;
-					if (texture.IsCollisionOn) {
-						if (IFColisionWithSides(CollisionRect, rect) == TOP) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
-						{
-							CurrentJumpHeight = 0;
-							IsJumping = false;
-							HadEnoughOfJumping = false;
-							TextureHolder = Rollback;
-							go = false;
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
 }
 void Mainapp::UpdateGravity()
 {
