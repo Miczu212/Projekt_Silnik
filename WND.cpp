@@ -82,7 +82,11 @@ GFX& WND::ReturnGFX()
 		Klt.OnKeyReleased(static_cast<unsigned char>(wParam));
 		break;
 	case WM_KEYDOWN:
-		Klt.OnKeyPressed(static_cast<unsigned char>(wParam));
+		if (!(lparam & 0x40000000) || Klt.AutorepeatIsEnabled()) //Implementacja Autorepeata, jezeli chce uzyc gdzies autorepeata, to musze uzyc clearstate, jak nie to nie daje i sie repeatuje
+		{
+			Klt.OnKeyPressed(static_cast<unsigned char>(wParam));
+		}
+		
 		break;
 	case WM_CHAR:
 		Klt.OnChar(static_cast<unsigned char>(wParam));

@@ -144,8 +144,8 @@ void Mainapp::HandleInput() noexcept
 			TextureCounter++;
 			if (TextureCounter > TextureHolder.size() - 1)
 				TextureCounter = 0;
-			WND1.Klt.ClearState();
 		}
+		WND1.Klt.ClearState();
 	}
 	//Wczytanie Textury
 	ISPressed(KEY_F)
@@ -184,7 +184,6 @@ void Mainapp::HandleInput() noexcept
 			CurrentPlayer.CurrentPlayerTexture.Theight -= 10 * ScaleDirection;
 			CurrentPlayer.CurrentPlayerTexture.Twidth -= 10 * ScaleDirection;
 		}
-		WND1.Klt.ClearState();
 	}
 	// Reset do domyslnej skali | Reset do domyœlnej pozycji
 	ISPressed(KEY_B)
@@ -235,8 +234,7 @@ void Mainapp::HandleInput() noexcept
 			AnimationRollback = LEFT;
 			AnimationIndex = 2;
 			PlayPlayerAnimation(0, 5);
-			StartWalkLeftAnimation = true;
-			
+			StartWalkLeftAnimation = true;	
 		}
 	}
 	ISPressed(KEY_RIGHT)
@@ -248,10 +246,7 @@ void Mainapp::HandleInput() noexcept
 			PlayPlayerAnimation(0, 5);
 			AnimationRollback = RIGHT;
 			StartWalkRightAnimation = true;
-			
-
-		}
-		
+		}	
 	}
 
 	ISPressed(KEY_DOWN)
@@ -284,9 +279,7 @@ void Mainapp::HandleInput() noexcept
 
 				}
 			}
-		}
-			
-		
+		}		
 	}
 	//Sterowanie
 	//Ustawienie Gracza na obecnie Wybran¹ texture
@@ -303,14 +296,14 @@ void Mainapp::HandleInput() noexcept
 			//zrobione tak by postac byla zawsze na srodku ekranu
 		}
 		CollisionRect = D2D1::RectF(CurrentPlayer.PlayerRect.left + 33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 33, CurrentPlayer.PlayerRect.bottom); //sprawdzanie kolizji nie jest prowadzone na player rectie w celu mozliwosci jej korekcji
-
+		WND1.Klt.ClearState();
 	}
 	//Wczytanie dzwiekow
 	ISPressed(KEY_O)
 	{
 		czyrysowaclinie = false;
 		LoadFileTypeAudio();
-
+		WND1.Klt.ClearState();
 	}
 	//Poruszanie sie po tablicy dzwiekow
 	ISPressed(KEY_0)
@@ -320,8 +313,8 @@ void Mainapp::HandleInput() noexcept
 
 			if (AudioCounter >= AudioHolder.size())
 				AudioCounter = 0;
-			WND1.Klt.ClearState();
 		}
+		WND1.Klt.ClearState();
 	}
 	ISPressed(KEY_A)
 	{
@@ -352,6 +345,7 @@ void Mainapp::HandleInput() noexcept
 		{
 			MessageBoxA(WND1.GetHandle(), "B³¹d podczas kopiowania pliku: ", NULL, MB_OK);
 		}
+		WND1.Klt.ClearState();
 		
 	}
 	//Odtworzenie dzwieku
@@ -381,6 +375,7 @@ void Mainapp::HandleInput() noexcept
 	{
 		std::wstring selectedFilePath = OpenFileDialog(L"Binary Files", L"*.bin;*.dat");
 		Currentlevel.ReTargetLevel(selectedFilePath);
+		WND1.Klt.ClearState();
 	}
 	//Zmiana Trybu Selekcji
 	ISPressed(KEY_E)
@@ -477,6 +472,7 @@ void Mainapp::HandleInput() noexcept
 	{
 		if(SelectionMode==MODE_TRIGERS)
 		AddTrigerbox = true;
+		WND1.Klt.ClearState();
 	}
 	ISPressed(KEY_ESCAPE)
 	{
@@ -528,15 +524,18 @@ void Mainapp::HandleInput() noexcept
 			oss.str("");
 		}
 		WND1.Klt.FlushChar();
+		WND1.Klt.ClearState();
 	}
 	ISPressed(KEY_TAB)
 	{
 		AnimHolder.Animations[AnimationIndex].ScaleHeight = ScaleDirection * ScaleTheight;
 		AnimHolder.Animations[AnimationIndex].ScaleWidth = ScaleDirection * ScaleTwidth;
+		WND1.Klt.ClearState();
 	}
 	ISPressed(KEY_I)
 	{
 		AudioHolder[AudioCounter].Loop = !AudioHolder[AudioCounter].Loop;
+		WND1.Klt.ClearState();
 	}
 
 }
