@@ -19,11 +19,11 @@ SoundHandler::SoundHandler()
 	XAudio2Create(&pEngine);
 	pEngine->CreateMasteringVoice(&pMaster);
 	for (int i = 0; i < nChannels; i++)
-		idleChannelPtrs.push_back(std::make_unique<Channel>(*this));
+		IdleChannels.push_back(std::make_unique<Channel>(*this));
 
 }
 
-void SoundHandler::Channel::VoiceCallback::OnBufferEnd(void* pBufferContext)
+void SoundHandler::Channel::Callbacks::OnBufferEnd(void* pBufferContext)
 {
 	
 	Channel& chan = *(Channel*)pBufferContext;
@@ -34,8 +34,8 @@ void SoundHandler::Channel::VoiceCallback::OnBufferEnd(void* pBufferContext)
 		chan.pSound->RemoveChannel(chan);
 		chan.pSound = nullptr;
 		soundhandler.DeactivateChannel(chan);
-		if (soundhandler.idleChannelPtrs.size() > soundhandler.nChannels)
-			soundhandler.idleChannelPtrs.pop_back();
+		if (soundhandler.IdleChannels.size() > soundhandler.nChannels)
+			soundhandler.IdleChannels.pop_back();
 
 		
 	}
@@ -48,8 +48,8 @@ void SoundHandler::Channel::VoiceCallback::OnBufferEnd(void* pBufferContext)
 		chan.pSound = nullptr;
 		soundhandler.DeactivateChannel(chan);
 
-		if (soundhandler.idleChannelPtrs.size() > soundhandler.nChannels)
-			soundhandler.idleChannelPtrs.pop_back();
+		if (soundhandler.IdleChannels.size() > soundhandler.nChannels)
+			soundhandler.IdleChannels.pop_back();
 
 		
 	}
@@ -65,8 +65,8 @@ void SoundHandler::Channel::PlaySoundBuffer(Sound& s, float freqMod, float vol)
 {
 	if (s.Started == false && s.Loop == true) {
 		SoundHandler& soundhandler = SoundHandler::Get();
-		if (soundhandler.idleChannelPtrs.size() == 0)
-			soundhandler.idleChannelPtrs.push_back(std::make_unique<Channel>(soundhandler));
+		if (soundhandler.IdleChannels.size() == 0)
+			soundhandler.IdleChannels.push_back(std::make_unique<Channel>(soundhandler));
 		assert(pSource && !pSound);
 		s.AddChannel(*this);
 		pSound = &s;
@@ -81,8 +81,8 @@ void SoundHandler::Channel::PlaySoundBuffer(Sound& s, float freqMod, float vol)
 	else if(s.Loop==true && s.Started==true)
 	{
 		SoundHandler& soundhandler = SoundHandler::Get();
-		if (soundhandler.idleChannelPtrs.size() == 0)
-			soundhandler.idleChannelPtrs.push_back(std::make_unique<Channel>(soundhandler));
+		if (soundhandler.IdleChannels.size() == 0)
+			soundhandler.IdleChannels.push_back(std::make_unique<Channel>(soundhandler));
 		pSound = &s;
 		s.AddChannel(*this);
 		xaBuffer.pAudioData = s.pData.get();
@@ -95,8 +95,8 @@ void SoundHandler::Channel::PlaySoundBuffer(Sound& s, float freqMod, float vol)
 	else
 	{
 		SoundHandler& soundhandler = SoundHandler::Get();
-		if (soundhandler.idleChannelPtrs.size() == 0)
-			soundhandler.idleChannelPtrs.push_back(std::make_unique<Channel>(soundhandler));
+		if (soundhandler.IdleChannels.size() == 0)
+			soundhandler.IdleChannels.push_back(std::make_unique<Channel>(soundhandler));
 		assert(pSource && !pSound);
 		s.AddChannel(*this);
 		pSound = &s;

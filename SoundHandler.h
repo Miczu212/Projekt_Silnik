@@ -35,7 +35,7 @@ public:
 	class Channel
 	{
 	private:
-		class VoiceCallback : public IXAudio2VoiceCallback
+		class Callbacks : public IXAudio2VoiceCallback
 		{
 		public:
 			void STDMETHODCALLTYPE OnStreamEnd() override
@@ -55,7 +55,7 @@ public:
 	public:
 		Channel(SoundHandler& sys)
 		{
-			static VoiceCallback vcb;
+			static Callbacks vcb;
 			ZeroMemory(&xaBuffer, sizeof(xaBuffer));
 			xaBuffer.pContext = this;
 			sys.pEngine->CreateSourceVoice(&pSource, &sys.format, 0u, 2.0f, &vcb);
@@ -93,11 +93,11 @@ public:
 	void PlaySoundBuffer(class Sound& s, float freqMod, float vol)
 	{
 		std::lock_guard<std::mutex> lock(mutex);
-		if (idleChannelPtrs.size() > 0)
+		if (IdleChannels.size() > 0)
 		{
-			activeChannelPtrs.push_back(std::move(idleChannelPtrs.back()));
-			idleChannelPtrs.pop_back();
-			activeChannelPtrs.back()->PlaySoundBuffer(s, freqMod, vol);
+			ActiveChannels.push_back(std::move(IdleChannels.back()));
+			IdleChannels.pop_back();
+			ActiveChannels.back()->PlaySoundBuffer(s, freqMod, vol);
 		}
 	}
 private:
@@ -105,23 +105,21 @@ private:
 	void DeactivateChannel(Channel& Chan)
 	{
 		std::lock_guard<std::mutex> lock(mutex);
-		auto i = std::find_if(activeChannelPtrs.begin(), activeChannelPtrs.end(),
-			[&Chan](const std::unique_ptr<Channel>& pChan) -> bool
+		auto i = std::find_if(ActiveChannels.begin(), ActiveChannels.end(),[&Chan](const std::unique_ptr<Channel>& pChan) -> bool
 			{
-				return &Chan == pChan.get();
+				return &Chan == pChan.get(); // poszukujemy wskaznika do kana³u które chcemy dezaktywowaæ, usuwamy go z aktywnych i przenosimy do nieaktywnych
 			});
-		idleChannelPtrs.push_back(std::move(*i));
-		activeChannelPtrs.erase(i);
+		IdleChannels.push_back(std::move(*i));
+		ActiveChannels.erase(i);
 	}
 private:
 	Microsoft::WRL::ComPtr<IXAudio2> pEngine;
 	IXAudio2MasteringVoice* pMaster = nullptr;
 	WAVEFORMATEX format;
-	const int nChannels = 16;
 	std::mutex mutex;
-	std::vector<std::unique_ptr<Channel>> idleChannelPtrs;
-	std::vector<std::unique_ptr<Channel>> activeChannelPtrs;
-
+	std::vector<std::unique_ptr<Channel>> IdleChannels;
+	std::vector<std::unique_ptr<Channel>> ActiveChannels;
+	const int nChannels = 16;
 };
 
 class Sound
