@@ -703,19 +703,20 @@ void Mainapp::DoLogic()
 			StartWalkRightAnimation = false;
 		}
 		HandleInput();
-		Rollback = TextureHolder;
-		UpdateCameraPosition();
-		if (IsJumping)
+		if (IsJumping) {
+			Rollback = TextureHolder;
 			Jump();
-		else
-		{
+		}
+		else {
+			Rollback = TextureHolder;
 			UpdateGravityAbsolute(); // updatuje grawitacje gdy po prostu schodzimy z bloku
 		}
-		 if(HadEnoughOfJumping){
-			if (GravityChanged)
-				UpdateGravity();
-
+		if (HadEnoughOfJumping) {
+			Rollback = TextureHolder;
+			UpdateGravity();
 		}
+		 Rollback = TextureHolder;
+		 UpdateCameraPosition();
 
 	}
 }
@@ -1073,66 +1074,34 @@ void Mainapp::DoFrame() {
 }
 void Mainapp::UpdateGravityAbsolute()
 {
-	
-	bool Gravitas = true;
-	for (auto& texture : TextureHolder)
-	{
-		for (auto& rect : texture.destinationRectTab)
-		{
-			if (texture.IsCollisionOn) {
-				if (IFColisionWithSides(CollisionRect, rect) == TOP)
-				{
-					TextureHolder = Rollback;
-					Gravitas = false;
-					break;
-				}
-			}
-		}
-
-	}
-	if (Gravitas) {
+	if (GravityChanged) {
+		bool go = true;
 		for (auto& texture : TextureHolder)
 		{
-			Rollback = TextureHolder;
+			if (go) {
 				for (auto& rect : texture.destinationRectTab)
 				{
 					rect.top -= GravitySpeed;
 					rect.bottom -= GravitySpeed;
 					if (texture.IsCollisionOn) {
-						if (IFColision(CollisionRect, rect)) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
+						if (IFColisionWithSides(CollisionRect, rect) == TOP) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
 						{
 							CurrentJumpHeight = 0;
 							IsJumping = false;
 							HadEnoughOfJumping = false;
 							TextureHolder = Rollback;
+							go = false;
 							break;
 						}
 					}
 				}
-			
+			}
 		}
-
 	}
 }
 void Mainapp::UpdateGravity()
 {
-	
 
-	for (auto& texture : TextureHolder)
-	{
-		for (auto& rect : texture.destinationRectTab)
-		{
-			if (texture.IsCollisionOn) {
-				if (IFColisionWithSides(CollisionRect, rect) == TOP)
-				{
-					TextureHolder = Rollback;
-					GravityChanged = false;
-					break;
-				}
-			}
-		}
-
-	}
 	if (GravityChanged) { 
 		bool go = true;
 		for (auto& texture : TextureHolder)
@@ -1143,7 +1112,7 @@ void Mainapp::UpdateGravity()
 					rect.top -= GravitySpeed;
 					rect.bottom -= GravitySpeed;
 					if (texture.IsCollisionOn) {
-						if (IFColision(CollisionRect, rect)) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
+						if (IFColisionWithSides(CollisionRect, rect) == TOP) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
 						{
 							CurrentJumpHeight = 0;
 							IsJumping = false;
@@ -1228,19 +1197,20 @@ void Mainapp::UpdateCameraPosition()
 		{
 			for (int i = 0; i < texture.destinationRectTab.size(); i++)
 			{
-				if (CameraXState) {
+					if (CameraXState) {
 
-					texture.destinationRectTab[i].left += CameraXPosition;
-					texture.destinationRectTab[i].right += CameraXPosition;
-					if (texture.IsCollisionOn) { // dodane z powodu du¿ej pustej przestrzeni w player rectie, po prostu zmienilem kolizje by sie zgadzala z faktycznym stanem rzeczy
-						if (IFColision(CollisionRect, texture.destinationRectTab[i]))
-						{
-							Collision = true;
-							break;
+						texture.destinationRectTab[i].left += CameraXPosition;
+						texture.destinationRectTab[i].right += CameraXPosition;
+						if (texture.IsCollisionOn) { // dodane z powodu du¿ej pustej przestrzeni w player rectie, po prostu zmienilem kolizje by sie zgadzala z faktycznym stanem rzeczy
+							if (IFColision(CollisionRect, texture.destinationRectTab[i]))
+							{
+								Collision = true;
+								break;
+							}
 						}
-					}
 
-				}
+					}
+				
 				if (!IsJumping) {
 					if (CameraYState) {
 						texture.destinationRectTab[i].top += CameraYPosition;
