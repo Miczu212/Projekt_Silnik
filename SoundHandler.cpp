@@ -36,24 +36,27 @@ void SoundHandler::Channel::VoiceCallback::OnBufferEnd(void* pBufferContext)
 		soundhandler.DeactivateChannel(chan);
 		if (soundhandler.idleChannelPtrs.size() > soundhandler.nChannels)
 			soundhandler.idleChannelPtrs.pop_back();
+
 		
 	}
 	else if(chan.pSound->ForcefulStop)
 	{
 		SoundHandler& soundhandler = SoundHandler::Get();
-		if (chan.pSound->activeChannelPtrs.size() == 0)
-			chan.pSound->ForcefulStop = false;
+		chan.pSound->ForcefulStop = false;
+		chan.pSound->Loop = false;
 		chan.pSound->RemoveChannel(chan);
 		chan.pSound = nullptr;
 		soundhandler.DeactivateChannel(chan);
 
 		if (soundhandler.idleChannelPtrs.size() > soundhandler.nChannels)
 			soundhandler.idleChannelPtrs.pop_back();
+
 		
 	}
 	else
 	{
 		// Ponownie odtwórz dŸwiêk
+		chan.pSound->RemoveChannel(chan);
 		chan.PlaySoundBuffer(*chan.pSound, 1.0f, 1.0f); // Przyk³adowe parametry freqMod i vol
 	}
 }
@@ -80,9 +83,8 @@ void SoundHandler::Channel::PlaySoundBuffer(Sound& s, float freqMod, float vol)
 		SoundHandler& soundhandler = SoundHandler::Get();
 		if (soundhandler.idleChannelPtrs.size() == 0)
 			soundhandler.idleChannelPtrs.push_back(std::make_unique<Channel>(soundhandler));
-		assert(pSource && !pSound);
-		s.AddChannel(*this);
 		pSound = &s;
+		s.AddChannel(*this);
 		xaBuffer.pAudioData = s.pData.get();
 		xaBuffer.AudioBytes = s.nBytes;
 		pSource->SubmitSourceBuffer(&xaBuffer, nullptr);

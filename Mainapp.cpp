@@ -40,7 +40,7 @@ void Mainapp::HandleInput() noexcept
 			case MODE_MOVE:
 			{
 
-					SelectionMode++;
+					SelectionMode=MODE_SELECT;
 					break;
 			
 			}
@@ -109,9 +109,7 @@ void Mainapp::HandleInput() noexcept
 		int X = WND1.Mk.GetPosX();
 		int Y = WND1.Mk.GetPosY();
 		if (SelectionMode == MODE_MOVE)
-		{
-
-			
+		{		
 			if (SelectionRectCounter != -1) {
 				TextureHolder[TextureCounter].destinationRectTab[SelectionRectCounter] =
 					D2D1::RectF(X, Y,
