@@ -537,6 +537,24 @@ void Mainapp::HandleInput() noexcept
 		AudioHolder[AudioCounter].Loop = !AudioHolder[AudioCounter].Loop;
 		WND1.Klt.ClearState();
 	}
+	ISPressed(KEY_1)
+	{
+		if (TextureHolder.size() > 1) 
+		{
+			if (TextureCounter != 0)
+			{
+				std::swap(TextureHolder[TextureCounter - 1], TextureHolder[TextureCounter]);
+				TextureCounter -= 1;
+			}
+			else 
+			{
+				std::swap(TextureHolder[TextureHolder.size() - 1], TextureHolder[TextureCounter]);
+				TextureCounter = TextureHolder.size() - 1;
+			}
+
+		}
+		WND1.Klt.ClearState();
+	}
 
 }
 //Funkcje Wczytuj¹ce/Zapisuj¹ce
@@ -996,7 +1014,33 @@ void Mainapp::DoDrawing()
 					WND1.ReturnGFX().Draw(MousePosition);
 				)
 			}
-	}	
+	}
+	if (TextureHolder.size() != 0)
+	{
+
+
+
+
+		for (auto& texture : TextureHolder)
+		{
+			if (texture.pBitmap)
+			{
+				// Rysuj wszystkie instancje tekstur na ekranie
+				for (auto& destinationRect : texture.destinationRectTab)
+				{
+					WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(texture.pBitmap.Get(), destinationRect);
+				}
+			}
+		}
+		if (SelectionMode == MODE_PLACE) {
+			if (TextureHolder[TextureCounter].pBitmap) //Rysowanie obecnie wybranej textury w pozycji kursora myszy
+			{
+				D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureHolder[TextureCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
+					TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
+				WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureHolder[TextureCounter].pBitmap.Get(), destinationRect);
+			}
+		}
+	}
 	if (StartJumpAnimation) {
 		PlayPlayerAnimation(0, 5);
 
@@ -1032,32 +1076,7 @@ void Mainapp::DoDrawing()
 	{
 		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(CurrentPlayer.CurrentPlayerTexture.pBitmap.Get(), CurrentPlayer.PlayerRect);
 	}
-	if (TextureHolder.size()!= 0)
-	{
-		
-		
-		
-		
-		for (auto& texture : TextureHolder)
-		{
-			if (texture.pBitmap)
-			{
-				// Rysuj wszystkie instancje tekstur na ekranie
-				for (auto& destinationRect : texture.destinationRectTab)
-				{
-					WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(texture.pBitmap.Get(), destinationRect);
-				}
-			}
-		}
-		if (SelectionMode == MODE_PLACE) {
-			if (TextureHolder[TextureCounter].pBitmap) //Rysowanie obecnie wybranej textury w pozycji kursora myszy
-			{
-				D2D1_RECT_F destinationRect = D2D1::RectF(WND1.Mk.GetPosX(), WND1.Mk.GetPosY(), TextureHolder[TextureCounter].Twidth + WND1.Mk.GetPosX() + ScaleTwidth,
-					TextureHolder[TextureCounter].Theight + WND1.Mk.GetPosY() + ScaleTheight);
-				WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(TextureHolder[TextureCounter].pBitmap.Get(), destinationRect);
-			}
-		}
-	}
+	
 	WND1.ReturnGFX().EndFrame();
 }
 /*std::ostringstream oss;
