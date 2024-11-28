@@ -2,7 +2,10 @@
 void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT, const AnimationHolder& AnimHolder, std::vector<std::wstring>& ToSaveA,std::vector<bool>& IsAudioLooped, const std::wstring& Filename, const Player PlayerInstance, std::vector<TrigerBoxInstance>& ToSaveTrigers) const //pamietaj by jak cokolwiek dodasz co wymaga zapisania to to tutaj zapisac
 {
     std::ofstream file;
-    file.open(Filename + L".dat", std::ios::binary);
+    if(Filename.ends_with(L".dat"))
+        file.open(Filename, std::ios::binary);
+    else
+        file.open(Filename + L".dat", std::ios::binary);
     if (file.is_open())
     {   //odpowiendio zapisywanie struktury tablicy textur i player
         file.write(reinterpret_cast<const char*>(&PlayerInstance.PlayerRect), sizeof(D2D1_RECT_F)); //playerrect
