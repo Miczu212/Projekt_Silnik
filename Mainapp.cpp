@@ -1080,17 +1080,15 @@ void Mainapp::UpdateGravity()
 				{
 					rect.top -= GravitySpeed;
 					rect.bottom -= GravitySpeed;
-					if (texture.IsCollisionOn) {
-						if (IFColisionWithSides(CollisionRect, rect) == TOP) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
+						if (IFColisionWithSides(CollisionRect, rect) == TOP && texture.IsCollisionOn) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
 						{
 							CurrentJumpHeight = 0;
 							IsJumping = false;
 							HadEnoughOfJumping = false;
 							TextureHolder = Rollback;
-							go = false;
+							go = false; // Jest tu po to by wyjsc z obu pêtli
 							break;
 						}
-					}
 				}
 			}
 		}
@@ -1109,7 +1107,7 @@ void Mainapp::Jump()
 				
 				rect.top += 10;
 				rect.bottom += 10;
-				if (IFColision(rect, CollisionRect))
+				if (IFColision(rect, CollisionRect) && texture.IsCollisionOn)
 				{
 					CurrentJumpHeight = MaxJumpHeight;
 					TextureHolder = Rollback;
@@ -1170,25 +1168,23 @@ void Mainapp::UpdateCameraPosition()
 
 						texture.destinationRectTab[i].left += CameraXPosition;
 						texture.destinationRectTab[i].right += CameraXPosition;
-						if (texture.IsCollisionOn) { 
-							if (IFColision(CollisionRect, texture.destinationRectTab[i]))
+							if (IFColision(CollisionRect, texture.destinationRectTab[i]) && texture.IsCollisionOn)
 							{
 								Collision = true;
 								break;
 							}
-						}
+						
 					}	
 				if (!IsJumping) {
 					if (CameraYState) {
 						texture.destinationRectTab[i].top += CameraYPosition;
 						texture.destinationRectTab[i].bottom += CameraYPosition;
-						if (texture.IsCollisionOn) {
-							if (IFColision(CollisionRect, texture.destinationRectTab[i]))
+							if (IFColision(CollisionRect, texture.destinationRectTab[i]) && texture.IsCollisionOn) 
 							{
 								Collision = true;
 								break;
 							}
-						}
+						
 					}
 				}
 			}	
