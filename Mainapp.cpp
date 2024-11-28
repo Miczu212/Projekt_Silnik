@@ -295,7 +295,7 @@ void Mainapp::HandleInput() noexcept
 			);
 			//zrobione tak by postac byla zawsze na srodku ekranu
 		}
-		CollisionRect = D2D1::RectF(CurrentPlayer.PlayerRect.left + 33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 33, CurrentPlayer.PlayerRect.bottom); //sprawdzanie kolizji nie jest prowadzone na player rectie w celu mozliwosci jej korekcji
+		CollisionRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right, CurrentPlayer.PlayerRect.bottom); //sprawdzanie kolizji nie jest prowadzone na player rectie w celu mozliwosci jej korekcji
 		WND1.Klt.ClearState();
 	}
 	//Wczytanie dzwiekow
@@ -622,7 +622,7 @@ void Mainapp::LoadFileTypeLevel()
 			AnimationIndex = 0;
 		//animacje
 		if(CurrentPlayer.CurrentPlayerTexture.pBitmap)
-			CollisionRect = D2D1::RectF(CurrentPlayer.PlayerRect.left + 33, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right - 33, CurrentPlayer.PlayerRect.bottom); //sprawdzanie kolizji nie jest prowadzone na player rectie w celu mozliwosci jej korekcji
+			CollisionRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right, CurrentPlayer.PlayerRect.bottom); //sprawdzanie kolizji nie jest prowadzone na player rectie w celu mozliwosci jej korekcji
 		
 	}
 }
@@ -996,8 +996,7 @@ void Mainapp::DoDrawing()
 					WND1.ReturnGFX().Draw(MousePosition);
 				)
 			}
-	}
-	
+	}	
 	if (StartJumpAnimation) {
 		PlayPlayerAnimation(0, 5);
 
@@ -1031,11 +1030,7 @@ void Mainapp::DoDrawing()
 	}
 	if (CurrentPlayer.CurrentPlayerTexture.pBitmap) //jak textura gracza jest to rysuj
 	{
-		
-				WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(CurrentPlayer.CurrentPlayerTexture.pBitmap.Get(), CurrentPlayer.PlayerRect);
-			
-
-
+		WND1.ReturnGFX().ReturnRenderTarget()->DrawBitmap(CurrentPlayer.CurrentPlayerTexture.pBitmap.Get(), CurrentPlayer.PlayerRect);
 	}
 	if (TextureHolder.size()!= 0)
 	{
@@ -1065,14 +1060,13 @@ void Mainapp::DoDrawing()
 	}
 	WND1.ReturnGFX().EndFrame();
 }
-void Mainapp::DoFrame() {
-	/*std::ostringstream oss;
+/*std::ostringstream oss;
 	oss << timer.Peek();
-	SetWindowTextA(WND1.GetHandle(), oss.str().c_str());*/ //potrzebne do debugowania problemów z timerem
+	SetWindowTextA(WND1.GetHandle(), oss.str().c_str());*/ //potrzebne do debugowania problemów z timerem do DoFrame
+void Mainapp::DoFrame() 
+{
 	DoLogic();
 	DoDrawing();
-
-
 }
 void Mainapp::UpdateGravity()
 {
@@ -1176,16 +1170,14 @@ void Mainapp::UpdateCameraPosition()
 
 						texture.destinationRectTab[i].left += CameraXPosition;
 						texture.destinationRectTab[i].right += CameraXPosition;
-						if (texture.IsCollisionOn) { // dodane z powodu du¿ej pustej przestrzeni w player rectie, po prostu zmienilem kolizje by sie zgadzala z faktycznym stanem rzeczy
+						if (texture.IsCollisionOn) { 
 							if (IFColision(CollisionRect, texture.destinationRectTab[i]))
 							{
 								Collision = true;
 								break;
 							}
 						}
-
-					}
-				
+					}	
 				if (!IsJumping) {
 					if (CameraYState) {
 						texture.destinationRectTab[i].top += CameraYPosition;
@@ -1199,8 +1191,7 @@ void Mainapp::UpdateCameraPosition()
 						}
 					}
 				}
-			}
-		
+			}	
 		 CurrentCameraSpeed += MOVMENT_SPEED;
 
 		 if (Collision) //jezeli doszlo do kolizji, zawroc wszelkie zmiany do kamery
@@ -1211,9 +1202,6 @@ void Mainapp::UpdateCameraPosition()
 			 Collision = false;
 			 CurrentCameraSpeed = 0;
 		 }
-			
-
-		
 		}
 	}
 	else

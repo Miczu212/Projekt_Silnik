@@ -13,9 +13,9 @@ WND::WND(const char* nazwa) //definicja konstruktora
 		Height=GetSystemMetrics(SM_CYSCREEN);
 	
 	RECT winRect; //polozenie okna
-		winRect.left = 100;
+		winRect.left = 0;
 		winRect.right = Width + winRect.left;
-		winRect.top = 100;
+		winRect.top = 0;
 		winRect.bottom = Height + winRect.top;
 		
 		if (		//error handling
@@ -92,8 +92,10 @@ GFX& WND::ReturnGFX()
 		Klt.OnChar(static_cast<unsigned char>(wParam));
 		break;
 	case WM_KILLFOCUS:
+	{
 		Klt.ClearState(); // po wyjsciu z okna usuwa klawisze z queue zeby nie naciskaly sie poza obecnosci¹ w oknie
 		break;
+	}
 	case WM_MOUSEMOVE:
 	{
 		POINTS points = MAKEPOINTS(lparam);
@@ -137,10 +139,12 @@ GFX& WND::ReturnGFX()
 	 //wParam musi byc przypisane do Du¿ych liter ale dzia³a równie¿ na ma³e je¿eli chcia³bym rozró¿niæ du¿e i ma³e litery
 						//musialbym uzyc WM_CHAR
 
-	case WM_LBUTTONDOWN:
-		const POINTS points = MAKEPOINTS(lparam);
-		Mk.OnLeftPressed(points.x, points.y);
-		break;
+		case WM_LBUTTONDOWN:
+		{
+			const POINTS points = MAKEPOINTS(lparam);
+			Mk.OnLeftPressed(points.x, points.y);
+			break;
+		}
 
 		case WM_SIZE:
 		{
@@ -196,9 +200,9 @@ GFX& WND::ReturnGFX()
 	 else
 	 {
 		 // Przywrócenie trybu okienkowego
-		 winRect.left = 100;
+		 winRect.left = 0;
 		 winRect.right = Width + winRect.left;
-		 winRect.top = 100;
+		 winRect.top = 0;
 		 winRect.bottom = Height + winRect.top;
 
 		 // Ponowne ustawienie stylu na okienkowy

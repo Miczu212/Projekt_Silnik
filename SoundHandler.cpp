@@ -57,7 +57,7 @@ void SoundHandler::Channel::Callbacks::OnBufferEnd(void* pBufferContext)
 	{
 		// Ponownie odtwórz dŸwiêk
 		chan.pSound->RemoveChannel(chan);
-		chan.PlaySoundBuffer(*chan.pSound, 1.0f, 1.0f); // Przyk³adowe parametry freqMod i vol
+		chan.PlaySoundBuffer(*chan.pSound, 1.0f, 1.0f); 
 	}
 }
 

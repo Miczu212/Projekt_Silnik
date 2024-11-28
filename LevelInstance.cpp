@@ -51,7 +51,7 @@ void LevelInstance::SaveLevel(const std::vector<TextureInstance>& ToSaveT, const
         std::wstring::size_type sizepathAnim;
         size_t TabsizeAnim = AnimHolder.Animations.size();
         file.write(reinterpret_cast<char*>(&TabsizeAnim), sizeof(TabsizeAnim));
-        for (const auto& Files : AnimHolder.Animations) //TODO DODAC SKALOWANIE
+        for (const auto& Files : AnimHolder.Animations)
         {
             file.write(reinterpret_cast<const char*>(&Files.FrameAmmountX), sizeof(Files.FrameAmmountX));
             file.write(reinterpret_cast<const char*>(&Files.FrameAmmountY), sizeof(Files.FrameAmmountY));
