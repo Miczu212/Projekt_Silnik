@@ -221,6 +221,7 @@ void Mainapp::HandleInput() noexcept
 	//Wczytanie Poziomu
 	ISPressed(KEY_L)
 	{
+
 		LoadFileTypeLevel();
 		czyrysowaclinie = false;
 		WND1.Klt.ClearState();
@@ -369,12 +370,6 @@ void Mainapp::HandleInput() noexcept
 	{
 		if (TextureCounter != -1)
 		TextureHolder[TextureCounter].IsCollisionOn = !TextureHolder[TextureCounter].IsCollisionOn;
-		WND1.Klt.ClearState();
-	}
-	ISPressed(KEY_W)
-	{
-		std::wstring selectedFilePath = OpenFileDialog(L"Binary Files", L"*.bin;*.dat");
-		Currentlevel.ReTargetLevel(selectedFilePath);
 		WND1.Klt.ClearState();
 	}
 	//Zmiana Trybu Selekcji
@@ -555,6 +550,24 @@ void Mainapp::HandleInput() noexcept
 		}
 		WND1.Klt.ClearState();
 	}
+	ISPressed(KEY_2)
+	{
+		if (TextureHolder.size() > 1)
+		{
+			if (TextureCounter != TextureHolder.size() - 1)
+			{
+				std::swap(TextureHolder[TextureCounter + 1], TextureHolder[TextureCounter]);
+				TextureCounter += 1;
+			}
+			else
+			{
+				std::swap(TextureHolder[0], TextureHolder[TextureCounter]);
+				TextureCounter = 0;
+			}
+
+		}
+		WND1.Klt.ClearState();
+	}
 
 }
 //Funkcje Wczytuj¹ce/Zapisuj¹ce
@@ -571,8 +584,8 @@ void Mainapp::LoadFileTypeAudio()
 }
 void Mainapp::LoadFileTypeLevel()
 {
-
 	std::wstring selectedFilePath = OpenFileDialog(L"Binary Files", L"*.bin;*.dat");
+	Currentlevel.ReTargetLevel(selectedFilePath);
 	if (!selectedFilePath.empty())
 	{
 		czyrysowaclinie = false;
@@ -679,7 +692,7 @@ void Mainapp::LoadFileTypeTexture()
 	std::wstring SelectedPath = OpenFileDialog(L"Bitmap Files", L"*.bmp;*.png;*.jpg");
 	if (!SelectedPath.empty()) {
 		czyrysowaclinie = false;
-		TextureCounter++;
+		TextureCounter= TextureHolder.size();
 		TextureInstance NewTextureInstance;
 		TextureHolder.push_back(NewTextureInstance);
 		LoadBMPToTexture(
