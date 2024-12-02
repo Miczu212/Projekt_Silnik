@@ -9,8 +9,8 @@ WND::WND(const char* nazwa) //definicja konstruktora
 		winclass.lpszClassName = wName;//zrozumiale przez sie
 	
 	RegisterClassA(&winclass); 
-		Width= GetSystemMetrics(SM_CXSCREEN);
-		Height=GetSystemMetrics(SM_CYSCREEN);
+	Width = GetSystemMetrics(SM_CXSCREEN);
+	Height = GetSystemMetrics(SM_CYSCREEN);
 	
 	RECT winRect; //polozenie okna
 		winRect.left = 0;
@@ -199,10 +199,11 @@ GFX& WND::ReturnGFX()
 	 }
 	 else
 	 {
-		 // Przywrócenie trybu okienkowego
-		 winRect.left = 0;
-		 winRect.right = Width + winRect.left;
-		 winRect.top = 0;
+		 
+		 // Przywrócenie trybu okienkoweg
+		 winRect.left =0;
+		 winRect.right = Width + winRect.left-50;
+		 winRect.top = 50;
 		 winRect.bottom = Height + winRect.top;
 
 		 // Ponowne ustawienie stylu na okienkowy

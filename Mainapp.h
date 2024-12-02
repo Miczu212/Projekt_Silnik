@@ -50,8 +50,6 @@ private:
 	bool StartWalkLeftAnimation = false;
 	bool StartWalkRightAnimation = false;
 private: //Wartoœci int
-	int ScreenWidth;
-	int ScreenHeight;
 	int GravitySpeed = 10;
 	int CameraXPosition = 0;
 	int CameraYPosition = 0;
@@ -75,7 +73,7 @@ private: //Wszystkie rollbacki (kopie zapasowe do wczytania pozycji)
 	int RollbackRectTop=0;
 	int AnimationRollback = -1;
 private: //Ró¿ne
-	const D2D1_RECT_F Background = D2D1::RectF(0, 0, ScreenWidth, ScreenHeight);
+	const D2D1_RECT_F Background = D2D1::RectF(0, 0, GetSystemMetrics(SM_CXSCREEN) , GetSystemMetrics(SM_CYSCREEN));
 	UINT32 KeyColour = 0xFFFF00FF;
 	MSG msg;
 	BOOL result;
@@ -88,7 +86,6 @@ private: //Ró¿ne
 	Player CurrentPlayer;
 	ID2D1SolidColorBrush* BackgroundColour = nullptr;
 	Animation TempAnim;
-	D2D1_RECT_F CollisionRect;
 	int AnimTempCounter = 0;
 	std::ostringstream oss;
 public: // Wszystko co ma model Singelton (¿e ma byæ tylko jedno)

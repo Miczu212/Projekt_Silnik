@@ -12,9 +12,8 @@ Mainapp::Mainapp()
 	WND1.ReturnGFX().ReturnRenderTarget()->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::DeepSkyBlue),
 		&BackgroundColour);
-	ScreenHeight = WND1.Height;
-	ScreenWidth = WND1.Width;
-
+	WND1.ReturnGFX().ScreenHeight = WND1.Height;
+	WND1.ReturnGFX().ScreenWidth = WND1.Width;
 }
 
 int Mainapp::Go()
@@ -289,14 +288,13 @@ void Mainapp::HandleInput() noexcept
 		if (TextureHolder.size() != 0) {
 			CurrentPlayer.CurrentPlayerTexture = TextureHolder[TextureCounter];
 			CurrentPlayer.PlayerRect = D2D1::RectF(
-				ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
-				ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2,
-				ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
-				ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2
+				WND1.ReturnGFX().ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+				WND1.ReturnGFX().ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
+				WND1.ReturnGFX().ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+				WND1.ReturnGFX().ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
 			);
 			//zrobione tak by postac byla zawsze na srodku ekranu
 		}
-		CollisionRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right, CurrentPlayer.PlayerRect.bottom); //sprawdzanie kolizji nie jest prowadzone na player rectie w celu mozliwosci jej korekcji
 		WND1.Klt.ClearState();
 	}
 	//Wczytanie dzwiekow
@@ -455,10 +453,10 @@ void Mainapp::HandleInput() noexcept
 			CurrentPlayer.CurrentPlayerTexture = AnimHolder.AnimationFrames[AnimationIndex][5];
 
 			CurrentPlayer.PlayerRect = D2D1::RectF(
-				ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
-				ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2,
-				ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth + ScaleTwidth) / 2,
-				ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight + ScaleTheight) / 2
+				WND1.ReturnGFX().ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+				WND1.ReturnGFX().ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
+				WND1.ReturnGFX().ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+				WND1.ReturnGFX().ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
 			);
 		}
 		WND1.Klt.ClearState();
@@ -652,9 +650,6 @@ void Mainapp::LoadFileTypeLevel()
 		if (AnimHolder.AnimationFrames.size() != 0)
 			AnimationIndex = 0;
 		//animacje
-		if(CurrentPlayer.CurrentPlayerTexture.pBitmap)
-			CollisionRect = D2D1::RectF(CurrentPlayer.PlayerRect.left, CurrentPlayer.PlayerRect.top, CurrentPlayer.PlayerRect.right, CurrentPlayer.PlayerRect.bottom); //sprawdzanie kolizji nie jest prowadzone na player rectie w celu mozliwosci jej korekcji
-		
 	}
 }
 void Mainapp::SaveFileTypeLevel()
@@ -796,10 +791,10 @@ void Mainapp::PlayPlayerAnimation(int StartFrame, int EndFrame) //¿eby wszystko 
 		CurrentPlayer.CurrentPlayerTexture.Theight += AnimHolder.Animations[AnimationIndex].ScaleHeight;
 		
 		CurrentPlayer.PlayerRect = D2D1::RectF(
-			ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
-			ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
-			ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
-			ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
+			WND1.ReturnGFX().ScreenWidth / 2 - (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+			WND1.ReturnGFX().ScreenHeight / 2 - (CurrentPlayer.CurrentPlayerTexture.Theight) / 2,
+			WND1.ReturnGFX().ScreenWidth / 2 + (CurrentPlayer.CurrentPlayerTexture.Twidth) / 2,
+			WND1.ReturnGFX().ScreenHeight / 2 + (CurrentPlayer.CurrentPlayerTexture.Theight) / 2
 		);
 	}
 	catch (...)
@@ -868,11 +863,11 @@ void Mainapp::DoDrawing()
 		{
 		if (RepeatIfPossible)
 		{
-			Write("Axis_Y    AutoReapeat:On", 0, ScreenHeight - 24);
+			Write("Axis_Y    AutoReapeat:On", 0, WND1.ReturnGFX().ScreenHeight - 24);
 		}
 		else
 		{
-			Write("Axis_Y", 0, ScreenHeight - 24);
+			Write("Axis_Y", 0, WND1.ReturnGFX().ScreenHeight - 24);
 		}
 		
 		break;
@@ -881,11 +876,11 @@ void Mainapp::DoDrawing()
 		{
 			if (RepeatIfPossible)
 			{
-				Write("Axis_X   AutoReapeat:On", 0, ScreenHeight - 24);
+				Write("Axis_X   AutoReapeat:On", 0, WND1.ReturnGFX().ScreenHeight - 24);
 			}
 			else 
 			{
-				Write("Axis_X", 0, ScreenHeight - 24);
+				Write("Axis_X", 0, WND1.ReturnGFX().ScreenHeight - 24);
 			}
 			
 			break;
@@ -1112,7 +1107,7 @@ void Mainapp::UpdateGravity()
 				{
 					rect.top -= GravitySpeed;
 					rect.bottom -= GravitySpeed;
-						if (IFColisionWithSides(CollisionRect, rect) == TOP && texture.IsCollisionOn) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
+						if (IFColisionWithSides(CurrentPlayer.PlayerRect, rect) == TOP && texture.IsCollisionOn) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
 						{
 							CurrentJumpHeight = 0;
 							IsJumping = false;
@@ -1139,7 +1134,7 @@ void Mainapp::Jump()
 				
 				rect.top += 10;
 				rect.bottom += 10;
-				if (IFColision(rect, CollisionRect) && texture.IsCollisionOn)
+				if (IFColision(rect, CurrentPlayer.PlayerRect) && texture.IsCollisionOn)
 				{
 					CurrentJumpHeight = MaxJumpHeight;
 					TextureHolder = Rollback;
@@ -1200,7 +1195,7 @@ void Mainapp::UpdateCameraPosition()
 
 						texture.destinationRectTab[i].left += CameraXPosition;
 						texture.destinationRectTab[i].right += CameraXPosition;
-							if (IFColision(CollisionRect, texture.destinationRectTab[i]) && texture.IsCollisionOn)
+							if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]) && texture.IsCollisionOn)
 							{
 								Collision = true;
 								break;
@@ -1211,7 +1206,7 @@ void Mainapp::UpdateCameraPosition()
 					if (CameraYState) {
 						texture.destinationRectTab[i].top += CameraYPosition;
 						texture.destinationRectTab[i].bottom += CameraYPosition;
-							if (IFColision(CollisionRect, texture.destinationRectTab[i]) && texture.IsCollisionOn) 
+							if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]) && texture.IsCollisionOn)
 							{
 								Collision = true;
 								break;
