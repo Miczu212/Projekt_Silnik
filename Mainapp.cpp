@@ -1107,41 +1107,49 @@ void Mainapp::UpdateGravity()
 				{
 					rect.top -= GravitySpeed;
 					rect.bottom -= GravitySpeed;
-						if (IFColisionWithSides(CurrentPlayer.PlayerRect, rect) == TOP && texture.IsCollisionOn) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
-						{
-							CurrentJumpHeight = 0;
-							IsJumping = false;
-							HadEnoughOfJumping = false;
-							TextureHolder = Rollback;
-							go = false; // Jest tu po to by wyjsc z obu pêtli
-							break;
-						}
+					if (IFColisionWithSides(CurrentPlayer.PlayerRect, rect) == TOP && texture.IsCollisionOn) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
+					{
+						CurrentJumpHeight = 0;
+						IsJumping = false;
+						HadEnoughOfJumping = false;
+						TextureHolder = Rollback;
+						go = false; // Jest tu po to by wyjsc z obu pêtli
+						break;
+					}
 				}
 			}
+			else
+				break;
 		}
 
 	}
 }
 void Mainapp::Jump()
 {
+	bool go = true;
 	if (CurrentJumpHeight <= MaxJumpHeight) 
 	{
 		for (auto& texture : TextureHolder)
 		{
-
-			for (auto& rect : texture.destinationRectTab)
+			if (go)
 			{
-				
-				rect.top += 10;
-				rect.bottom += 10;
-				if (IFColision(rect, CurrentPlayer.PlayerRect) && texture.IsCollisionOn)
+				for (auto& rect : texture.destinationRectTab)
 				{
-					CurrentJumpHeight = MaxJumpHeight;
-					TextureHolder = Rollback;
-					break;
-				}
 
+					rect.top += 10;
+					rect.bottom += 10;
+					if (IFColision(rect, CurrentPlayer.PlayerRect) && texture.IsCollisionOn)
+					{
+						CurrentJumpHeight = MaxJumpHeight;
+						TextureHolder = Rollback;
+						go = false;
+						break;
+					}
+
+				}
 			}
+			else
+				break;
 
 		}
 		CurrentJumpHeight += 10;
@@ -1185,34 +1193,36 @@ int Mainapp::IFColisionWithSides(const D2D1_RECT_F& rect1, const D2D1_RECT_F& re
 
 void Mainapp::UpdateCameraPosition()
 {
+	bool go = true;
 	if(CurrentCameraSpeed<=MaxCameraSpeed){
 		
 		for (auto& texture : TextureHolder)
 		{
-			for (int i = 0; i < texture.destinationRectTab.size(); i++)
-			{
+				for (int i = 0; i < texture.destinationRectTab.size(); i++)
+				{
 					if (CameraXState) {
 
 						texture.destinationRectTab[i].left += CameraXPosition;
 						texture.destinationRectTab[i].right += CameraXPosition;
-							if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]) && texture.IsCollisionOn)
-							{
-								Collision = true;
-								break;
-							}
-						
-					}	
-				if (!IsJumping) {
-					if (CameraYState) {
-						texture.destinationRectTab[i].top += CameraYPosition;
-						texture.destinationRectTab[i].bottom += CameraYPosition;
-							if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]) && texture.IsCollisionOn)
-							{
-								Collision = true;
-								break;
-							}
-						
+						if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]) && texture.IsCollisionOn)
+						{
+							Collision = true;
+							break;
+						}
+
 					}
+					if (!IsJumping) {
+						if (CameraYState) {
+							texture.destinationRectTab[i].top += CameraYPosition;
+							texture.destinationRectTab[i].bottom += CameraYPosition;
+							if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]) && texture.IsCollisionOn)
+							{
+								Collision = true;
+								break;
+							}
+
+						}
+					
 				}
 			}	
 		 CurrentCameraSpeed += MOVMENT_SPEED;
