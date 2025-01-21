@@ -751,7 +751,11 @@ void Mainapp::DoLogic()
 		 UpdateCameraPosition();
 		 if (TrigerBoxHolder.size() != 0)
 			 if (IFColision(CurrentPlayer.PlayerRect, TrigerBoxHolder[0].TrigerBoxPosition))
-				 int a = 0;
+			 {
+				 TextureHolder[2].pBitmap = TextureHolder[3].pBitmap;
+				 TextureHolder[2].destinationRectTab[0].bottom=550;
+				 TrigerBoxHolder.pop_back();
+			 }
 
 	}
 }
