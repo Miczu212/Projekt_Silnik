@@ -731,20 +731,27 @@ void Mainapp::DoLogic()
 		HandleInput();
 		if (IsJumping) {
 			Rollback = TextureHolder;
+			RollbackTrigers = TrigerBoxHolder;
 			Jump();
 		}
 		else if(!HadEnoughOfJumping)// updatuje grawitacje gdy po prostu schodzimy z bloku
 		{
 				Rollback = TextureHolder;
+				RollbackTrigers = TrigerBoxHolder;
 				UpdateGravity(); 
 		}
 		if (HadEnoughOfJumping) //Updatuje grawitacje gdy skonczylismy skakac
 		{ 
 			Rollback = TextureHolder;
+			RollbackTrigers = TrigerBoxHolder;
 			UpdateGravity();
 		}
 		 Rollback = TextureHolder;
+		 RollbackTrigers = TrigerBoxHolder;
 		 UpdateCameraPosition();
+		 if (TrigerBoxHolder.size() != 0)
+			 if (IFColision(CurrentPlayer.PlayerRect, TrigerBoxHolder[0].TrigerBoxPosition))
+				 int a = 0;
 
 	}
 }
@@ -806,7 +813,7 @@ void Mainapp::PlayPlayerAnimation(int StartFrame, int EndFrame) //¿eby wszystko 
 void Mainapp::DoDrawing()
 {
 	WND1.ReturnGFX().BeginFrame();
-	WND1.ReturnGFX().ClearBuffer(0, 0, 0);
+	WND1.ReturnGFX().ClearBuffer(0, 255, 255);
 
 	//kolor t³a
 //	WND1.ReturnGFX().ReturnRenderTarget()->FillRectangle(&Background, BackgroundColour);
@@ -1099,12 +1106,18 @@ void Mainapp::UpdateGravity()
 {
 
 	if (GravityChanged) { 
+		for (auto& triger : TrigerBoxHolder)
+		{
+			triger.TrigerBoxPosition.top -= GravitySpeed;
+			triger.TrigerBoxPosition.bottom -= GravitySpeed;
+		}
 		bool go = true;
 		for (auto& texture : TextureHolder)
 		{
 			if (go) {
 				for (auto& rect : texture.destinationRectTab)
 				{
+					
 					rect.top -= GravitySpeed;
 					rect.bottom -= GravitySpeed;
 					if (IFColisionWithSides(CurrentPlayer.PlayerRect, rect) == TOP && texture.IsCollisionOn) //po l¹dowaniu na bloku przestañ œci¹gaæ gracza w dó³ i pozwól mu na ponowny skok
@@ -1113,6 +1126,7 @@ void Mainapp::UpdateGravity()
 						IsJumping = false;
 						HadEnoughOfJumping = false;
 						TextureHolder = Rollback;
+						TrigerBoxHolder = RollbackTrigers;
 						go = false; // Jest tu po to by wyjsc z obu pêtli
 						break;
 					}
@@ -1129,19 +1143,24 @@ void Mainapp::Jump()
 	bool go = true;
 	if (CurrentJumpHeight <= MaxJumpHeight) 
 	{
+		for (auto& triger : TrigerBoxHolder)
+		{
+			triger.TrigerBoxPosition.top += 10;
+			triger.TrigerBoxPosition.bottom += 10;
+		}
 		for (auto& texture : TextureHolder)
 		{
 			if (go)
 			{
 				for (auto& rect : texture.destinationRectTab)
 				{
-
 					rect.top += 10;
 					rect.bottom += 10;
 					if (IFColision(rect, CurrentPlayer.PlayerRect) && texture.IsCollisionOn)
 					{
 						CurrentJumpHeight = MaxJumpHeight;
 						TextureHolder = Rollback;
+						TrigerBoxHolder = RollbackTrigers;
 						go = false;
 						break;
 					}
@@ -1194,16 +1213,37 @@ int Mainapp::IFColisionWithSides(const D2D1_RECT_F& rect1, const D2D1_RECT_F& re
 void Mainapp::UpdateCameraPosition()
 {
 	bool go = true;
-	if(CurrentCameraSpeed<=MaxCameraSpeed){
+	if(CurrentCameraSpeed<=MaxCameraSpeed)
+	{
+		if (CameraXState) {
+			for (auto& triger : TrigerBoxHolder)
+			{
+				triger.TrigerBoxPosition.left += CameraXPosition;
+				triger.TrigerBoxPosition.right += CameraXPosition;
+			}
+		}
+		if (!IsJumping) {
+
+			if (CameraYState) {
+				for (auto& triger : TrigerBoxHolder)
+				{
+					triger.TrigerBoxPosition.top += CameraYPosition;
+					triger.TrigerBoxPosition.bottom += CameraYPosition;
+				}
+			}
+		}
 		
 		for (auto& texture : TextureHolder)
 		{
 				for (int i = 0; i < texture.destinationRectTab.size(); i++)
 				{
-					if (CameraXState) {
+					if (CameraXState) 
+					{
+
 
 						texture.destinationRectTab[i].left += CameraXPosition;
 						texture.destinationRectTab[i].right += CameraXPosition;
+
 						if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]) && texture.IsCollisionOn)
 						{
 							Collision = true;
@@ -1212,9 +1252,12 @@ void Mainapp::UpdateCameraPosition()
 
 					}
 					if (!IsJumping) {
+
 						if (CameraYState) {
+
 							texture.destinationRectTab[i].top += CameraYPosition;
 							texture.destinationRectTab[i].bottom += CameraYPosition;
+
 							if (IFColision(CurrentPlayer.PlayerRect, texture.destinationRectTab[i]) && texture.IsCollisionOn)
 							{
 								Collision = true;
@@ -1230,6 +1273,7 @@ void Mainapp::UpdateCameraPosition()
 		 if (Collision) //jezeli doszlo do kolizji, zawroc wszelkie zmiany do kamery
 		 {
 			 TextureHolder = Rollback;
+			 TrigerBoxHolder = RollbackTrigers;
 			 CameraXState = false;
 			 CameraYState = false;
 			 Collision = false;

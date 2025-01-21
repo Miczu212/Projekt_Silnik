@@ -30,6 +30,7 @@ private: //Tablice
 	std::vector<Sound> AudioHolder;
 	std::vector<std::wstring> AudioPathHolder;
 	std::vector<TextureInstance> Rollback;
+	std::vector<TrigerBoxInstance>RollbackTrigers;
 private:
 	//Flagi bool
 	bool LoadAnimation = false;
